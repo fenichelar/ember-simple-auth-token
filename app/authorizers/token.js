@@ -42,7 +42,7 @@ export default Base.extend({
     ```js
     window.ENV = window.ENV || {};
     window.ENV['simple-auth-token'] = {
-      tokenPropertyName: 'JWT '
+      tokenPropertyName: 'authToken'
     }
     ```
 
@@ -60,15 +60,15 @@ export default Base.extend({
     ```js
     window.ENV = window.ENV || {};
     window.ENV['simple-auth-token'] = {
-      headerName: 'JWT '
+      authorizationHeaderName: 'X-Auth'
     }
     ```
 
-    @property headerName
+    @property authorizationHeaderName
     @type String
     @default 'Authorization'
   */
-  headerName: 'Authorization',
+  authorizationHeaderName: 'Authorization',
 
   /**
     @method init
@@ -78,7 +78,7 @@ export default Base.extend({
     var globalConfig = getGlobalConfig('simple-auth-token');
     this.authorizationPrefix = globalConfig.authorizationPrefix || this.authorizationPrefix;
     this.tokenPropertyName = globalConfig.tokenPropertyName || this.tokenPropertyName;
-    this.headerName = globalConfig.headerName || this.headerName;
+    this.authorizationHeaderName = globalConfig.authorizationHeaderName || this.authorizationHeaderName;
   },
 
   /**
