@@ -1,4 +1,6 @@
+import Ember from 'ember';
 import Base from 'simple-auth/authorizers/base';
+import getGlobalConfig from './../utils/get-global-config';
 import isSecureUrl from './../utils/is-secure-url';
 
 /**
@@ -73,7 +75,7 @@ export default Base.extend({
     @private
   */
   init: function() {
-    var globalConfig         = getGlobalConfig('simple-auth-token');
+    var globalConfig = getGlobalConfig('simple-auth-token');
     this.authorizationPrefix = globalConfig.authorizationPrefix || this.authorizationPrefix;
     this.tokenPropertyName = globalConfig.tokenPropertyName || this.tokenPropertyName;
     this.headerName = globalConfig.headerName || this.headerName;

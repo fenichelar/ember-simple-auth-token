@@ -1,5 +1,6 @@
+import Ember from 'ember';
 import Base from 'simple-auth/authenticators/base';
-import getGlobalConfig from 'simple-auth/utils/get-global-config';
+import getGlobalConfig from './../utils/get-global-config';
 import isSecureUrl from './../utils/is-secure-url';
 
 /**
@@ -37,7 +38,7 @@ export default Base.extend({
     @private
   */
   init: function() {
-    var globalConfig         = getGlobalConfig('simple-auth-token');
+    var globalConfig = getGlobalConfig('simple-auth-token');
     this.serverTokenEndpoint = globalConfig.serverTokenEndpoint || this.serverTokenEndpoint;
   },
 
@@ -99,7 +100,7 @@ export default Base.extend({
     return {
       username: credentials.identification,
       password: credentials.password
-    }
+    };
   },
 
   /**
@@ -110,7 +111,7 @@ export default Base.extend({
     @return {object} An object with properties for the session.
   */
   getResponseData: function(response) {
-    return response
+    return response;
   },
 
   /**
@@ -127,7 +128,7 @@ export default Base.extend({
     @method makeRequest
     @private
   */
-  makeRequest: function(data, resolve, reject) {
+  makeRequest: function(data) {
     if (!isSecureUrl(this.serverTokenEndpoint)) {
       Ember.Logger.warn('Credentials are transmitted via an insecure connection - use HTTPS to keep them secure.');
     }
