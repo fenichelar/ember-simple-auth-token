@@ -77,7 +77,7 @@ export default Base.extend({
   authenticate: function(credentials) {
     var _this = this;
     return new Ember.RSVP.Promise(function(resolve, reject) {
-      var data = this.getAuthenticateData(credentials);
+      var data = _this.getAuthenticateData(credentials);
       _this.makeRequest(data).then(function(response) {
         Ember.run(function() {
           resolve(_this.getResponseData(response));
