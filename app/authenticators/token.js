@@ -82,7 +82,7 @@ export default Base.extend({
         Ember.run(function() {
           resolve(_this.getResponseData(response));
         });
-      }, function(xhr, status, error) {
+      }, function(xhr) {
         Ember.run(function() {
           reject(xhr.responseJSON || xhr.responseText);
         });
