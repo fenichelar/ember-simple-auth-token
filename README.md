@@ -5,6 +5,11 @@ authenticator and an authorizer that are compatible with APIs with token-based a
 
 Based on [ember-simple-auth-devise](https://github.com/simplabs/ember-simple-auth/tree/master/packages/ember-simple-auth-devise).
 
+## Authors
+
+- [José Padilla](https://github.com/jpadilla)
+- [Giovanni Collazo](https://github.com/gcollazo)
+
 ## Installation
 
 To install Ember Simple Auth Token in an Ember.js application that uses [Ember CLI](https://github.com/stefanpenner/ember-cli):
