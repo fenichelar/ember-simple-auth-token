@@ -3,10 +3,10 @@ import Authorizer    from './../authorizers/token';
 
 
 export default {
-  name:       'simple-auth-token',
-  before:      'simple-auth',
+  name: 'simple-auth-token',
+  before: 'simple-auth',
   initialize: function(container){
-    container.register('simple-auth-authorizer:token', Authorizer);
-    container.register('simple-auth-authenticator:token', Authenticator);
+    container.register('authorizer:token', Authorizer);
+    container.register('authenticator:token', Authenticator);
   }
 };
