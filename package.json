@@ -1,0 +1,20 @@
+{
+  "name": "ember-cli-simple-auth-token",
+  "version": "0.0.1",
+  "description": "An authenticator and authorizer for Ember Simple Auth that is compatible with token-based authentication like JSON Web Tokens.",
+  "main": "index.js",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jpadilla/ember-cli-simple-auth-token.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jpadilla/ember-cli-simple-auth-token/issues"
+  },
+  "keywords": [
+    "ember-addon"
+  ],
+  "author": {
+    "name": "José Padilla"
+  },
+}
