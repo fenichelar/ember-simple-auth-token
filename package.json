@@ -15,7 +15,7 @@
     "ember-addon",
     "token",
     "jwt",
-    "auth"
+    "auth",
     "authentication",
     "authorization"
   ],
