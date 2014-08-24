@@ -1,7 +1,9 @@
 # Ember Simple Auth Token
 
 This is an extension to the Ember Simple Auth library that provides an
-authenticator and an authorizer that are compatible with token-based implementations.
+authenticator and an authorizer that are compatible with APIs with token-based authentication.
+
+Based on [ember-simple-auth-devise](https://github.com/simplabs/ember-simple-auth/tree/master/packages/ember-simple-auth-devise).
 
 ## Installation
 
