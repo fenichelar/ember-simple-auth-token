@@ -23,6 +23,7 @@ npm install ember-cli-simple-auth-token --save-dev
 In order to use the Token authenticator the application needs to have a login route:
 
 ```js
+// app/router.js
 App.Router.map(function() {
   this.route('login');
 });
@@ -32,6 +33,7 @@ This route displays the login form with fields for `identification`,
 `password`:
 
 ```html
+{{! app/templates/login.hbs }}
 <form {{action 'authenticate' on='submit'}}>
   <label for="identification">Login</label>
   {{input id='identification' placeholder='Enter Login' value=identification}}
@@ -50,7 +52,8 @@ It then also needs to specify the Token authenticator to be used:
 
 ```js
 // app/controllers/login.js
-import LoginControllerMixin from 'simple-auth/mixins/login-controller-mixin'
+import Ember from 'ember';
+import LoginControllerMixin from 'simple-auth/mixins/login-controller-mixin';
 
 export default Ember.Controller.extend(LoginControllerMixin, {
   authenticator: 'authenticator:token'
@@ -68,6 +71,7 @@ Authorization: Bearer <token>
 To use the authorizer, configure it in the global environment object:
 
 ```js
+// app/index.html
 window.ENV = window.ENV || {};
 window.ENV['simple-auth'] = {
   authorizer: 'authorizer:token'
@@ -77,6 +81,7 @@ window.ENV['simple-auth'] = {
 ## Available Customization Options
 
 ```js
+// app/index.html
 window.ENV = window.ENV || {};
 window.ENV['simple-auth'] = {
   authorizer: 'authorizer:token',
