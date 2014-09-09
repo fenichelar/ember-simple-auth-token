@@ -102,7 +102,7 @@ export default Base.extend({
         Ember.Logger.warn('Credentials are transmitted via an insecure connection - use HTTPS to keep them secure.');
       }
 
-      jqXHR.setRequestHeader(this.headerName, this.authorizationPrefix + token);
+      jqXHR.setRequestHeader(this.authorizationHeaderName, this.authorizationPrefix + token);
     }
   }
 });
