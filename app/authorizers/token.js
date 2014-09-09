@@ -76,9 +76,12 @@ export default Base.extend({
   */
   init: function() {
     var globalConfig = getGlobalConfig('simple-auth-token');
-    this.authorizationPrefix = globalConfig.authorizationPrefix || this.authorizationPrefix;
     this.tokenPropertyName = globalConfig.tokenPropertyName || this.tokenPropertyName;
     this.authorizationHeaderName = globalConfig.authorizationHeaderName || this.authorizationHeaderName;
+    
+    if (globalConfig.authorizationPrefix || globalConfig.authorizationPrefix === null) {
+      this.authorizationPrefix = globalConfig.authorizationPrefix;
+    }
   },
 
   /**
@@ -93,7 +96,6 @@ export default Base.extend({
     @param {jqXHR} jqXHR The XHR request to authorize (see http://api.jquery.com/jQuery.ajax/#jqXHR)
     @param {Object} requestOptions The options as provided to the `$.ajax` method (see http://api.jquery.com/jQuery.ajaxPrefilter/)
   */
-
   authorize: function(jqXHR, requestOptions) {
     var token = this.get('session.' + this.tokenPropertyName);
 
@@ -101,8 +103,12 @@ export default Base.extend({
       if (!isSecureUrl(requestOptions.url)) {
         Ember.Logger.warn('Credentials are transmitted via an insecure connection - use HTTPS to keep them secure.');
       }
+      
+      if(this.authorizationPrefix) {
+        token = this.authorizationPrefix + token;
+      }
 
-      jqXHR.setRequestHeader(this.authorizationHeaderName, this.authorizationPrefix + token);
+      jqXHR.setRequestHeader(this.authorizationHeaderName, token);
     }
   }
 });
