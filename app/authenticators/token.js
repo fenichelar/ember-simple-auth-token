@@ -34,7 +34,7 @@ export default Base.extend({
   serverTokenEndpoint: '/api-token-auth/',
 
   /**
-    The attribute-name that is used for the identification field when sending the 
+    The attribute-name that is used for the identification field when sending the
     authentication data to the server.
 
     This value can be configured via the global environment object:
@@ -121,7 +121,7 @@ export default Base.extend({
       password: credentials.password
     };
 
-    authentication[this.identificationField] = credentials.identification
+    authentication[this.identificationField] = credentials.identification;
 
     return authentication;
   },
