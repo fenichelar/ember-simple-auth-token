@@ -34,12 +34,32 @@ export default Base.extend({
   serverTokenEndpoint: '/api-token-auth/',
 
   /**
+    The attribute-name that is used for the identification field when sending the
+    authentication data to the server.
+
+    This value can be configured via the global environment object:
+
+    ```js
+    window.ENV = window.ENV || {};
+    window.ENV['simple-auth-token'] = {
+      identificationField: 'email'
+    }
+    ```
+
+    @property identificationField
+    @type String
+    @default 'username'
+  */
+  identificationField: 'username',
+
+  /**
     @method init
     @private
   */
   init: function() {
     var globalConfig = getGlobalConfig('simple-auth-token');
     this.serverTokenEndpoint = globalConfig.serverTokenEndpoint || this.serverTokenEndpoint;
+    this.identificationField = globalConfig.identificationField || this.identificationField;
   },
 
   /**
@@ -97,10 +117,13 @@ export default Base.extend({
     @return {object} An object with properties for authentication.
   */
   getAuthenticateData: function(credentials) {
-    return {
-      username: credentials.identification,
+    var authentication = {
       password: credentials.password
     };
+
+    authentication[this.identificationField] = credentials.identification;
+
+    return authentication;
   },
 
   /**
