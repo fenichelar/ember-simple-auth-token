@@ -78,7 +78,7 @@ export default Base.extend({
     var globalConfig = getGlobalConfig('simple-auth-token');
     this.tokenPropertyName = globalConfig.tokenPropertyName || this.tokenPropertyName;
     this.authorizationHeaderName = globalConfig.authorizationHeaderName || this.authorizationHeaderName;
-    
+
     if (globalConfig.authorizationPrefix || globalConfig.authorizationPrefix === null) {
       this.authorizationPrefix = globalConfig.authorizationPrefix;
     }
@@ -103,7 +103,7 @@ export default Base.extend({
       if (!isSecureUrl(requestOptions.url)) {
         Ember.Logger.warn('Credentials are transmitted via an insecure connection - use HTTPS to keep them secure.');
       }
-      
+
       if(this.authorizationPrefix) {
         token = this.authorizationPrefix + token;
       }
