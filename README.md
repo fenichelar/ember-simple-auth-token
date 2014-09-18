@@ -1,5 +1,7 @@
 # Ember Simple Auth Token
 
+[![NPM](https://nodei.co/npm/ember-cli-simple-auth-token.png?downloads=true&stars=true)](https://nodei.co/npm/ember-cli-simple-auth-token/)
+
 This is an extension to the Ember Simple Auth library that provides an
 authenticator and an authorizer that are compatible with APIs with token-based authentication.
 
