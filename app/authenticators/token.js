@@ -53,6 +53,24 @@ export default Base.extend({
   identificationField: 'username',
 
   /**
+    The name of the property in session that contains token used for authorization.
+
+    This value can be configured via the global environment object:
+
+    ```js
+    window.ENV = window.ENV || {};
+    window.ENV['simple-auth-token'] = {
+      tokenPropertyName: 'authToken'
+    }
+    ```
+
+    @property tokenPropertyName
+    @type String
+    @default 'token'
+  */
+  tokenPropertyName: 'token',
+  
+  /**
     @method init
     @private
   */
@@ -60,6 +78,7 @@ export default Base.extend({
     var globalConfig = getGlobalConfig('simple-auth-token');
     this.serverTokenEndpoint = globalConfig.serverTokenEndpoint || this.serverTokenEndpoint;
     this.identificationField = globalConfig.identificationField || this.identificationField;
+    this.tokenPropertyName = globalConfig.tokenPropertyName || this.tokenPropertyName;
   },
 
   /**
@@ -72,8 +91,9 @@ export default Base.extend({
     @return {Ember.RSVP.Promise} A promise that when it resolves results in the session being authenticated
   */
   restore: function(properties) {
+    var _this = this;
     return new Ember.RSVP.Promise(function(resolve, reject) {
-      if (!Ember.isEmpty(properties.token)) {
+      if (!Ember.isEmpty(properties[_this.tokenPropertyName])) {
         resolve(properties);
       } else {
         reject();
