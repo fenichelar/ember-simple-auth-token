@@ -69,7 +69,7 @@ export default Base.extend({
     @default 'token'
   */
   tokenPropertyName: 'token',
-  
+
   /**
     @method init
     @private
