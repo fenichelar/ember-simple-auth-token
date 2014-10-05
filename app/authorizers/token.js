@@ -97,7 +97,7 @@ export default Base.extend({
     @param {Object} requestOptions The options as provided to the `$.ajax` method (see http://api.jquery.com/jQuery.ajaxPrefilter/)
   */
   authorize: function(jqXHR, requestOptions) {
-    var token = this.get('session.' + this.tokenPropertyName);
+    var token = this.buildToken();
 
     if (this.get('session.isAuthenticated') && !Ember.isEmpty(token)) {
       if (!isSecureUrl(requestOptions.url)) {
@@ -110,5 +110,15 @@ export default Base.extend({
 
       jqXHR.setRequestHeader(this.authorizationHeaderName, token);
     }
+  },
+
+  /**
+    Builds the token string. It can be overriden for inclusion of quotes.
+
+    @method buildToken
+    @return {String}
+  */
+  buildToken: function() {
+    return this.get('session.' + this.tokenPropertyName);
   }
 });
