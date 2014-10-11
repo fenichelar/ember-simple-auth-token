@@ -17,7 +17,7 @@ Based on [ember-simple-auth-devise](https://github.com/simplabs/ember-simple-aut
 To install Ember Simple Auth Token in an Ember.js application that uses [Ember CLI](https://github.com/stefanpenner/ember-cli):
 
 ```
-npm install --save-dev git+https://github.com/jpadilla/ember-simple-auth-token.git
+npm install --save-dev git+https://github.com/jpadilla/ember-cli-simple-auth-token.git#refactor
 ember generate simple-auth-token
 ```
 
