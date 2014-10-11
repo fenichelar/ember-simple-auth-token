@@ -1,6 +1,6 @@
 # Ember Simple Auth Token
 
-**Note** This is a working progress to migrate [ember-cli-simple-auth-token](https://github.com/jpadilla/ember-cli-simple-auth-token) to ember-cli's latest ember addon feature. Once working it will replace ember-cli-simple-auth-token instead of being a new package.
+**Note** This is a working progress to migrate [ember-cli-simple-auth-token](https://github.com/jpadilla/ember-cli-simple-auth-token) to ember-cli's latest ember addon feature.
 
 This is an extension to the Ember Simple Auth library that provides an
 authenticator and an authorizer that are compatible with APIs with token-based authentication.
