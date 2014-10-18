@@ -1,6 +1,7 @@
 {
   "name": "ember-cli-simple-auth-token",
-  "version": "0.0.0",
+  "version": "0.4.0",
+  "description": "An authenticator and authorizer for Ember Simple Auth that is compatible with token-based authentication like JWT in Ember CLI applications.",
   "directories": {
     "doc": "doc",
     "test": "tests"
@@ -10,11 +11,18 @@
     "build": "ember build",
     "test": "ember test"
   },
-  "repository": "https://github.com/stefanpenner/ember-cli",
+  "repository": "https://github.com/jpadilla/ember-cli-simple-auth-token",
   "engines": {
     "node": ">= 0.10.0"
   },
-  "author": "",
+  "author": {
+    "name": "José Padilla",
+    "email": "hello@jpadilla.com",
+    "url": "http://jpadilla.com"
+  },
+  "contributors": [
+    "Giovanni Collazo <hello@gcollazo.com>"
+  ],
   "license": "MIT",
   "devDependencies": {
     "body-parser": "^1.2.0",
@@ -32,7 +40,12 @@
     "glob": "^4.0.5"
   },
   "keywords": [
-    "ember-addon"
+    "ember-addon",
+    "token",
+    "jwt",
+    "auth",
+    "authentication",
+    "authorization"
   ],
   "ember-addon": {
     "configPath": "tests/dummy/config"
