@@ -1,6 +1,4 @@
-# Ember Simple Auth Token
-
-**Note** This is a working progress to migrate [ember-cli-simple-auth-token](https://github.com/jpadilla/ember-cli-simple-auth-token) to ember-cli's latest ember addon feature.
+# Ember Simple Auth Token [![Build Status](https://travis-ci.org/jpadilla/ember-cli-simple-auth-token.svg?branch=master)](https://travis-ci.org/jpadilla/ember-cli-simple-auth-token)
 
 This is an extension to the Ember Simple Auth library that provides an
 authenticator and an authorizer that are compatible with APIs with token-based authentication.
@@ -17,7 +15,7 @@ Based on [ember-simple-auth-devise](https://github.com/simplabs/ember-simple-aut
 To install Ember Simple Auth Token in an Ember.js application that uses [Ember CLI](https://github.com/stefanpenner/ember-cli):
 
 ```
-npm install --save-dev git+https://github.com/jpadilla/ember-cli-simple-auth-token.git#refactor
+npm install --save-dev ember-cli-simple-auth-token.git
 ember generate simple-auth-token
 ```
 
