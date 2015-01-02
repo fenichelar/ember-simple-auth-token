@@ -11,10 +11,7 @@
     "build": "ember build",
     "test": "ember test"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/jpadilla/ember-cli-simple-auth-token"
-  },
+  "repository": "https://github.com/jpadilla/ember-cli-simple-auth-token",
   "engines": {
     "node": ">= 0.10.0"
   },
@@ -24,10 +21,7 @@
     "url": "http://jpadilla.com"
   },
   "contributors": [
-    {
-      "name": "Giovanni Collazo",
-      "email": "hello@gcollazo.com"
-    }
+    "Giovanni Collazo <hello@gcollazo.com>"
   ],
   "license": "MIT",
   "devDependencies": {
@@ -55,34 +49,5 @@
   ],
   "ember-addon": {
     "configPath": "tests/dummy/config"
-  },
-  "gitHead": "ff58f83dbf94542dbb497fa9ff4c86cda80d2660",
-  "bugs": {
-    "url": "https://github.com/jpadilla/ember-cli-simple-auth-token/issues"
-  },
-  "homepage": "https://github.com/jpadilla/ember-cli-simple-auth-token",
-  "_id": "ember-cli-simple-auth-token@0.4.0",
-  "_shasum": "822d014cac7a3acd9bf1b81213b08389abd06bd3",
-  "_from": "ember-cli-simple-auth-token@>=0.4.0 <0.5.0",
-  "_npmVersion": "1.4.26",
-  "_npmUser": {
-    "name": "jpadilla",
-    "email": "hello@jpadilla.com"
-  },
-  "maintainers": [
-    {
-      "name": "jpadilla",
-      "email": "hello@jpadilla.com"
-    },
-    {
-      "name": "gcollazo",
-      "email": "hello@gcollazo.com"
-    }
-  ],
-  "dist": {
-    "shasum": "822d014cac7a3acd9bf1b81213b08389abd06bd3",
-    "tarball": "http://registry.npmjs.org/ember-cli-simple-auth-token/-/ember-cli-simple-auth-token-0.4.0.tgz"
-  },
-  "_resolved": "https://registry.npmjs.org/ember-cli-simple-auth-token/-/ember-cli-simple-auth-token-0.4.0.tgz",
-  "readme": "ERROR: No README data found!"
+  }
 }
