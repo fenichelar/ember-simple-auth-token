@@ -1,0 +1,88 @@
+{
+  "name": "ember-cli-simple-auth-token",
+  "version": "0.4.0",
+  "description": "An authenticator and authorizer for Ember Simple Auth that is compatible with token-based authentication like JWT in Ember CLI applications.",
+  "directories": {
+    "doc": "doc",
+    "test": "tests"
+  },
+  "scripts": {
+    "start": "ember server",
+    "build": "ember build",
+    "test": "ember test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jpadilla/ember-cli-simple-auth-token"
+  },
+  "engines": {
+    "node": ">= 0.10.0"
+  },
+  "author": {
+    "name": "José Padilla",
+    "email": "hello@jpadilla.com",
+    "url": "http://jpadilla.com"
+  },
+  "contributors": [
+    {
+      "name": "Giovanni Collazo",
+      "email": "hello@gcollazo.com"
+    }
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "body-parser": "^1.2.0",
+    "broccoli-asset-rev": "0.3.0",
+    "broccoli-ember-hbs-template-compiler": "^1.6.1",
+    "broccoli-merge-trees": "^0.2.0",
+    "broccoli-static-compiler": "^0.2.1",
+    "ember-cli": "0.1.1",
+    "ember-cli-content-security-policy": "0.2.0",
+    "ember-cli-ic-ajax": "0.1.1",
+    "ember-cli-inject-live-reload": "^1.2.2",
+    "ember-cli-qunit": "0.1.0",
+    "ember-data": "1.0.0-beta.10",
+    "express": "^4.8.5",
+    "glob": "^4.0.5"
+  },
+  "keywords": [
+    "ember-addon",
+    "token",
+    "jwt",
+    "auth",
+    "authentication",
+    "authorization"
+  ],
+  "ember-addon": {
+    "configPath": "tests/dummy/config"
+  },
+  "gitHead": "ff58f83dbf94542dbb497fa9ff4c86cda80d2660",
+  "bugs": {
+    "url": "https://github.com/jpadilla/ember-cli-simple-auth-token/issues"
+  },
+  "homepage": "https://github.com/jpadilla/ember-cli-simple-auth-token",
+  "_id": "ember-cli-simple-auth-token@0.4.0",
+  "_shasum": "822d014cac7a3acd9bf1b81213b08389abd06bd3",
+  "_from": "ember-cli-simple-auth-token@>=0.4.0 <0.5.0",
+  "_npmVersion": "1.4.26",
+  "_npmUser": {
+    "name": "jpadilla",
+    "email": "hello@jpadilla.com"
+  },
+  "maintainers": [
+    {
+      "name": "jpadilla",
+      "email": "hello@jpadilla.com"
+    },
+    {
+      "name": "gcollazo",
+      "email": "hello@gcollazo.com"
+    }
+  ],
+  "dist": {
+    "shasum": "822d014cac7a3acd9bf1b81213b08389abd06bd3",
+    "tarball": "http://registry.npmjs.org/ember-cli-simple-auth-token/-/ember-cli-simple-auth-token-0.4.0.tgz"
+  },
+  "_resolved": "https://registry.npmjs.org/ember-cli-simple-auth-token/-/ember-cli-simple-auth-token-0.4.0.tgz",
+  "readme": "ERROR: No README data found!"
+}
