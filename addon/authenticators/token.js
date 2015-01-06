@@ -82,6 +82,13 @@ export default Base.extend({
   tokenExpireName: 'exp',
 
   /**
+    @property tokenOrigIssuedAt
+    @type String
+    @default 'orig_iat' 
+  */
+  tokenOrigIssuedAt: 'orig_iat',
+
+  /**
     @method init
     @private
   */
@@ -91,6 +98,8 @@ export default Base.extend({
     this.identificationField = Configuration.identificationField;
     this.tokenPropertyName = Configuration.tokenPropertyName;
     //this.refreshAccessTokens = Configuration.refreshAccessTokens;
+    //this.tokenExpireName = Configuration.tokenExpireName;
+    //this.tokenOrigIssuedAt = Configuration.tokenOrigIssuedAt;
   },
 
   /**
@@ -133,9 +142,9 @@ export default Base.extend({
       _this.makeRequest(_this.serverTokenEndpoint, data).then(function(response) {
         Ember.run(function() {
           var tokenData = _this.getTokenData(response),
-              expiresIn = tokenData[_this.tokenExpireName],
-              expiresAt = _this.absolutizeExpirationTime(expiresIn);
-          _this.scheduleAccessTokenRefresh(expiresIn, expiresAt, response.token);          
+              expiresAt = tokenData[_this.tokenExpireName],
+              origIssuedAt = tokenData[_this.tokenOrigIssuedAt];
+          _this.scheduleAccessTokenRefresh(expiresAt, origIssuedAt, response.token);          
           resolve(_this.getResponseData(response));
         });
       }, function(xhr) {
@@ -164,18 +173,17 @@ export default Base.extend({
     @method scheduleAccessTokenRefresh
     @private
   */
-  scheduleAccessTokenRefresh: function(expiresIn, expiresAt, token) {
+  scheduleAccessTokenRefresh: function(expiresAt, origIssuedAt, token) {
+    console.log('@AAA');
     if(this.refreshAccessTokens){
-      var now = (new Date()).getTime(),
-          wait = new Date((expiresIn * 1000) - now).getSeconds() * 1000;
-      if(Ember.isEmpty(expiresAt) && !Ember.isEmpty(expiresIn)){
-        expiresAt = new Date(now + expiresIn * 1000).getTime();
-      }
+      var now = new Date().getTime(),
+        wait = expiresAt * 1000 - now,
+        expiresAt = new Date(expiresAt * 1000).getTime();
       if(!Ember.isEmpty(token) && !Ember.isEmpty(expiresAt) && expiresAt > now){
         Ember.run.cancel(this._refreshTokenTimeout);
         delete this._refreshTokenTimeout;
         if(!Ember.testing){
-          this._refreshTokenTimeout = Ember.run.later(this, this.refreshAccessToken, expiresIn, token, wait);
+          this._refreshTokenTimeout = Ember.run.later(this, this.refreshAccessToken, expiresAt, token, wait);
         }
       }
     }
@@ -185,16 +193,16 @@ export default Base.extend({
     @method refreshAccessToken
     @private
   */
-  refreshAccessToken: function(expiresIn, token) {
+  refreshAccessToken: function(expiresAt, token) {
     var _this = this;
     var data  = {token: token};
     return new Ember.RSVP.Promise(function(resolve, reject) {
       _this.makeRequest(_this.serverTokenRefreshEndpoint, data).then(function(response) {
         Ember.run(function() {
-          var tokenData = _this.getTokenData(response);
-          expiresIn = tokenData[_this.tokenExpireName] || expiresIn;
-          token = tokenData[_this.tokenPropertyName] || token;
-          _this.scheduleAccessTokenRefresh(expiresIn, null, token);
+          var tokenData = _this.getTokenData(response),
+            origIssuedAt = tokenData[_this.tokenOrigIssuedAt],
+            expiresAt = tokenData[_this.tokenExpireName];
+          _this.scheduleAccessTokenRefresh(expiresAt, origIssuedAt, response.token);
           resolve(response);
         });
       }, function(xhr, status, error) {
@@ -255,14 +263,4 @@ export default Base.extend({
       }
     });
   },
-
-  /**
-    @method absolutizeExpirationTime
-    @private
-  */
-  absolutizeExpirationTime: function(expiresIn) {
-    if (!Ember.isEmpty(expiresIn)) {
-      return new Date((new Date().getTime()) + expiresIn * 1000).getTime();
-    }
-  }
 });
