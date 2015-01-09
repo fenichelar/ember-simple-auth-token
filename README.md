@@ -29,7 +29,7 @@ In order to use the Token authenticator the application needs to have a login ro
 
 ```js
 // app/router.js
-App.Router.map(function() {
+Router.map(function() {
   this.route('login');
 });
 ```
