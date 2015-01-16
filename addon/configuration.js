@@ -6,6 +6,7 @@ var defaults = {
   tokenPropertyName: 'token',
   authorizationPrefix: 'Bearer ',
   authorizationHeaderName: 'Authorization',
+  enableHttpsWarnings: false
 };
 
 /**
@@ -83,6 +84,17 @@ export default {
     @default 'Authorization'
   */
   authorizationHeaderName: defaults.authorizationHeaderName,
+
+  /**
+    Enables https warnings in console
+
+    @property enableHttpsWarnings
+    @readOnly
+    @static
+    @type Boolean
+    @default 'false'
+  */
+  enableHttpsWarnings: defaults.enableHttpsWarnings,
 
   /**
     @method load

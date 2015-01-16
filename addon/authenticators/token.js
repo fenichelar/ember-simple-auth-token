@@ -153,7 +153,7 @@ export default Base.extend({
     @private
   */
   makeRequest: function(data) {
-    if (!isSecureUrl(this.serverTokenEndpoint)) {
+    if (!isSecureUrl(this.serverTokenEndpoint) && Configuration.enableHttpsWarnings) {
       Ember.Logger.warn('Credentials are transmitted via an insecure connection - use HTTPS to keep them secure.');
     }
     return Ember.$.ajax({
