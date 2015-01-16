@@ -33,3 +33,7 @@ test('authorizationPrefix', function() {
 test('authorizationHeaderName', function() {
   equal(Configuration.authorizationHeaderName, 'Authorization', 'defaults to "Authorization"');
 });
+
+test('enableHttpsWarnings', function() {
+  equal(Configuration.enableHttpsWarnings, false, 'defaults to "false"');
+});

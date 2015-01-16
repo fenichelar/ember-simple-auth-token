@@ -81,7 +81,7 @@ export default Base.extend({
     var token = this.buildToken();
 
     if (this.get('session.isAuthenticated') && !Ember.isEmpty(token)) {
-      if (!isSecureUrl(requestOptions.url)) {
+      if (!isSecureUrl(requestOptions.url) && Configuration.enableHttpsWarnings) {
         Ember.Logger.warn('Credentials are transmitted via an insecure connection - use HTTPS to keep them secure.');
       }
 
