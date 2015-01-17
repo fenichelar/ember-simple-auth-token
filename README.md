@@ -110,7 +110,6 @@ ENV['simple-auth-token'] = {
   refreshAccessTokens: true,
   serverTokenRefreshEndpoint: '/api-token-refresh/',
   tokenExpireName: 'exp',
-  tokenOrigIssuedAt: 'orig_iat',
-  timeFactor: 1  // example set to 1000 if time comes in as seconds.
+  timeFactor: 1  // example - set to "1000" to convert incoming seconds to milliseconds.
 };
 ```
