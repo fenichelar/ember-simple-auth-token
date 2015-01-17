@@ -2,10 +2,15 @@ import loadConfig from './utils/load-config';
 
 var defaults = {
   serverTokenEndpoint: '/api-token-auth/',
+  serverTokenRefreshEndpoint: '/api-token-refresh/',
   identificationField: 'username',
   tokenPropertyName: 'token',
+  refreshAccessTokens: true,
+  tokenExpireName: 'exp',
+  tokenOrigIssuedAt: 'orig_iat',
   authorizationPrefix: 'Bearer ',
   authorizationHeaderName: 'Authorization',
+  timeFactor: 1,
 };
 
 /**
@@ -38,6 +43,16 @@ export default {
   */
   serverTokenEndpoint: defaults.serverTokenEndpoint,
 
+
+  /**
+    The endpoint on the server where the authenticator refreshes a token.
+    @property serverTokenRefreshEndpoint
+    @type String
+    @default '/api-token-refresh/'
+  */
+  serverTokenRefreshEndpoint: defaults.serverTokenRefreshEndpoint,
+
+
   /**
     The attribute-name that is used for the identification field when sending
     the authentication data to the server.
@@ -61,6 +76,38 @@ export default {
     @default 'token'
   */
   tokenPropertyName: defaults.tokenPropertyName,
+
+  /**
+    Sets whether the authenticator automatically refreshes access tokens.
+    @property refreshAccessTokens
+    @type Boolean
+    @default true
+  */
+  refreshAccessTokens: defaults.refreshAccessTokens,
+
+  /**
+    The name for which decoded token field represents the token expire time.
+    @property tokenExpireName
+    @type String
+    @default 'exp' 
+  */
+  tokenExpireName: defaults.tokenExpireName,
+
+  /**
+    The name for which decoded token field represents the token issed at time.
+    @property tokenOrigIssuedAt
+    @type String
+    @default 'orig_iat' 
+  */
+  tokenOrigIssuedAt: defaults.tokenOrigIssuedAt,
+
+  /**
+    Default time unit.
+    @property timeFactor
+    @type Integer
+    @default 1 (seconds)
+  */
+  timeFactor: 1,
 
   /**
     The prefix used in the value of the Authorization header.

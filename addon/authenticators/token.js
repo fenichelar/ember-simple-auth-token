@@ -28,14 +28,6 @@ export default Base.extend({
   serverTokenEndpoint: '/api-token-auth/',
 
   /**
-    The endpoint on the server for refreshing a token.
-    @property serverTokenRefreshEndpoint
-    @type String
-    @default '/api-token-refresh/'
-  */
-  serverTokenRefreshEndpoint: '/api/v1/auth-token-refresh/',
-
-  /**
     The attribute-name that is used for the identification field when sending the
     authentication data to the server.
 
@@ -61,45 +53,13 @@ export default Base.extend({
   tokenPropertyName: 'token',
 
   /**
-    Sets whether the authenticator automatically refreshes access tokens.
-    @property refreshAccessTokens
-    @type Boolean
-    @default true
-  */
-  refreshAccessTokens: true,
-
-  /**
-    @property _refreshTokenTimeout
-    @private
-  */
-  _refreshTokenTimeout: null,
-
-  /**
-    @property tokenExpireName
-    @type String
-    @default 'exp' 
-  */
-  tokenExpireName: 'exp',
-
-  /**
-    @property tokenOrigIssuedAt
-    @type String
-    @default 'orig_iat' 
-  */
-  tokenOrigIssuedAt: 'orig_iat',
-
-  /**
     @method init
     @private
   */
   init: function() {
     this.serverTokenEndpoint = Configuration.serverTokenEndpoint;
-    //this.serverTokenRefreshEndpoint = Configuration.serverTokenEndpoint;
     this.identificationField = Configuration.identificationField;
     this.tokenPropertyName = Configuration.tokenPropertyName;
-    //this.refreshAccessTokens = Configuration.refreshAccessTokens;
-    //this.tokenExpireName = Configuration.tokenExpireName;
-    //this.tokenOrigIssuedAt = Configuration.tokenOrigIssuedAt;
   },
 
   /**
@@ -139,12 +99,8 @@ export default Base.extend({
     var _this = this;
     return new Ember.RSVP.Promise(function(resolve, reject) {
       var data = _this.getAuthenticateData(credentials);
-      _this.makeRequest(_this.serverTokenEndpoint, data).then(function(response) {
+      _this.makeRequest(data).then(function(response) {
         Ember.run(function() {
-          var tokenData = _this.getTokenData(response),
-              expiresAt = tokenData[_this.tokenExpireName],
-              origIssuedAt = tokenData[_this.tokenOrigIssuedAt];
-          _this.scheduleAccessTokenRefresh(expiresAt, origIssuedAt, response.token);          
           resolve(_this.getResponseData(response));
         });
       }, function(xhr) {
@@ -165,62 +121,10 @@ export default Base.extend({
     var authentication = {
       password: credentials.password
     };
+
     authentication[this.identificationField] = credentials.identification;
+
     return authentication;
-  },
-
-  /**
-    @method scheduleAccessTokenRefresh
-    @private
-  */
-  scheduleAccessTokenRefresh: function(expiresAt, origIssuedAt, token) {
-    console.log('@AAA');
-    if(this.refreshAccessTokens){
-      var now = new Date().getTime(),
-        wait = expiresAt * 1000 - now,
-        expiresAt = new Date(expiresAt * 1000).getTime();
-      if(!Ember.isEmpty(token) && !Ember.isEmpty(expiresAt) && expiresAt > now){
-        Ember.run.cancel(this._refreshTokenTimeout);
-        delete this._refreshTokenTimeout;
-        if(!Ember.testing){
-          this._refreshTokenTimeout = Ember.run.later(this, this.refreshAccessToken, expiresAt, token, wait);
-        }
-      }
-    }
-  },
-
-  /**
-    @method refreshAccessToken
-    @private
-  */
-  refreshAccessToken: function(expiresAt, token) {
-    var _this = this;
-    var data  = {token: token};
-    return new Ember.RSVP.Promise(function(resolve, reject) {
-      _this.makeRequest(_this.serverTokenRefreshEndpoint, data).then(function(response) {
-        Ember.run(function() {
-          var tokenData = _this.getTokenData(response),
-            origIssuedAt = tokenData[_this.tokenOrigIssuedAt],
-            expiresAt = tokenData[_this.tokenExpireName];
-          _this.scheduleAccessTokenRefresh(expiresAt, origIssuedAt, response.token);
-          resolve(response);
-        });
-      }, function(xhr, status, error) {
-        Ember.Logger.warn('Access token could not be refreshed - server responded with ' + error + '.');
-        reject();
-      });
-    });
-  },
-
-  /**
-    Returns the decoded token with accessible returned values.
-
-    @method getTokenData
-    @return {object} An object with properties for the session.
-  */
-  getTokenData: function(response) {
-    var token = response.token.split('.')[1];
-    return JSON.parse(atob(token));
   },
 
   /**
@@ -248,12 +152,12 @@ export default Base.extend({
     @method makeRequest
     @private
   */
-  makeRequest: function(url, data) {
+  makeRequest: function(data) {
     if (!isSecureUrl(this.serverTokenEndpoint)) {
       Ember.Logger.warn('Credentials are transmitted via an insecure connection - use HTTPS to keep them secure.');
     }
     return Ember.$.ajax({
-      url: url,
+      url: this.serverTokenEndpoint,
       type: 'POST',
       data: JSON.stringify(data),
       dataType: 'json',
@@ -262,5 +166,5 @@ export default Base.extend({
         xhr.setRequestHeader('Accept', settings.accepts.json);
       }
     });
-  },
+  }
 });
