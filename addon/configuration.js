@@ -7,7 +7,6 @@ var defaults = {
   tokenPropertyName: 'token',
   refreshAccessTokens: true,
   tokenExpireName: 'exp',
-  tokenOrigIssuedAt: 'orig_iat',
   authorizationPrefix: 'Bearer ',
   authorizationHeaderName: 'Authorization',
   timeFactor: 1,
@@ -92,14 +91,6 @@ export default {
     @default 'exp' 
   */
   tokenExpireName: defaults.tokenExpireName,
-
-  /**
-    The name for which decoded token field represents the token issed at time.
-    @property tokenOrigIssuedAt
-    @type String
-    @default 'orig_iat' 
-  */
-  tokenOrigIssuedAt: defaults.tokenOrigIssuedAt,
 
   /**
     Default time unit.

@@ -47,14 +47,6 @@ export default TokenAuthenticator.extend({
   tokenExpireName: 'exp',
 
   /**
-    The name for which decoded token field represents the token issed at time.
-    @property tokenOrigIssuedAt
-    @type String
-    @default 'orig_iat' 
-  */
-  tokenOrigIssuedAt: 'orig_iat',
-
-  /**
     Default time unit.
     @property timeFactor
     @type Integer
@@ -73,7 +65,6 @@ export default TokenAuthenticator.extend({
     this.tokenPropertyName = Configuration.tokenPropertyName;
     this.refreshAccessTokens = Configuration.refreshAccessTokens;
     this.tokenExpireName = Configuration.tokenExpireName;
-    this.tokenOrigIssuedAt = Configuration.tokenOrigIssuedAt;
     this.timeFactor = Configuration.timeFactor;
   },
 
@@ -97,9 +88,8 @@ export default TokenAuthenticator.extend({
       _this.makeRequest(_this.serverTokenEndpoint, data).then(function(response) {
         Ember.run(function() {
           var tokenData = _this.getTokenData(response),
-              expiresAt = tokenData[_this.tokenExpireName],
-              origIssuedAt = tokenData[_this.tokenOrigIssuedAt];
-          _this.scheduleAccessTokenRefresh(expiresAt, origIssuedAt, response.token);          
+              expiresAt = tokenData[_this.tokenExpireName];
+          _this.scheduleAccessTokenRefresh(expiresAt, response.token);          
           resolve(_this.getResponseData(response));
         });
       }, function(xhr) {
@@ -114,7 +104,7 @@ export default TokenAuthenticator.extend({
     @method scheduleAccessTokenRefresh
     @private
   */
-  scheduleAccessTokenRefresh: function(expiresAt, origIssuedAt, token) {
+  scheduleAccessTokenRefresh: function(expiresAt, token) {
     if(this.refreshAccessTokens){
       var now = new Date().getTime(),
         expiresAt = this.resolveTime(expiresAt),
@@ -150,9 +140,8 @@ export default TokenAuthenticator.extend({
       _this.makeRequest(_this.serverTokenRefreshEndpoint, data).then(function(response) {
         Ember.run(function() {
           var tokenData = _this.getTokenData(response),
-            origIssuedAt = tokenData[_this.tokenOrigIssuedAt],
             expiresAt = tokenData[_this.tokenExpireName];
-          _this.scheduleAccessTokenRefresh(expiresAt, origIssuedAt, response.token);
+          _this.scheduleAccessTokenRefresh(expiresAt, response.token);
           resolve(response);
         });
       }, function(xhr, status, error) {
