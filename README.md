@@ -50,7 +50,7 @@ session API directly; see the
 [API docs for `Session`](http://ember-simple-auth.simplabs.com/ember-simple-auth-api-docs.html#SimpleAuth-Session)).
 It then also needs to specify the Token authenticator to be used:
 
-*Token Authenticator*
+**Token Authenticator**
 
 Default base implementation for token authentication.
 
@@ -64,7 +64,7 @@ export default Ember.Controller.extend(LoginControllerMixin, {
 });
 ```
 
-*JWT Authenticator*
+**JWT Authenticator**
 
 Extends the Token Authenticator and adds automatic refresh functionality.
 
