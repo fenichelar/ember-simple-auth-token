@@ -106,14 +106,14 @@ export default TokenAuthenticator.extend({
   */
   scheduleAccessTokenRefresh: function(expiresAt, token) {
     if(this.refreshAccessTokens){
+      expiresAt = this.resolveTime(expiresAt);
       var now = new Date().getTime(),
-        expiresAt = this.resolveTime(expiresAt),
         wait = expiresAt - now;
       if(!Ember.isEmpty(token) && !Ember.isEmpty(expiresAt) && expiresAt > now){
         Ember.run.cancel(this._refreshTokenTimeout);
         delete this._refreshTokenTimeout;
         if(!Ember.testing){
-          this._refreshTokenTimeout = Ember.run.later(this, this.refreshAccessToken, expiresAt, token, wait);
+          this._refreshTokenTimeout = Ember.run.later(this, this.refreshAccessToken, token, wait);
         }
       }
     }
@@ -126,14 +126,14 @@ export default TokenAuthenticator.extend({
     @private
   */
   resolveTime: function(time){
-    return new Date(time * this.timeFactor).getTime()
+    return new Date(time * this.timeFactor).getTime();
   },
 
   /**
     @method refreshAccessToken
     @private
   */
-  refreshAccessToken: function(expiresAt, token) {
+  refreshAccessToken: function(token) {
     var _this = this;
     var data  = {token: token};
     return new Ember.RSVP.Promise(function(resolve, reject) {
