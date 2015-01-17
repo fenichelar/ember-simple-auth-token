@@ -1,7 +1,6 @@
 # Ember Simple Auth Token [![Build Status](https://travis-ci.org/jpadilla/ember-cli-simple-auth-token.svg?branch=master)](https://travis-ci.org/jpadilla/ember-cli-simple-auth-token)
 
-This is an extension to the Ember Simple Auth library that provides an
-authenticator and an authorizer that are compatible with APIs with token-based authentication.
+This is an extension to the Ember Simple Auth library that provides a default token authenticator, an enhanced authenticator with automatic refresh capability, and an authorizer that are compatible with APIs with token-based authentication.
 
 Based on [ember-simple-auth-devise](https://github.com/simplabs/ember-simple-auth/tree/master/packages/ember-simple-auth-devise).
 
@@ -19,9 +18,9 @@ npm install --save-dev ember-cli-simple-auth-token
 ember generate simple-auth-token
 ```
 
-## The Authenticator
+## The Authenticators
 
-In order to use the Token authenticator the application needs to have a login route:
+In order to use the Token authenticator or the JWT authenticator, the application needs to have a login route:
 
 ```js
 // app/router.js
@@ -61,6 +60,18 @@ export default Ember.Controller.extend(LoginControllerMixin, {
 });
 ```
 
+or
+
+```js
+// app/controllers/login.js
+import Ember from 'ember';
+import LoginControllerMixin from 'simple-auth/mixins/login-controller-mixin';
+
+export default Ember.Controller.extend(LoginControllerMixin, {
+  authenticator: 'simple-auth-authenticator:jwt'
+});
+```
+
 ## The Authorizer
 
 The authorizer authorizes requests by adding `token` property from the session in the `Authorization` header:
@@ -88,5 +99,12 @@ ENV['simple-auth-token'] = {
   tokenPropertyName: 'token',
   authorizationPrefix: 'Bearer ',
   authorizationHeaderName: 'Authorization',
+
+  // Only used with JWT Authenticator.
+  refreshAccessTokens: true,
+  serverTokenRefreshEndpoint: '/api-token-refresh/',
+  tokenExpireName: 'exp',
+  tokenOrigIssuedAt: 'orig_iat',
+  timeFactor: 1  // example set to 1000 if time comes in as seconds.
 };
 ```
