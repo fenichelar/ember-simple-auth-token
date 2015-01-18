@@ -3,6 +3,9 @@
 This is an extension to the Ember Simple Auth library that provides an
 authenticator and an authorizer that are compatible with APIs with token-based authentication.
 
+**As your user's credentials as well as the token are exchanged between the
+Ember.js app and the server you have to make sure that this connection uses HTTPS!**
+
 Based on [ember-simple-auth-devise](https://github.com/simplabs/ember-simple-auth/tree/master/packages/ember-simple-auth-devise).
 
 ## Installation
