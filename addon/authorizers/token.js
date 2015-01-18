@@ -1,6 +1,5 @@
 import Ember from 'ember';
 import Base from 'simple-auth/authorizers/base';
-import isSecureUrl from '../utils/is-secure-url';
 import Configuration from '../configuration';
 
 /**
@@ -75,16 +74,11 @@ export default Base.extend({
 
     @method authorize
     @param {jqXHR} jqXHR The XHR request to authorize (see http://api.jquery.com/jQuery.ajax/#jqXHR)
-    @param {Object} requestOptions The options as provided to the `$.ajax` method (see http://api.jquery.com/jQuery.ajaxPrefilter/)
   */
-  authorize: function(jqXHR, requestOptions) {
+  authorize: function(jqXHR) {
     var token = this.buildToken();
 
     if (this.get('session.isAuthenticated') && !Ember.isEmpty(token)) {
-      if (!isSecureUrl(requestOptions.url)) {
-        Ember.Logger.warn('Credentials are transmitted via an insecure connection - use HTTPS to keep them secure.');
-      }
-
       if(this.authorizationPrefix) {
         token = this.authorizationPrefix + token;
       }
