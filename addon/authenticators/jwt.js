@@ -1,5 +1,4 @@
 import Ember from 'ember';
-import isSecureUrl from '../utils/is-secure-url';
 import Configuration from '../configuration';
 import TokenAuthenticator from './token';
 
@@ -167,9 +166,6 @@ export default TokenAuthenticator.extend({
     @private
   */
   makeRequest: function(url, data) {
-    if (!isSecureUrl(this.serverTokenEndpoint) || !isSecureUrl(this.serverTokenRefreshEndpoint)) {
-      Ember.Logger.warn('Credentials are transmitted via an insecure connection - use HTTPS to keep them secure.');
-    }
     return Ember.$.ajax({
       url: url,
       type: 'POST',
