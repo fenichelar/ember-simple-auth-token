@@ -2,16 +2,23 @@
 
 This is an extension to the Ember Simple Auth library that provides a default token authenticator, an enhanced authenticator with automatic refresh capability, and an authorizer that are compatible with APIs with token-based authentication.
 
+**As your user's credentials as well as the token are exchanged between the
+Ember.js app and the server you have to make sure that this connection uses HTTPS!**
+
 Based on [ember-simple-auth-devise](https://github.com/simplabs/ember-simple-auth/tree/master/packages/ember-simple-auth-devise).
-
-## Authors
-
-- [José Padilla](https://github.com/jpadilla)
-- [Giovanni Collazo](https://github.com/gcollazo)
 
 ## Installation
 
 To install Ember Simple Auth Token in an Ember.js application that uses [Ember CLI](https://github.com/stefanpenner/ember-cli):
+
+Make sure you have [ember-cli-simple-auth](https://github.com/simplabs/ember-cli-simple-auth) installed:
+
+```
+npm install --save-dev ember-cli-simple-auth
+ember generate ember-cli-simple-auth
+```
+
+To install simply run:
 
 ```
 npm install --save-dev ember-cli-simple-auth-token
@@ -24,7 +31,7 @@ In order to use the Token authenticator or the JWT authenticator, the applicatio
 
 ```js
 // app/router.js
-App.Router.map(function() {
+Router.map(function() {
   this.route('login');
 });
 ```

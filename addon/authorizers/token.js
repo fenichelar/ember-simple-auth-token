@@ -74,9 +74,8 @@ export default Base.extend({
 
     @method authorize
     @param {jqXHR} jqXHR The XHR request to authorize (see http://api.jquery.com/jQuery.ajax/#jqXHR)
-    @param {Object} requestOptions The options as provided to the `$.ajax` method (see http://api.jquery.com/jQuery.ajaxPrefilter/)
   */
-  authorize: function(jqXHR, requestOptions) {
+  authorize: function(jqXHR) {
     var token = this.buildToken();
 
     if (this.get('session.isAuthenticated') && !Ember.isEmpty(token)) {
