@@ -141,7 +141,7 @@ export default TokenAuthenticator.extend({
     @param {Object} data The data of the session to be invalidated
     @return {Ember.RSVP.Promise} A resolving promise
   */
-  invalidate: function(data) {
+  invalidate: function() {
     Ember.run.cancel(this._refreshTokenTimeout);
     delete this._refreshTokenTimeout;
     return new Ember.RSVP.resolve();
