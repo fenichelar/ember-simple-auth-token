@@ -68,6 +68,40 @@ export default TokenAuthenticator.extend({
   },
 
   /**
+    Restores the session from a set of session properties; __will return a
+    resolving promise when there's a non-empty `token` in the `data`__
+    and a rejecting promise otherwise.
+    This method also schedules automatic token refreshing when there are values
+    for `token` and `expiresAt` in the `data` and automatic token
+    refreshing is not disabled.
+    @method restore
+    @param {Object} data The data to restore the session from
+    @return {Ember.RSVP.Promise} A promise that when it resolves results in the session being authenticated
+  */
+  restore: function(data){
+    var _this = this;
+    return new Ember.RSVP.Promise(function(resolve, reject){
+      var now = (new Date()).getTime();
+      if(!Ember.isEmpty(data.expiresAt) && data.expiresAt < now){
+        if(_this.refreshAccessTokens){
+          _this.refreshAccessToken(data.token).then(function(data){
+            resolve(data);
+          }, reject);
+        }else{
+          reject();
+        }
+      }else{
+        if(Ember.isEmpty(data.token)){
+          reject();
+        }else{
+          _this.scheduleAccessTokenRefresh(data.expiresAt, data.token);
+          resolve(data);
+        }
+      }
+    });
+  },
+
+  /**
     Authenticates the session with the specified `credentials`; the credentials
     are `POST`ed to the
     [`Authenticators.Token#serverTokenEndpoint`](#SimpleAuth-Authenticators-Token-serverTokenEndpoint)
@@ -89,6 +123,7 @@ export default TokenAuthenticator.extend({
           var tokenData = _this.getTokenData(response),
               expiresAt = tokenData[_this.tokenExpireName];
           _this.scheduleAccessTokenRefresh(expiresAt, response.token);          
+          response = Ember.merge(response, { expiresAt: expiresAt });
           resolve(_this.getResponseData(response));
         });
       }, function(xhr) {
@@ -100,13 +135,26 @@ export default TokenAuthenticator.extend({
   },
 
   /**
+    Cancels any outstanding automatic token refreshes and returns a resolving
+    promise.
+    @method invalidate
+    @param {Object} data The data of the session to be invalidated
+    @return {Ember.RSVP.Promise} A resolving promise
+  */
+  invalidate: function(data) {
+    Ember.run.cancel(this._refreshTokenTimeout);
+    delete this._refreshTokenTimeout;
+    return new Ember.RSVP.resolve();
+  }, 
+
+  /**
     @method scheduleAccessTokenRefresh
     @private
   */
   scheduleAccessTokenRefresh: function(expiresAt, token) {
     if(this.refreshAccessTokens){
       expiresAt = this.resolveTime(expiresAt);
-      var now = new Date().getTime(),
+      var now = (new Date()).getTime(),
         wait = expiresAt - now;
       if(!Ember.isEmpty(token) && !Ember.isEmpty(expiresAt) && expiresAt > now){
         Ember.run.cancel(this._refreshTokenTimeout);
@@ -140,7 +188,7 @@ export default TokenAuthenticator.extend({
         Ember.run(function() {
           var tokenData = _this.getTokenData(response),
             expiresAt = tokenData[_this.tokenExpireName],
-            data = Ember.merge(response, {token: response.token});
+            data = Ember.merge(response, {expiresAt: expiresAt, token: response.token});
           _this.scheduleAccessTokenRefresh(expiresAt, response.token);
           _this.trigger('sessionDataUpdated', data);
           resolve(response);
