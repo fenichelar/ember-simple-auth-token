@@ -44,10 +44,10 @@ test('assigns tokenPropertyName from the configuration object', function() {
   Configuration.load({}, {});
 });
 
-test('assigns customHeaders from the configuration object', function() {
-  Configuration.customHeaders = 'customHeaders';
+test('assigns custom headers from the configuration object', function() {
+  Configuration.headers = 'headers';
 
-  equal(Token.create().customHeaders, 'customHeaders');
+  equal(Token.create().headers, 'headers');
 
   Configuration.load({}, {});
 });
@@ -131,7 +131,7 @@ test('#authenticate sends an AJAX request with custom headers', function() {
     password: 'password'
   };
 
-  Configuration.customHeaders = {'X-API-KEY': '123-abc', 'X-ANOTHER-HEADER': 0};
+  Configuration.headers = {'X-API-KEY': '123-abc', 'X-ANOTHER-HEADER': 0};
   App.authenticator = Token.create();
   App.authenticator.authenticate(credentials);
 
