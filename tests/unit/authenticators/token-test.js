@@ -36,6 +36,14 @@ test('assigns identificationField from the configuration object', function() {
   Configuration.load({}, {});
 });
 
+test('assigns passwordField from the configuration object', function() {
+  Configuration.passwordField = 'passwordField';
+
+  equal(Token.create().passwordField, 'passwordField');
+
+  Configuration.load({}, {});
+});
+
 test('assigns tokenPropertyName from the configuration object', function() {
   Configuration.tokenPropertyName = 'tokenPropertyName';
 
@@ -89,6 +97,35 @@ test('#authenticate sends an AJAX request to the sign in endpoint', function() {
   });
 });
 
+test('#authenticate sends an AJAX request to the sign in endpoint with custom fields', function() {
+  sinon.spy(Ember.$, 'ajax');
+
+  var credentials = {
+    identification: 'username',
+    password: 'password'
+  };
+
+  Configuration.identificationField = 'api-user';
+  Configuration.passwordField = 'api-key';
+
+  App.authenticator = Token.create();
+  App.authenticator.authenticate(credentials);
+
+  Ember.run.next(function() {
+    var args = Ember.$.ajax.getCall(0).args[0];
+    delete args.beforeSend;
+
+    deepEqual(args, {
+      url: '/api-token-auth/',
+      type: 'POST',
+      data: '{"api-key":"password","api-user":"username"}',
+      dataType: 'json',
+      contentType: 'application/json',
+    });
+
+    Ember.$.ajax.restore();
+  });
+});
 
 test('#authenticate successfully resolves with the correct data', function() {
   sinon.spy(Ember.$, 'ajax');
