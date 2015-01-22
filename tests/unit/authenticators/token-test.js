@@ -52,6 +52,14 @@ test('assigns tokenPropertyName from the configuration object', function() {
   Configuration.load({}, {});
 });
 
+test('assigns custom headers from the configuration object', function() {
+  Configuration.headers = 'headers';
+
+  equal(Token.create().headers, 'headers');
+
+  Configuration.load({}, {});
+});
+
 test('#restore resolves with the correct data', function() {
   var properties = {
     token: 'secret token!'
@@ -91,6 +99,7 @@ test('#authenticate sends an AJAX request to the sign in endpoint', function() {
       data: '{"password":"password","username":"username"}',
       dataType: 'json',
       contentType: 'application/json',
+      headers: {}
     });
 
     Ember.$.ajax.restore();
@@ -146,6 +155,34 @@ test('#authenticate successfully resolves with the correct data', function() {
       deepEqual(data, {
         access_token: 'secret token!'
       });
+    });
+
+    Ember.$.ajax.restore();
+  });
+});
+
+test('#authenticate sends an AJAX request with custom headers', function() {
+  sinon.spy(Ember.$, 'ajax');
+
+  var credentials = {
+    identification: 'username',
+    password: 'password'
+  };
+
+  Configuration.headers = {'X-API-KEY': '123-abc', 'X-ANOTHER-HEADER': 0};
+  App.authenticator = Token.create();
+  App.authenticator.authenticate(credentials);
+
+  Ember.run.next(function() {
+    var args = Ember.$.ajax.getCall(0).args[0];
+    delete args.beforeSend;
+    deepEqual(args, {
+      url: '/api-token-auth/',
+      type: 'POST',
+      data: '{"password":"password","username":"username"}',
+      dataType: 'json',
+      contentType: 'application/json',
+      headers: {'X-API-KEY': '123-abc', 'X-ANOTHER-HEADER': 0}
     });
 
     Ember.$.ajax.restore();

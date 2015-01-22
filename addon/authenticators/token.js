@@ -65,6 +65,18 @@ export default Base.extend({
   tokenPropertyName: 'token',
 
   /**
+    The property that stores custom headers that will be sent on every request.
+
+    This value can be configured via
+    [`SimpleAuth.Configuration.Token#headers`](#SimpleAuth-Configuration-Token-headers).
+
+    @property headers
+    @type Object
+    @default {}
+  */
+  headers: {},
+
+  /**
     @method init
     @private
   */
@@ -73,6 +85,7 @@ export default Base.extend({
     this.identificationField = Configuration.identificationField;
     this.passwordField = Configuration.passwordField;
     this.tokenPropertyName = Configuration.tokenPropertyName;
+    this.headers = Configuration.headers;
   },
 
   /**
@@ -171,7 +184,8 @@ export default Base.extend({
       contentType: 'application/json',
       beforeSend: function(xhr, settings) {
         xhr.setRequestHeader('Accept', settings.accepts.json);
-      }
+      },
+      headers: this.headers
     });
   }
 });

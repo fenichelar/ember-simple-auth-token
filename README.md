@@ -96,5 +96,6 @@ ENV['simple-auth-token'] = {
   tokenPropertyName: 'token',
   authorizationPrefix: 'Bearer ',
   authorizationHeaderName: 'Authorization',
+  headers: {}
 };
 ```
