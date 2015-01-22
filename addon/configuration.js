@@ -3,6 +3,7 @@ import loadConfig from './utils/load-config';
 var defaults = {
   serverTokenEndpoint: '/api-token-auth/',
   identificationField: 'username',
+  passwordField: 'password',
   tokenPropertyName: 'token',
   authorizationPrefix: 'Bearer ',
   authorizationHeaderName: 'Authorization',
@@ -50,6 +51,18 @@ export default {
     @default 'username'
   */
   identificationField: defaults.identificationField,
+
+  /**
+    The attribute-name that is used for the password field when sending
+    the authentication data to the server.
+
+    @property passwordField
+    @readOnly
+    @static
+    @type String
+    @default 'password'
+  */
+  passwordField: defaults.passwordField,
 
   /**
     The name of the property in session that contains token
