@@ -6,6 +6,7 @@ var defaults = {
   tokenPropertyName: 'token',
   authorizationPrefix: 'Bearer ',
   authorizationHeaderName: 'Authorization',
+  headers: {}
 };
 
 /**
@@ -83,6 +84,17 @@ export default {
     @default 'Authorization'
   */
   authorizationHeaderName: defaults.authorizationHeaderName,
+
+  /**
+    Custom headers to be added on request.
+
+    @property headers
+    @readonly
+    @static
+    @type Object
+    @default {}
+  */
+  headers: defaults.headers,
 
   /**
     @method load
