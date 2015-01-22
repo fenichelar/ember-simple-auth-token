@@ -130,6 +130,7 @@ test('#authenticate sends an AJAX request to the sign in endpoint with custom fi
       data: '{"api-key":"password","api-user":"username"}',
       dataType: 'json',
       contentType: 'application/json',
+      headers: {}
     });
 
     Ember.$.ajax.restore();
