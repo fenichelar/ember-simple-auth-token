@@ -83,22 +83,17 @@ export default TokenAuthenticator.extend({
     return new Ember.RSVP.Promise(function(resolve, reject){
       var now = (new Date()).getTime();
       if(!Ember.isEmpty(data.expiresAt) && data.expiresAt < now){
-        console.log('@AAA');
         if(_this.refreshAccessTokens){
-          console.log('@BBB');
           _this.refreshAccessToken(data.token).then(function(data){
             resolve(data);
           }, reject);
         }else{
-          console.log('@CCC');
           reject();
         }
       }else{
-        console.log('@DDD');
         if(Ember.isEmpty(data.token)){
           reject();
         }else{
-          console.log('@EEE');
           var tokenData = _this.getTokenData({'token': data.token}),
             tokenExpiresAt = tokenData[_this.tokenExpireName],
             expiresAt = _this.resolveTime(tokenExpiresAt);
@@ -165,7 +160,6 @@ export default TokenAuthenticator.extend({
       var now = (new Date()).getTime(),
         wait = expiresAt - now;
       if(!Ember.isEmpty(token) && !Ember.isEmpty(expiresAt) && expiresAt > now){
-        console.log("#@#$QWERWEWDADFDSF");
         Ember.run.cancel(this._refreshTokenTimeout);
         delete this._refreshTokenTimeout;
         if(!Ember.testing){
@@ -193,16 +187,11 @@ export default TokenAuthenticator.extend({
     var _this = this;
     var data  = {token: token};
     return new Ember.RSVP.Promise(function(resolve, reject) {
-      console.log("SHOUDL WE BE HERE");
-      console.log('@ATADATA: ',data);
       _this.makeRequest(_this.serverTokenRefreshEndpoint, data).then(function(response) {
-        console.log("HEMRMRMRMRM");
         Ember.run(function() {
           var tokenData = _this.getTokenData(response),
             expiresAt = tokenData[_this.tokenExpireName],
             data = Ember.merge(response, {expiresAt: expiresAt, token: response.token});
-            console.log('@TD',tokenData);
-            console.log('@R',response);
           _this.scheduleAccessTokenRefresh(expiresAt, response.token);
           _this.trigger('sessionDataUpdated', data);
           resolve(response);
