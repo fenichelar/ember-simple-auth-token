@@ -86,7 +86,7 @@ export default TokenAuthenticator.extend({
         if(_this.refreshAccessTokens){
           _this.refreshAccessToken(data.token).then(function(data){
             resolve(data);
-          }, reject);
+          }, reject());
         }else{
           reject();
         }
