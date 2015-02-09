@@ -52,7 +52,7 @@ test('assigns timeFactor from the configuration object', function() {
   Configuration.load({}, {});
 });
 
-test('#restore resolves correctly with good data', function() {
+test('#restore resolves when the data includes `expiresAt`', function() {
   var jwt = JWT.create(),
     expiresAt = (new Date()).getTime() - 60000;
 
@@ -81,7 +81,7 @@ test('#restore resolves correctly with good data', function() {
   });
 });
 
-test('#restore resolves correctly with bad data', function() {
+test('#restore resolves when the data excludes `expiresAt`', function() {
   var jwt = JWT.create(),
     expiresAt = (new Date()).getTime() - 60000;
 
@@ -109,30 +109,63 @@ test('#restore resolves correctly with bad data', function() {
   });
 });
 
+test('#restore rejects when `refreshAccessTokens` is false', function() {
+  var jwt = JWT.create(),
+    expiresAt = (new Date()).getTime() - 60000;
 
-/*
-test('#authenticate sends an AJAX request to the sign in endpoint', function() {
-  sinon.spy(Ember.$, 'ajax');
+  var token = {};
+  token[jwt.identificationField] = 'test@test.com';
+  token[jwt.tokenExpireName] = expiresAt;
+  
+  token = window.btoa(JSON.stringify(token));
 
-  var credentials = {
-    identification: 'username',
-    password: 'password'
-  };
+  var goodData = {};
+  goodData[jwt.tokenPropertyName] = token;
+  goodData['expiresAt'] = expiresAt;
 
-  App.authenticator.authenticate(credentials);
+  App.authenticator.refreshAccessTokens = false;
 
-  Ember.run.next(function() {
-    var args = Ember.$.ajax.getCall(0).args[0];
-    delete args.beforeSend;
-    deepEqual(args, {
-      url: '/api-token-auth/',
-      type: 'POST',
-      data: '{"password":"password","username":"username"}',
-      dataType: 'json',
-      contentType: 'application/json',
+  App.server.respondWith('POST', '/api-token-refresh/', [
+    201,
+    {
+      'Content-Type': 'application/json'
+    },
+    '{ "token": "' + token + '"}'
+  ]); 
+ 
+  Ember.run(function(){
+    App.authenticator.restore(goodData).then(null, function(){
+      ok(true, 'If we are there then the promise was rejected.');
     });
-
-    Ember.$.ajax.restore();
   });
 });
-*/
+
+test('#restore rejects when there is no token included', function() {
+  var jwt = JWT.create(),
+    expiresAt = (new Date()).getTime() - 60000;
+
+  var token = {};
+  token[jwt.identificationField] = 'test@test.com';
+  token[jwt.tokenExpireName] = expiresAt;
+  
+  token = window.btoa(JSON.stringify(token));
+
+  var goodData = {};
+  goodData['expiresAt'] = expiresAt;
+
+  App.authenticator.refreshAccessTokens = false;
+
+  App.server.respondWith('POST', '/api-token-refresh/', [
+    201,
+    {
+      'Content-Type': 'application/json'
+    },
+    '{ "token": "' + token + '"}'
+  ]); 
+ 
+  Ember.run(function(){
+    App.authenticator.restore(goodData).then(null, function(){
+      ok(true, 'If we are there then the promise was rejected.');
+    });
+  });
+});

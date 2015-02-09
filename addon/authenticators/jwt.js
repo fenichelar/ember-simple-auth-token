@@ -82,7 +82,7 @@ export default TokenAuthenticator.extend({
     var _this = this;
     return new Ember.RSVP.Promise(function(resolve, reject){
       var now = (new Date()).getTime();
-      if(!Ember.isEmpty(data.expiresAt) && data.expiresAt < now){
+      if(!Ember.isEmpty(data.expiresAt) && !Ember.isEmpty(data.token) && data.expiresAt < now){
         if(_this.refreshAccessTokens){
           _this.refreshAccessToken(data.token).then(function(data){
             resolve(data);
