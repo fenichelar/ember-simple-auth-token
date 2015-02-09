@@ -217,6 +217,9 @@ test('#restore schedules a token refresh when `refreshAccessTokens` is true.', f
   data[jwt.tokenPropertyName] = token;
   data[jwt.tokenExpireName] = expiresAt;
 
+  // This is bad - waiting for better solution, required to check Ember.run.later.
+  Ember.testing = false;
+
   Ember.run(function(){
     App.authenticator.restore(data).then(function(content){
       var spyCall = Ember.run.later.getCall(0);
@@ -225,6 +228,8 @@ test('#restore schedules a token refresh when `refreshAccessTokens` is true.', f
       deepEqual(spyCall.args[2], data.token);
     });
   });
+
+  Ember.testing = true;
 
   Ember.run.later.restore();
 });
