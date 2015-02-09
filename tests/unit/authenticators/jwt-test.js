@@ -200,3 +200,60 @@ test('#restore resolves when `expiresAt` is greater than `now`', function() {
     });
   });
 });
+
+test('#restore schedules a token refresh when `refreshAccessTokens` is true.', function() {
+  sinon.spy(Ember.run, 'later');
+
+  var jwt = JWT.create(),
+    expiresAt = (new Date()).getTime() + 60000;
+
+  var token = {};
+  token[jwt.identificationField] = 'test@test.com';
+  token[jwt.tokenExpireName] = expiresAt;
+  
+  token = window.btoa(JSON.stringify(token));
+
+  var data = {};
+  data[jwt.tokenPropertyName] = token;
+  data[jwt.tokenExpireName] = expiresAt;
+
+  Ember.run(function(){
+    App.authenticator.restore(data).then(function(content){
+      var spyCall = Ember.run.later.getCall(0);
+
+      deepEqual(spyCall.args[1], App.authenticator.refreshAccessToken);
+      deepEqual(spyCall.args[2], data.token);
+    });
+  });
+
+  Ember.run.later.restore();
+});
+
+test('#restore does not schedule a token refresh when `refreshAccessTokens` is false.', function() {
+  sinon.spy(Ember.run, 'later');
+
+  var jwt = JWT.create(),
+    expiresAt = (new Date()).getTime() + 60000;
+
+  var token = {};
+  token[jwt.identificationField] = 'test@test.com';
+  token[jwt.tokenExpireName] = expiresAt;
+  
+  token = window.btoa(JSON.stringify(token));
+
+  var data = {};
+  data[jwt.tokenPropertyName] = token;
+  data[jwt.tokenExpireName] = expiresAt;
+
+  App.authenticator.refreshAccessTokens = false;
+
+  Ember.run(function(){
+    App.authenticator.restore(data).then(function(content){
+      var spyCall = Ember.run.later.getCall(0);
+
+      deepEqual(spyCall, null);
+    });
+  });
+
+  Ember.run.later.restore();
+});
