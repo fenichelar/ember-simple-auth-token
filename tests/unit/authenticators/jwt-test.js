@@ -52,24 +52,47 @@ test('assigns timeFactor from the configuration object', function() {
   Configuration.load({}, {});
 });
 
-test('#restore resolves the correct data', function() {
-  var expiresAt = (new Date()).getTime() - 60000;
+test('#restore resolves correctly with good data', function() {
+  var jwt = JWT.create(),
+    expiresAt = (new Date()).getTime() - 60000;
 
-  var token = {
-    'user': 'test@test.com',
-    'exp': expiresAt
-  };
+  var token = {};
+  token[jwt.identificationField] = 'test@test.com';
+  token[jwt.tokenExpireName] = expiresAt;
   
   token = window.btoa(JSON.stringify(token));
 
-  var goodData = {
-    'token': token,
-    'expiresAt': expiresAt
-  };
+  var goodData = {};
+  goodData[jwt.tokenPropertyName] = token;
+  goodData[jwt.tokenExpireName] = expiresAt;
 
-  var badData = {
-    'token': token
-  };
+  App.server.respondWith('POST', '/api-token-refresh/', [
+    201,
+    {
+      'Content-Type': 'application/json'
+    },
+    '{ "token": "' + token + '"}'
+  ]); 
+
+  Ember.run(function(){
+    App.authenticator.restore(goodData).then(function(content){
+      deepEqual(content, goodData);
+    });
+  });
+});
+
+test('#restore resolves correctly with bad data', function() {
+  var jwt = JWT.create(),
+    expiresAt = (new Date()).getTime() - 60000;
+
+  var token = {};
+  token[jwt.identificationField] = 'test@test.com';
+  token[jwt.tokenExpireName] = expiresAt;
+  
+  token = window.btoa(JSON.stringify(token));
+
+  var badData = {};
+  badData[jwt.tokenPropertyName] = token;
 
   App.server.respondWith('POST', '/api-token-refresh/', [
     201,
@@ -80,14 +103,36 @@ test('#restore resolves the correct data', function() {
   ]); 
  
   Ember.run(function(){
-    App.authenticator.restore(goodData).then(function(content){
-      deepEqual(content, goodData);
-    });
-  });
-
-  Ember.run(function(){
     App.authenticator.restore(badData).then(function(content){
       deepEqual(content, badData);
     });
   });
 });
+
+
+/*
+test('#authenticate sends an AJAX request to the sign in endpoint', function() {
+  sinon.spy(Ember.$, 'ajax');
+
+  var credentials = {
+    identification: 'username',
+    password: 'password'
+  };
+
+  App.authenticator.authenticate(credentials);
+
+  Ember.run.next(function() {
+    var args = Ember.$.ajax.getCall(0).args[0];
+    delete args.beforeSend;
+    deepEqual(args, {
+      url: '/api-token-auth/',
+      type: 'POST',
+      data: '{"password":"password","username":"username"}',
+      dataType: 'json',
+      contentType: 'application/json',
+    });
+
+    Ember.$.ajax.restore();
+  });
+});
+*/
