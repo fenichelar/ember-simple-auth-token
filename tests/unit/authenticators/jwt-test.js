@@ -51,3 +51,43 @@ test('assigns timeFactor from the configuration object', function() {
 
   Configuration.load({}, {});
 });
+
+test('#restore resolves the correct data', function() {
+  var expiresAt = (new Date()).getTime() - 60000;
+
+  var token = {
+    'user': 'test@test.com',
+    'exp': expiresAt
+  };
+  
+  token = window.btoa(JSON.stringify(token));
+
+  var goodData = {
+    'token': token,
+    'expiresAt': expiresAt
+  };
+
+  var badData = {
+    'token': token
+  };
+
+  App.server.respondWith('POST', '/api-token-refresh/', [
+    201,
+    {
+      'Content-Type': 'application/json'
+    },
+    '{ "token": "' + token + '"}'
+  ]); 
+ 
+  Ember.run(function(){
+    App.authenticator.restore(goodData).then(function(content){
+      deepEqual(content, goodData);
+    });
+  });
+
+  Ember.run(function(){
+    App.authenticator.restore(badData).then(function(content){
+      deepEqual(content, badData);
+    });
+  });
+});

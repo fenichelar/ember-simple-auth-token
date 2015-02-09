@@ -94,7 +94,10 @@ export default TokenAuthenticator.extend({
         if(Ember.isEmpty(data.token)){
           reject();
         }else{
-          _this.scheduleAccessTokenRefresh(data.expiresAt, data.token);
+          var tokenData = _this.getTokenData({'token': data.token}),
+            tokenExpiresAt = tokenData[_this.tokenExpireName],
+            expiresAt = _this.resolveTime(tokenExpiresAt);
+          _this.scheduleAccessTokenRefresh(expiresAt, data.token);
           resolve(data);
         }
       }
@@ -207,7 +210,14 @@ export default TokenAuthenticator.extend({
     @return {object} An object with properties for the session.
   */
   getTokenData: function(response) {
-    var token = response.token.split('.')[1];
+    var token = response.token.split('.');
+    
+    if(token.length > 1){
+      token = token[1];
+    }else{
+      token = token[0];
+    }
+
     return JSON.parse(atob(token));
   },
 
