@@ -40,6 +40,19 @@ export default Base.extend({
   identificationField: 'username',
 
   /**
+    The attribute-name that is used for the password field when sending the
+    authentication data to the server.
+
+    This value can be configured via
+    [`SimpleAuth.Configuration.Token#passwordfield`](#SimpleAuth-Configuration-Token-passwordfield).
+
+    @property passwordField
+    @type String
+    @default 'password'
+  */
+  passwordField: 'password',
+
+  /**
     The name of the property in session that contains token used for authorization.
 
     This value can be configured via
@@ -52,13 +65,27 @@ export default Base.extend({
   tokenPropertyName: 'token',
 
   /**
+    The property that stores custom headers that will be sent on every request.
+
+    This value can be configured via
+    [`SimpleAuth.Configuration.Token#headers`](#SimpleAuth-Configuration-Token-headers).
+
+    @property headers
+    @type Object
+    @default {}
+  */
+  headers: {},
+
+  /**
     @method init
     @private
   */
   init: function() {
     this.serverTokenEndpoint = Configuration.serverTokenEndpoint;
     this.identificationField = Configuration.identificationField;
+    this.passwordField = Configuration.passwordField;
     this.tokenPropertyName = Configuration.tokenPropertyName;
+    this.headers = Configuration.headers;
   },
 
   /**
@@ -117,12 +144,9 @@ export default Base.extend({
     @return {object} An object with properties for authentication.
   */
   getAuthenticateData: function(credentials) {
-    var authentication = {
-      password: credentials.password
-    };
-
+    var authentication = {};
+    authentication[this.passwordField] = credentials.password;
     authentication[this.identificationField] = credentials.identification;
-
     return authentication;
   },
 
@@ -160,7 +184,8 @@ export default Base.extend({
       contentType: 'application/json',
       beforeSend: function(xhr, settings) {
         xhr.setRequestHeader('Accept', settings.accepts.json);
-      }
+      },
+      headers: this.headers
     });
   }
 });

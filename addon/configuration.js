@@ -4,12 +4,14 @@ var defaults = {
   serverTokenEndpoint: '/api-token-auth/',
   serverTokenRefreshEndpoint: '/api-token-refresh/',
   identificationField: 'username',
+  passwordField: 'password',
   tokenPropertyName: 'token',
   refreshAccessTokens: true,
   tokenExpireName: 'exp',
   authorizationPrefix: 'Bearer ',
   authorizationHeaderName: 'Authorization',
   timeFactor: 1,
+  headers: {}
 };
 
 /**
@@ -63,6 +65,18 @@ export default {
     @default 'username'
   */
   identificationField: defaults.identificationField,
+
+  /**
+    The attribute-name that is used for the password field when sending
+    the authentication data to the server.
+
+    @property passwordField
+    @readOnly
+    @static
+    @type String
+    @default 'password'
+  */
+  passwordField: defaults.passwordField,
 
   /**
     The name of the property in session that contains token
@@ -121,6 +135,17 @@ export default {
     @default 'Authorization'
   */
   authorizationHeaderName: defaults.authorizationHeaderName,
+
+  /**
+    Custom headers to be added on request.
+
+    @property headers
+    @readonly
+    @static
+    @type Object
+    @default {}
+  */
+  headers: defaults.headers,
 
   /**
     @method load

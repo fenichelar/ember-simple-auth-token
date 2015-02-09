@@ -109,9 +109,11 @@ ENV['simple-auth'] = {
 ENV['simple-auth-token'] = {
   serverTokenEndpoint: '/api-token-auth/',
   identificationField: 'username',
+  passwordField: 'password',
   tokenPropertyName: 'token',
   authorizationPrefix: 'Bearer ',
   authorizationHeaderName: 'Authorization',
+  headers: {},
 
   // Only used with JWT Authenticator.
   refreshAccessTokens: true,
