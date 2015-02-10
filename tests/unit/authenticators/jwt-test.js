@@ -3,7 +3,6 @@ import startApp from '../../helpers/start-app';
 import Ember from 'ember';
 import JWT from 'simple-auth-token/authenticators/jwt';
 import Configuration from 'simple-auth-token/configuration';
-import QUnit from 'qunit';
 
 var App;
 
@@ -14,20 +13,13 @@ module('JWT Authenticator', {
     App.server = sinon.fakeServer.create();
     App.server.autoRespond = true;
     App.authenticator = JWT.create();
+    sinon.spy(Ember.run, 'later');
   },
   teardown: function() {
     Ember.run(App, App.destroy);
     App.xhr.restore();
+    Ember.run.later.restore();
   }
-});
-
-QUnit.testStart(function(detail){
-  sinon.spy(Ember.run, 'later');
-
-});
-
-QUnit.testDone(function(detail){
-  Ember.run.later.restore();
 });
 
 test('assigns serverTokenRefreshEndpoint from the configuration object', function() {
