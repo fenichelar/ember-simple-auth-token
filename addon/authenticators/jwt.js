@@ -138,19 +138,6 @@ export default TokenAuthenticator.extend({
   },
 
   /**
-    Cancels any outstanding automatic token refreshes and returns a resolving
-    promise.
-    @method invalidate
-    @param {Object} data The data of the session to be invalidated
-    @return {Ember.RSVP.Promise} A resolving promise
-  */
-  invalidate: function() {
-    Ember.run.cancel(this._refreshTokenTimeout);
-    delete this._refreshTokenTimeout;
-    return new Ember.RSVP.resolve();
-  }, 
-
-  /**
     @method scheduleAccessTokenRefresh
     @private
   */
@@ -167,16 +154,6 @@ export default TokenAuthenticator.extend({
         }
       }
     }
-  },
-
-  /**
-    Handles converting between time units for data between different systems.
-    Default: seconds(1)
-    @method resolveTime
-    @private
-  */
-  resolveTime: function(time){
-    return new Date(time * this.timeFactor).getTime();
   },
 
   /**
@@ -236,5 +213,28 @@ export default TokenAuthenticator.extend({
         xhr.setRequestHeader('Accept', settings.accepts.json);
       }
     });
+  },
+  
+  /**
+    Cancels any outstanding automatic token refreshes and returns a resolving
+    promise.
+    @method invalidate
+    @param {Object} data The data of the session to be invalidated
+    @return {Ember.RSVP.Promise} A resolving promise
+  */
+  invalidate: function() {
+    Ember.run.cancel(this._refreshTokenTimeout);
+    delete this._refreshTokenTimeout;
+    return new Ember.RSVP.resolve();
+  }, 
+
+  /**
+    Handles converting between time units for data between different systems.
+    Default: seconds(1)
+    @method resolveTime
+    @private
+  */
+  resolveTime: function(time){
+    return new Date(time * this.timeFactor).getTime();
   },
 });
