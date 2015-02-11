@@ -65,6 +65,7 @@ export default TokenAuthenticator.extend({
     this.refreshAccessTokens = Configuration.refreshAccessTokens;
     this.tokenExpireName = Configuration.tokenExpireName;
     this.timeFactor = Configuration.timeFactor;
+    this.headers = Configuration.headers;
   },
 
   /**
@@ -81,12 +82,13 @@ export default TokenAuthenticator.extend({
   restore: function(data){
     var _this = this;
     return new Ember.RSVP.Promise(function(resolve, reject){
-      var now = (new Date()).getTime();
-      if(!Ember.isEmpty(data.expiresAt) && !Ember.isEmpty(data.token) && data.expiresAt < now){
+      var now = (new Date()).getTime(),
+        expiresAt = _this.resolveTime(data.expiresAt);
+      if(!Ember.isEmpty(data.expiresAt) && !Ember.isEmpty(data.token) && data.expiresAt > now){
         if(_this.refreshAccessTokens){
           _this.refreshAccessToken(data.token).then(function(data){
             resolve(data);
-          }, reject());
+          }, reject);
         }else{
           reject();
         }
@@ -95,8 +97,8 @@ export default TokenAuthenticator.extend({
           reject();
         }else{
           var tokenData = _this.getTokenData({'token': data.token}),
-            tokenExpiresAt = tokenData[_this.tokenExpireName],
-            expiresAt = _this.resolveTime(tokenExpiresAt);
+            tokenExpiresAt = tokenData[_this.tokenExpireName];
+          expiresAt = _this.resolveTime(tokenExpiresAt);
           _this.scheduleAccessTokenRefresh(expiresAt, data.token);
           resolve(data);
         }
@@ -168,7 +170,7 @@ export default TokenAuthenticator.extend({
         Ember.run(function() {
           var tokenData = _this.getTokenData(response),
             expiresAt = tokenData[_this.tokenExpireName],
-            data = Ember.merge(response, {expiresAt: expiresAt});
+            data = Ember.merge(response, {expiresAt: expiresAt, token: response.token});
           _this.scheduleAccessTokenRefresh(expiresAt, response.token);
           _this.trigger('sessionDataUpdated', data);
           resolve(response);
@@ -211,7 +213,8 @@ export default TokenAuthenticator.extend({
       contentType: 'application/json',
       beforeSend: function(xhr, settings) {
         xhr.setRequestHeader('Accept', settings.accepts.json);
-      }
+      },
+      headers: this.headers
     });
   },
   

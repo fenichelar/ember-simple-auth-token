@@ -56,7 +56,7 @@ test('assigns timeFactor from the configuration object', function() {
 
 test('#restore resolves when the data includes `token` and `expiresAt`', function() {
   var jwt = JWT.create(),
-    expiresAt = (new Date()).getTime() - 60000;
+    expiresAt = (new Date()).getTime() + 60000;
 
   var token = {};
   token[jwt.identificationField] = 'test@test.com';
@@ -78,6 +78,7 @@ test('#restore resolves when the data includes `token` and `expiresAt`', functio
 
   Ember.run(function(){
     App.authenticator.restore(data).then(function(content){
+      // Check that the resolved data matches the init data.
       deepEqual(content, data);
     });
   });
@@ -85,7 +86,7 @@ test('#restore resolves when the data includes `token` and `expiresAt`', functio
 
 test('#restore resolves when the data includes `token` and excludes `expiresAt`', function() {
   var jwt = JWT.create(),
-    expiresAt = (new Date()).getTime() - 60000;
+    expiresAt = (new Date()).getTime() + 60000;
 
   var token = {};
   token[jwt.identificationField] = 'test@test.com';
@@ -106,6 +107,7 @@ test('#restore resolves when the data includes `token` and excludes `expiresAt`'
  
   Ember.run(function(){
     App.authenticator.restore(data).then(function(content){
+      // Check that the resolved data matches the init data.
       deepEqual(content, data);
     });
   });
@@ -113,7 +115,7 @@ test('#restore resolves when the data includes `token` and excludes `expiresAt`'
 
 test('#restore rejects when `refreshAccessTokens` is false', function() {
   var jwt = JWT.create(),
-    expiresAt = (new Date()).getTime() - 60000;
+    expiresAt = (new Date()).getTime() + 60000;
 
   var token = {};
   token[jwt.identificationField] = 'test@test.com';
@@ -137,14 +139,15 @@ test('#restore rejects when `refreshAccessTokens` is false', function() {
  
   Ember.run(function(){
     App.authenticator.restore(data).then(null, function(){
-      ok(true, 'If we are there then the promise was rejected.');
+      // Check that Ember.run.later was not called.
+      deepEqual(Ember.run.later.getCall(0), null);
     });
   });
 });
 
 test('#restore rejects when `token` is excluded.', function() {
   var jwt = JWT.create(),
-    expiresAt = (new Date()).getTime() - 60000;
+    expiresAt = (new Date()).getTime() + 60000;
 
   var token = {};
   token[jwt.identificationField] = 'test@test.com';
@@ -167,7 +170,8 @@ test('#restore rejects when `token` is excluded.', function() {
  
   Ember.run(function(){
     App.authenticator.restore(data).then(null, function(){
-      ok(true, 'If we are there then the promise was rejected.');
+      // Check that Ember.run.later was not called.
+      deepEqual(Ember.run.later.getCall(0), null);
     });
   });
 });
@@ -198,7 +202,8 @@ test('#restore resolves when `expiresAt` is greater than `now`', function() {
  
   Ember.run(function(){
     App.authenticator.restore(data).then(function(content){
-      deepEqual(content, data);
+      // Check that Ember.run.later was not called.
+      deepEqual(Ember.run.later.getCall(0), null);
     });
   });
 });
@@ -222,6 +227,7 @@ test('#restore schedules a token refresh when `refreshAccessTokens` is true.', f
 
   Ember.run(function(){
     App.authenticator.restore(data).then(function(content){
+      // Check that Ember.run.later ran.
       var spyCall = Ember.run.later.getCall(0);
       deepEqual(spyCall.args[1], App.authenticator.refreshAccessToken);
       deepEqual(spyCall.args[2], token);
@@ -247,8 +253,31 @@ test('#restore does not schedule a token refresh when `refreshAccessTokens` is f
 
   Ember.run(function(){
     App.authenticator.restore(data).then(function(content){
+      // Check that Ember.run.later ran.
       var spyCall = Ember.run.later.getCall(0);
       deepEqual(spyCall, null);
+    });
+  });
+});
+
+test('#restore does not schedule a token refresh when `expiresAt` < now.', function() {
+  var jwt = JWT.create(),
+    expiresAt = (new Date()).getTime() + 60000;
+
+  var token = {};
+  token[jwt.identificationField] = 'test@test.com';
+  token[jwt.tokenExpireName] = expiresAt;
+  
+  token = window.btoa(JSON.stringify(token));
+
+  var data = {};
+  data[jwt.tokenPropertyName] = token;
+  data[jwt.tokenExpireName] = expiresAt;
+
+  Ember.run(function(){
+    App.authenticator.restore(data).then(function(){
+      // Check that Ember.run.later was not called.
+      deepEqual(Ember.run.later.getCall(0), null);
     });
   });
 });
@@ -274,6 +303,7 @@ test('#authenticate sends an ajax request to the token endpoint', function() {
       data: '{"password":"password","username":"username"}',
       dataType: 'json',
       contentType: 'application/json',
+      headers: {}
     });
     Ember.$.ajax.restore();
   });
@@ -306,8 +336,9 @@ test('#authenticate rejects with invalid credentials', function() {
   Ember.testing = false;
 
   Ember.run(function(){
-    App.authenticator.authenticate(credentials).then(null, function(err){
-      ok(true, 'Exited with: ' + err.message);
+    App.authenticator.authenticate(credentials).then(null, function(){
+      // Check that Ember.run.later was not called.
+      deepEqual(Ember.run.later.getCall(0), null);
     });
   });
 });
@@ -377,6 +408,7 @@ test('#authenticate does not schedule a token refresh when `refreshAccessTokens`
 
   Ember.run(function(){
     App.authenticator.authenticate(credentials).then(function(content){
+      // Check that Ember.run.later ran.
       var spyCall = Ember.run.later.getCall(0);
       deepEqual(spyCall, null);
     });
@@ -406,6 +438,7 @@ test('#refreshAccessToken makes an AJAX request to the token endpoint.', functio
       data: JSON.stringify({'token': token}),
       dataType: 'json',
       contentType: 'application/json',
+      headers: {}
     });
     Ember.$.ajax.restore();
   });
