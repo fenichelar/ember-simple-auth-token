@@ -170,7 +170,7 @@ export default TokenAuthenticator.extend({
         Ember.run(function() {
           var tokenData = _this.getTokenData(response),
             expiresAt = tokenData[_this.tokenExpireName],
-            data = Ember.merge(response, {expiresAt: expiresAt, token: response.token});
+            data = Ember.merge(response, {expiresAt: expiresAt});
           _this.scheduleAccessTokenRefresh(expiresAt, response.token);
           _this.trigger('sessionDataUpdated', data);
           resolve(response);
@@ -190,14 +190,11 @@ export default TokenAuthenticator.extend({
   */
   getTokenData: function(response) {
     var token = response.token.split('.');
-    
     if(token.length > 1){
-      token = token[1];
+      return JSON.parse(atob(token[1]));
     }else{
-      token = token[0];
+      return JSON.parse(atob(token[0]));
     }
-
-    return JSON.parse(atob(token));
   },
 
   /**
