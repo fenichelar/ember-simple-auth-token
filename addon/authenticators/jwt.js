@@ -3,12 +3,14 @@ import Configuration from '../configuration';
 import TokenAuthenticator from './token';
 
 /**
-  Extended Token Authenticator that includes refresh by default.
+  JWT (JSON Web Token) Authenticator that supports automatic token refresh.
 
-  _The factory for this authenticator is registered as
-  `'simple-auth-authenticator:jwt'` in Ember's container._
+  Inspired by [ember-simple-auth-oauth2](https://github.com/simplabs/ember-simple-auth/tree/master/packages/ember-simple-auth-oauth2)
 
-  @class Jwt
+  The factory for this authenticator is registered as
+  'simple-auth-authenticator:jwt` in Ember's container.
+
+  @class JWT
   @namespace SimpleAuth.Authenticators
   @module simple-auth-token/authenticators/jwt
   @extends TokenAuthenticator
@@ -69,15 +71,22 @@ export default TokenAuthenticator.extend({
   },
 
   /**
-    Restores the session from a set of session properties; __will return a
-    resolving promise when there's a non-empty `token` in the `data`__
-    and a rejecting promise otherwise.
-    This method also schedules automatic token refreshing when there are values
-    for `token` and `expiresAt` in the `data` and automatic token
-    refreshing is not disabled.
+    Restores the session from a set of session properties.
+
+    It will return a resolving promise if one of two conditions is met:
+
+    1) Both `data.token` and `data.expiresAt` are non-empty and `expiresAt`
+       is greater than the calculated `now`.
+    2) If `data.token` is non-empty and the decoded token has a key for
+       `tokenExpireName`.
+
+    If `refreshAccessTokens` is true, `scheduleAccessTokenRefresh` will
+    be called and an automatic token refresh will be initiated.
+
     @method restore
     @param {Object} data The data to restore the session from
-    @return {Ember.RSVP.Promise} A promise that when it resolves results in the session being authenticated
+    @return {Ember.RSVP.Promise} A promise that when it resolves results
+                                 in the session being authenticated
   */
   restore: function(data){
     var _this = this;
@@ -106,17 +115,20 @@ export default TokenAuthenticator.extend({
   },
 
   /**
-    Authenticates the session with the specified `credentials`; the credentials
-    are `POST`ed to the
-    [`Authenticators.Token#serverTokenEndpoint`](#SimpleAuth-Authenticators-Token-serverTokenEndpoint)
-    and if they are valid the server returns an auth token in
-    response. __If the credentials are valid and authentication succeeds, a
-    promise that resolves with the server's response is returned__, otherwise a
-    promise that rejects with the server error is returned.
+    Authenticates the session with the specified `credentials`.
+
+    It will return a resolving promise if it successfully posts a request
+    to the `JWT.serverTokenEndpoint` with the valid credentials.
+
+    An automatic token refresh will be scheduled with the new expiration date
+    from the returned refresh token. That expiration will be merged with the
+    response and the promise resolved.
 
     @method authenticate
     @param {Object} options The credentials to authenticate the session with
-    @return {Ember.RSVP.Promise} A promise that resolves when an auth token is successfully acquired from the server and rejects otherwise
+    @return {Ember.RSVP.Promise} A promise that resolves when an auth token is
+                                 successfully acquired from the server and rejects
+                                 otherwise
   */
   authenticate: function(credentials) {
     var _this = this;
@@ -139,6 +151,12 @@ export default TokenAuthenticator.extend({
   },
 
   /**
+    Schedules a token refresh request to be sent to the backend after a calculated
+    `wait` time has passed.
+
+    If both `token` and `expiresAt` are non-empty, and `expiresAt` is greater than
+    the calculated `now`, the token refresh will be scheduled through Ember.run.later.
+
     @method scheduleAccessTokenRefresh
     @private
   */
@@ -158,6 +176,16 @@ export default TokenAuthenticator.extend({
   },
 
   /**
+    Makes a refresh token request to grab a new authenticated JWT token from the server.
+
+    It will return a resolving promise if a successful POST is made to the
+    `JWT.serverTokenRefreshEndpoint`.
+
+    After the new token is obtained it will schedule the next automatic token refresh
+    based on the new `expiresAt` time.
+
+    The session will be updated via the trigger `sessionDataUpdated`.
+
     @method refreshAccessToken
     @private
   */
@@ -197,6 +225,8 @@ export default TokenAuthenticator.extend({
   },
 
   /**
+    Accepts a `url` and `data` to be used in an ajax server request.
+
     @method makeRequest
     @private
   */

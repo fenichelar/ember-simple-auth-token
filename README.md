@@ -104,6 +104,8 @@ ENV['simple-auth'] = {
 
 ## Available Customization Options
 
+For the Token authenticator:
+
 ```js
 // config/environment.js
 ENV['simple-auth-token'] = {
@@ -114,11 +116,14 @@ ENV['simple-auth-token'] = {
   authorizationPrefix: 'Bearer ',
   authorizationHeaderName: 'Authorization',
   headers: {},
+};
+```
 
-  // Only used with JWT Authenticator.
+For the JWT authenticator (in addition to the Token authenticator fields):
+
+```
   refreshAccessTokens: true,
   serverTokenRefreshEndpoint: '/api-token-refresh/',
   tokenExpireName: 'exp',
   timeFactor: 1  // example - set to "1000" to convert incoming seconds to milliseconds.
-};
-```
+``
