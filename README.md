@@ -126,4 +126,4 @@ For the JWT authenticator (in addition to the Token authenticator fields):
   serverTokenRefreshEndpoint: '/api-token-refresh/',
   tokenExpireName: 'exp',
   timeFactor: 1  // example - set to "1000" to convert incoming seconds to milliseconds.
-``
+```
