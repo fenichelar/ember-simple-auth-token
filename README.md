@@ -86,22 +86,24 @@ export default Ember.Controller.extend(LoginControllerMixin, {
 ```
 
 Please note, the JWT authenticator will decode a token and look for the
-expiration time found by looking up the token[JWT.tokenExpireName]. It then
+expiration time found by looking up the token[Condig.tokenExpireName]. It then
 calculated the difference between current time and the expire time to
 determine when to make the next automatic token refresh request.
 
 For example, your decoded token might look like this:
 
+```
 token = {
   'user': 'george',
   'email': 'george@castanza.com'
   'exp': '98343234' // <ISO-8601> UTC seconds from e.g. python backend.
 }
+```
 
 In this case the token expire name is using the default `exp` as set by the
-`JWT.tokenExpireName` property.
+`Config.tokenExpireName` property.
 
-An automatic token refresh request would be sent out at token[tokenExpireName] - now()
+An automatic token refresh request would be sent out at token[Config.tokenExpireName] - now()
 
 ## The Authorizer
 
