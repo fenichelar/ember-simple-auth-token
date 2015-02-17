@@ -100,7 +100,7 @@ export default Base.extend({
   restore: function(properties) {
     var _this = this;
     return new Ember.RSVP.Promise(function(resolve, reject) {
-      if (!Ember.isEmpty(properties[_this.tokenPropertyName])) {
+      if (!Ember.isEmpty(_this.extractTokenFromProperties(properties))) {
         resolve(properties);
       } else {
         reject();
@@ -187,5 +187,17 @@ export default Base.extend({
       },
       headers: this.headers
     });
+  },
+
+  /**
+    @method extractTokenFromProperties
+    @private
+  */
+  extractTokenFromProperties: function(properties) {
+    var res = properties;
+    this.tokenPropertyName.split('.').forEach(function(e) {
+      if (res && res[e]) { res = res[e]; }
+    });
+    return res;
   }
 });
