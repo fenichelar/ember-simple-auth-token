@@ -13,12 +13,11 @@ var defaults = {
 /**
   Ember Simple Auth Token's configuration object.
 
-  To change any of these values, define a global environment object for Ember
-  Simple Auth and define the values there:
+  To change any of these values, set them on the application's
+  environment object:
 
   ```js
-  window.ENV = window.ENV || {};
-  window.ENV['simple-auth-token'] = {
+  ENV['simple-auth-token'] = {
     serverTokenEndpoint: '/some/other/endpoint'
   }
   ```
