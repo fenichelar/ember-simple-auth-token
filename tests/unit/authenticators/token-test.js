@@ -80,6 +80,34 @@ test('#restore resolves with the correct data', function() {
   });
 });
 
+test('#restore resolves custom token with the correct data', function() {
+  Configuration.tokenPropertyName = 'user.data.token';
+
+  App.authenticator = Token.create();
+
+  var properties = {
+    user: {
+      data: {
+        token: 'secret token!'
+      }
+    }
+  };
+
+  App.server.respondWith('POST', '/api-token-auth/', [
+    201,
+    {
+      'Content-Type': 'application/json'
+    },
+    '{ "token": "secret token!" }'
+  ]);
+
+  Ember.run(function() {
+    App.authenticator.restore(properties).then(function(content) {
+      deepEqual(content, properties);
+    });
+  });
+});
+
 test('#authenticate sends an AJAX request to the sign in endpoint', function() {
   sinon.spy(Ember.$, 'ajax');
 
