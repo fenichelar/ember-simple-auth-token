@@ -11,7 +11,7 @@ import ENV from '../config/environment';
 export default {
   name: 'simple-auth-token',
   before: 'simple-auth',
-  initialize: function(container){
+  initialize: function(container) {
     Configuration.load(container, ENV['simple-auth-token'] || {});
     container.register('simple-auth-authorizer:token', Authorizer);
     container.register('simple-auth-authenticator:token', TokenAuthenticator);

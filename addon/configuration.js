@@ -101,7 +101,7 @@ export default {
     The name for which decoded token field represents the token expire time.
     @property tokenExpireName
     @type String
-    @default 'exp' 
+    @default 'exp'
   */
   tokenExpireName: defaults.tokenExpireName,
 

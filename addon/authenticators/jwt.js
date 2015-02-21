@@ -43,7 +43,7 @@ export default TokenAuthenticator.extend({
     The name for which decoded token field represents the token expire time.
     @property tokenExpireName
     @type String
-    @default 'exp' 
+    @default 'exp'
   */
   tokenExpireName: 'exp',
 
@@ -88,26 +88,32 @@ export default TokenAuthenticator.extend({
     @return {Ember.RSVP.Promise} A promise that when it resolves results
                                  in the session being authenticated
   */
-  restore: function(data){
+  restore: function(data) {
     var _this = this;
-    return new Ember.RSVP.Promise(function(resolve, reject){
+
+    return new Ember.RSVP.Promise(function(resolve, reject) {
       var now = (new Date()).getTime(),
         expiresAt = _this.resolveTime(data.expiresAt);
-      if(!Ember.isEmpty(data.expiresAt) && !Ember.isEmpty(data.token) && expiresAt > now){
-        if(_this.refreshAccessTokens){
-          _this.refreshAccessToken(data.token).then(function(data){
+
+      if (!Ember.isEmpty(data.expiresAt) && !Ember.isEmpty(data.token) && expiresAt > now) {
+        if (_this.refreshAccessTokens) {
+          _this.refreshAccessToken(data.token).then(function(data) {
             resolve(data);
           }, reject);
-        }else{
+        } else {
           reject();
         }
-      }else{
-        if(Ember.isEmpty(data.token)){
+      } else {
+        if (Ember.isEmpty(data.token)) {
           reject();
-        }else{
-          var tokenData = _this.getTokenData({'token': data.token}),
+        } else {
+          var tokenData = _this.getTokenData({
+              'token': data.token
+            }),
             tokenExpiresAt = tokenData[_this.tokenExpireName];
+
           _this.scheduleAccessTokenRefresh(tokenExpiresAt, data.token);
+
           resolve(data);
         }
       }
@@ -132,14 +138,21 @@ export default TokenAuthenticator.extend({
   */
   authenticate: function(credentials) {
     var _this = this;
+
     return new Ember.RSVP.Promise(function(resolve, reject) {
       var data = _this.getAuthenticateData(credentials);
+
       _this.makeRequest(_this.serverTokenEndpoint, data).then(function(response) {
         Ember.run(function() {
           var tokenData = _this.getTokenData(response),
-              expiresAt = tokenData[_this.tokenExpireName];
-          _this.scheduleAccessTokenRefresh(expiresAt, response.token);          
-          response = Ember.merge(response, { expiresAt: expiresAt });
+            expiresAt = tokenData[_this.tokenExpireName];
+
+          _this.scheduleAccessTokenRefresh(expiresAt, response.token);
+
+          response = Ember.merge(response, {
+            expiresAt: expiresAt
+          });
+
           resolve(_this.getResponseData(response));
         });
       }, function(xhr) {
@@ -161,14 +174,18 @@ export default TokenAuthenticator.extend({
     @private
   */
   scheduleAccessTokenRefresh: function(expiresAt, token) {
-    if(this.refreshAccessTokens){
+    if (this.refreshAccessTokens) {
       expiresAt = this.resolveTime(expiresAt);
+
       var now = (new Date()).getTime(),
         wait = expiresAt - now;
-      if(!Ember.isEmpty(token) && !Ember.isEmpty(expiresAt) && expiresAt > now){
+
+      if (!Ember.isEmpty(token) && !Ember.isEmpty(expiresAt) && expiresAt > now) {
         Ember.run.cancel(this._refreshTokenTimeout);
+
         delete this._refreshTokenTimeout;
-        if(!Ember.testing){
+
+        if (!Ember.testing) {
           this._refreshTokenTimeout = Ember.run.later(this, this.refreshAccessToken, token, wait);
         }
       }
@@ -190,16 +207,24 @@ export default TokenAuthenticator.extend({
     @private
   */
   refreshAccessToken: function(token) {
-    var _this = this;
-    var data  = {token: token};
+    var _this = this,
+      data = {
+        token: token
+      };
+
     return new Ember.RSVP.Promise(function(resolve, reject) {
       _this.makeRequest(_this.serverTokenRefreshEndpoint, data).then(function(response) {
         Ember.run(function() {
           var tokenData = _this.getTokenData(response),
             expiresAt = tokenData[_this.tokenExpireName],
-            data = Ember.merge(response, {expiresAt: expiresAt});
+            data = Ember.merge(response, {
+              expiresAt: expiresAt
+            });
+
           _this.scheduleAccessTokenRefresh(expiresAt, response.token);
+
           _this.trigger('sessionDataUpdated', data);
+
           resolve(response);
         });
       }, function(xhr, status, error) {
@@ -217,9 +242,10 @@ export default TokenAuthenticator.extend({
   */
   getTokenData: function(response) {
     var token = response.token.split('.');
-    if(token.length > 1){
+
+    if (token.length > 1) {
       return JSON.parse(atob(token[1]));
-    }else{
+    } else {
       return JSON.parse(atob(token[0]));
     }
   },
@@ -243,7 +269,7 @@ export default TokenAuthenticator.extend({
       headers: this.headers
     });
   },
-  
+
   /**
     Cancels any outstanding automatic token refreshes and returns a resolving
     promise.
@@ -253,9 +279,11 @@ export default TokenAuthenticator.extend({
   */
   invalidate: function() {
     Ember.run.cancel(this._refreshTokenTimeout);
+
     delete this._refreshTokenTimeout;
+
     return new Ember.RSVP.resolve();
-  }, 
+  },
 
   /**
     Handles converting between time units for data between different systems.
@@ -263,7 +291,7 @@ export default TokenAuthenticator.extend({
     @method resolveTime
     @private
   */
-  resolveTime: function(time){
+  resolveTime: function(time) {
     return new Date(time * this.timeFactor).getTime();
   },
 });

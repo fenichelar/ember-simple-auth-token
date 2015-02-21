@@ -66,8 +66,7 @@ test('#restore resolves with the correct data', function() {
   };
 
   App.server.respondWith('POST', '/api-token-auth/', [
-    201,
-    {
+    201, {
       'Content-Type': 'application/json'
     },
     '{ "token": "secret token!" }'
@@ -94,8 +93,7 @@ test('#restore resolves custom token with the correct data', function() {
   };
 
   App.server.respondWith('POST', '/api-token-auth/', [
-    201,
-    {
+    201, {
       'Content-Type': 'application/json'
     },
     '{ "token": "secret token!" }'
@@ -174,8 +172,9 @@ test('#authenticate successfully resolves with the correct data', function() {
   };
 
   App.server.respondWith('POST', '/api-token-auth/', [
-    201,
-    { 'Content-Type': 'application/json' },
+    201, {
+      'Content-Type': 'application/json'
+    },
     '{ "access_token": "secret token!" }'
   ]);
 
@@ -198,7 +197,10 @@ test('#authenticate sends an AJAX request with custom headers', function() {
     password: 'password'
   };
 
-  Configuration.headers = {'X-API-KEY': '123-abc', 'X-ANOTHER-HEADER': 0};
+  Configuration.headers = {
+    'X-API-KEY': '123-abc',
+    'X-ANOTHER-HEADER': 0
+  };
   App.authenticator = Token.create();
   App.authenticator.authenticate(credentials);
 
@@ -211,7 +213,10 @@ test('#authenticate sends an AJAX request with custom headers', function() {
       data: '{"password":"password","username":"username"}',
       dataType: 'json',
       contentType: 'application/json',
-      headers: {'X-API-KEY': '123-abc', 'X-ANOTHER-HEADER': 0}
+      headers: {
+        'X-API-KEY': '123-abc',
+        'X-ANOTHER-HEADER': 0
+      }
     });
 
     Ember.$.ajax.restore();
@@ -227,14 +232,17 @@ test('#authenticate rejects with the correct error', function() {
   };
 
   App.server.respondWith('POST', '/api-token-auth/', [
-    400,
-    { 'Content-Type': 'application/json' },
+    400, {
+      'Content-Type': 'application/json'
+    },
     '{ "error": "invalid_grant" }'
   ]);
 
   Ember.run(function() {
     App.authenticator.authenticate(credentials).then(null, function(error) {
-      deepEqual(error, {'error': 'invalid_grant'});
+      deepEqual(error, {
+        'error': 'invalid_grant'
+      });
     });
 
     Ember.$.ajax.restore();
