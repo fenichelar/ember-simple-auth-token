@@ -33,3 +33,19 @@ test('authorizationPrefix', function() {
 test('authorizationHeaderName', function() {
   equal(Configuration.authorizationHeaderName, 'Authorization', 'defaults to "Authorization"');
 });
+
+test('serverTokenRefreshEndpoint', function() {
+  equal(Configuration.serverTokenRefreshEndpoint, '/api-token-refresh/', 'defaults to "/api-token-refresh/"');
+});
+
+test('refreshAccessTokens', function() {
+  equal(Configuration.refreshAccessTokens, true, 'defaults to true');
+});
+
+test('tokenExpireName', function() {
+  equal(Configuration.tokenExpireName, 'exp', 'defaults to "exp"');
+});
+
+test('timeFactor', function() {
+  equal(Configuration.timeFactor, 1, 'defaults to 1');
+});
