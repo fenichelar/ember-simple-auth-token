@@ -1,6 +1,6 @@
 {
   "name": "ember-cli-simple-auth-token",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "An authenticator and authorizer for Ember Simple Auth that is compatible with token-based authentication like JWT in Ember CLI applications.",
   "directories": {
     "doc": "doc",
