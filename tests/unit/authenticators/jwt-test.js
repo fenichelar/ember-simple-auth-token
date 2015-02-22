@@ -6,6 +6,11 @@ import Configuration from 'simple-auth-token/configuration';
 
 var App;
 
+var createFakeToken = function(obj) {
+  var token = window.btoa(JSON.stringify(obj));
+  return 'a.' + token + '.b';
+};
+
 module('JWT Authenticator', {
   setup: function() {
     App = startApp();
@@ -62,7 +67,7 @@ test('#restore resolves when the data includes `token` and `expiresAt`', functio
   token[jwt.identificationField] = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
-  token = window.btoa(JSON.stringify(token));
+  token = createFakeToken(token);
 
   var data = {};
   data[jwt.tokenPropertyName] = token;
@@ -91,7 +96,7 @@ test('#restore resolves when the data includes `token` and excludes `expiresAt`'
   token[jwt.identificationField] = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
-  token = window.btoa(JSON.stringify(token));
+  token = createFakeToken(token);
 
   var data = {};
   data[jwt.tokenPropertyName] = token;
@@ -119,7 +124,7 @@ test('#restore rejects when `refreshAccessTokens` is false', function() {
   token[jwt.identificationField] = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
-  token = window.btoa(JSON.stringify(token));
+  token = createFakeToken(token);
 
   var data = {};
   data[jwt.tokenPropertyName] = token;
@@ -150,7 +155,7 @@ test('#restore rejects when `token` is excluded.', function() {
   token[jwt.identificationField] = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
-  token = window.btoa(JSON.stringify(token));
+  token = createFakeToken(token);
 
   var data = {};
   data['expiresAt'] = expiresAt;
@@ -180,7 +185,7 @@ test('#restore resolves when `expiresAt` is greater than `now`', function() {
   token[jwt.identificationField] = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
-  token = window.btoa(JSON.stringify(token));
+  token = createFakeToken(token);
 
   var data = {};
   data[jwt.tokenPropertyName] = token;
@@ -211,7 +216,7 @@ test('#restore schedules a token refresh when `refreshAccessTokens` is true.', f
   token[jwt.identificationField] = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
-  token = window.btoa(JSON.stringify(token));
+  token = createFakeToken(token);
 
   var data = {};
   data[jwt.tokenPropertyName] = token;
@@ -238,7 +243,7 @@ test('#restore does not schedule a token refresh when `refreshAccessTokens` is f
   token[jwt.identificationField] = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
-  token = window.btoa(JSON.stringify(token));
+  token = createFakeToken(token);
 
   var data = {};
   data[jwt.tokenPropertyName] = token;
@@ -263,7 +268,7 @@ test('#restore does not schedule a token refresh when `expiresAt` < now.', funct
   token[jwt.identificationField] = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
-  token = window.btoa(JSON.stringify(token));
+  token = createFakeToken(token);
 
   var data = {};
   data[jwt.tokenPropertyName] = token;
@@ -312,7 +317,7 @@ test('#authenticate rejects with invalid credentials', function() {
   token[jwt.identificationField] = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
-  token = window.btoa(JSON.stringify(token));
+  token = createFakeToken(token);
 
   var credentials = {
     identification: 'username',
@@ -345,7 +350,7 @@ test('#authenticate schedules a token refresh when `refreshAccessTokens` is true
   token[jwt.identificationField] = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
-  token = window.btoa(JSON.stringify(token));
+  token = createFakeToken(token);
 
   var credentials = {
     identification: 'username',
@@ -379,7 +384,7 @@ test('#authenticate does not schedule a token refresh when `refreshAccessTokens`
   token[jwt.identificationField] = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
-  token = window.btoa(JSON.stringify(token));
+  token = createFakeToken(token);
 
   var credentials = {
     identification: 'username',
@@ -417,7 +422,7 @@ test('#refreshAccessToken makes an AJAX request to the token endpoint.', functio
   token[jwt.identificationField] = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
-  token = window.btoa(JSON.stringify(token));
+  token = createFakeToken(token);
 
   App.authenticator.refreshAccessToken(token);
 
@@ -446,7 +451,7 @@ test('#refreshAccessToken triggers the `sessionDataUpdated` event on successful 
   token[jwt.identificationField] = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
-  token = window.btoa(JSON.stringify(token));
+  token = createFakeToken(token);
 
   App.server.respondWith('POST', jwt.serverTokenRefreshEndpoint, [
     201, {
