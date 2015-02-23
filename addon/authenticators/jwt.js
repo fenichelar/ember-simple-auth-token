@@ -63,6 +63,7 @@ export default TokenAuthenticator.extend({
     this.serverTokenEndpoint = Configuration.serverTokenEndpoint;
     this.serverTokenRefreshEndpoint = Configuration.serverTokenRefreshEndpoint;
     this.identificationField = Configuration.identificationField;
+    this.tokenPropertyName = Configuration.tokenPropertyName;
     this.refreshAccessTokens = Configuration.refreshAccessTokens;
     this.tokenExpireName = Configuration.tokenExpireName;
     this.timeFactor = Configuration.timeFactor;
@@ -106,7 +107,7 @@ export default TokenAuthenticator.extend({
         if (Ember.isEmpty(data.token)) {
           reject();
         } else {
-          var tokenData = _this.getTokenData(data.token),
+          var tokenData = _this.getTokenData(data[_this.tokenPropertyName]),
             tokenExpiresAt = tokenData[_this.tokenExpireName];
 
           _this.scheduleAccessTokenRefresh(tokenExpiresAt, data.token);
@@ -141,7 +142,7 @@ export default TokenAuthenticator.extend({
 
       _this.makeRequest(_this.serverTokenEndpoint, data).then(function(response) {
         Ember.run(function() {
-          var tokenData = _this.getTokenData(response.token),
+          var tokenData = _this.getTokenData(response[_this.tokenPropertyName]),
             expiresAt = tokenData[_this.tokenExpireName];
 
           _this.scheduleAccessTokenRefresh(expiresAt, response.token);
@@ -212,7 +213,7 @@ export default TokenAuthenticator.extend({
     return new Ember.RSVP.Promise(function(resolve, reject) {
       _this.makeRequest(_this.serverTokenRefreshEndpoint, data).then(function(response) {
         Ember.run(function() {
-          var tokenData = _this.getTokenData(response.token),
+          var tokenData = _this.getTokenData(response[_this.tokenPropertyName]),
             expiresAt = tokenData[_this.tokenExpireName],
             data = Ember.merge(response, {
               expiresAt: expiresAt
