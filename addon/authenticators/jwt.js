@@ -89,13 +89,15 @@ export default TokenAuthenticator.extend({
                                  in the session being authenticated
   */
   restore: function(data) {
-    var _this = this;
-
+    var _this = this,
+      dataObject = Ember.Object.create(data);
+    
     return new Ember.RSVP.Promise(function(resolve, reject) {
       var now = (new Date()).getTime(),
-        expiresAt = _this.resolveTime(data.expiresAt);
+        expiresAt = _this.resolveTime(dataObject.get('expiresAt')),
+        token = dataObject.get(_this.tokenPropertyName);
 
-      if (!Ember.isEmpty(data.expiresAt) && !Ember.isEmpty(data.token) && expiresAt > now) {
+      if (!Ember.isEmpty(expiresAt) && !Ember.isEmpty(token) && expiresAt > now) {
         if (_this.refreshAccessTokens) {
           _this.refreshAccessToken(data.token).then(function(data) {
             resolve(data);
@@ -104,13 +106,15 @@ export default TokenAuthenticator.extend({
           reject();
         }
       } else {
-        if (Ember.isEmpty(data.token)) {
+        if (Ember.isEmpty(token)) {
           reject();
         } else {
+          // Fetch the expire time from the token data since `expiresAt`
+          // wasn't included in the data object that was passed in.
           var tokenData = _this.getTokenData(data[_this.tokenPropertyName]),
             tokenExpiresAt = tokenData[_this.tokenExpireName];
 
-          _this.scheduleAccessTokenRefresh(tokenExpiresAt, data.token);
+          _this.scheduleAccessTokenRefresh(tokenExpiresAt, token);
 
           resolve(data);
         }
