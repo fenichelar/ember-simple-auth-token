@@ -282,6 +282,31 @@ test('#restore does not schedule a token refresh when `expiresAt` < now.', funct
   });
 });
 
+test('#restore does not schedule a token refresh when `expiresAt` - `refreshMargin` < now.', function() {
+  var jwt = JWT.create(),
+    expiresAt = (new Date()).getTime() + 60000;
+
+  var token = {};
+  token[jwt.identificationField] = 'test@test.com';
+  token[jwt.tokenExpireName] = expiresAt;
+
+  token = createFakeToken(token);
+
+  var data = {};
+  data[jwt.tokenPropertyName] = token;
+  data[jwt.tokenExpireName] = expiresAt;
+
+  // Set the refreshMargin to > expiresAt.
+  App.authenticator.refreshMargin = 120;
+
+  Ember.run(function() {
+    App.authenticator.restore(data).then(function() {
+      // Check that Ember.run.later was not called.
+      deepEqual(Ember.run.later.getCall(0), null);
+    });
+  });
+});
+
 test('#authenticate sends an ajax request to the token endpoint', function() {
   sinon.spy(Ember.$, 'ajax');
 

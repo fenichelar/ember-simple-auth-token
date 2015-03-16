@@ -33,6 +33,15 @@ export default TokenAuthenticator.extend({
   refreshAccessTokens: true,
 
   /**
+    The number of seconds to subtract from the token's time of expiration when
+    scheduling the automatic token refresh call.
+    @property refreshMargin
+    @type Integer
+    @default 0 (seconds)
+  */
+  refreshMargin: 0,
+
+  /**
     The amount of time to wait before refreshing the token - set automatically.
     @property refreshTokenTimeout
     @private
@@ -65,6 +74,7 @@ export default TokenAuthenticator.extend({
     this.identificationField = Configuration.identificationField;
     this.tokenPropertyName = Configuration.tokenPropertyName;
     this.refreshAccessTokens = Configuration.refreshAccessTokens;
+    this.refreshMargin = Configuration.refreshMargin;
     this.tokenExpireName = Configuration.tokenExpireName;
     this.timeFactor = Configuration.timeFactor;
     this.headers = Configuration.headers;
@@ -169,8 +179,9 @@ export default TokenAuthenticator.extend({
     Schedules a token refresh request to be sent to the backend after a calculated
     `wait` time has passed.
 
-    If both `token` and `expiresAt` are non-empty, and `expiresAt` is greater than
-    the calculated `now`, the token refresh will be scheduled through Ember.run.later.
+    If both `token` and `expiresAt` are non-empty, and `expiresAt` minus the optional 
+    refres margin is greater than the calculated `now`, the token refresh will be scheduled
+    through Ember.run.later.
 
     @method scheduleAccessTokenRefresh
     @private
@@ -180,9 +191,9 @@ export default TokenAuthenticator.extend({
       expiresAt = this.resolveTime(expiresAt);
 
       var now = (new Date()).getTime(),
-        wait = expiresAt - now;
+        wait = expiresAt - now - (this.refreshMargin * 1000);
 
-      if (!Ember.isEmpty(token) && !Ember.isEmpty(expiresAt) && expiresAt > now) {
+      if (!Ember.isEmpty(token) && !Ember.isEmpty(expiresAt) && wait > 0) {
         Ember.run.cancel(this._refreshTokenTimeout);
 
         delete this._refreshTokenTimeout;
