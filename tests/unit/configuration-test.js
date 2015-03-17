@@ -42,8 +42,8 @@ test('refreshAccessTokens', function() {
   equal(Configuration.refreshAccessTokens, true, 'defaults to true');
 });
 
-test('refreshMargin', function() {
-  equal(Configuration.refreshMargin, 0, 'defaults to 0');
+test('refreshLeeway', function() {
+  equal(Configuration.refreshLeeway, 0, 'defaults to 0');
 });
 
 test('tokenExpireName', function() {

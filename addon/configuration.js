@@ -7,7 +7,7 @@ var defaults = {
   passwordField: 'password',
   tokenPropertyName: 'token',
   refreshAccessTokens: true,
-  refreshMargin: 0,
+  refreshLeeway: 0,
   tokenExpireName: 'exp',
   authorizationPrefix: 'Bearer ',
   authorizationHeaderName: 'Authorization',
@@ -101,11 +101,11 @@ export default {
   /**
     The number of seconds to subtract from the token's time of expiration when
     scheduling the automatic token refresh call.
-    @property refreshMargin
+    @property refreshLeeway
     @type Integer
     @default 0 (seconds)
   */
-  refreshMargin: defaults.refreshMargin,
+  refreshLeeway: defaults.refreshLeeway,
 
   /**
     The name for which decoded token field represents the token expire time.

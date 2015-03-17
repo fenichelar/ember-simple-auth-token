@@ -282,7 +282,7 @@ test('#restore does not schedule a token refresh when `expiresAt` < now.', funct
   });
 });
 
-test('#restore does not schedule a token refresh when `expiresAt` - `refreshMargin` < now.', function() {
+test('#restore does not schedule a token refresh when `expiresAt` - `refreshLeeway` < now.', function() {
   var jwt = JWT.create(),
     expiresAt = (new Date()).getTime() + 60000;
 
@@ -296,8 +296,8 @@ test('#restore does not schedule a token refresh when `expiresAt` - `refreshMarg
   data[jwt.tokenPropertyName] = token;
   data[jwt.tokenExpireName] = expiresAt;
 
-  // Set the refreshMargin to > expiresAt.
-  App.authenticator.refreshMargin = 120;
+  // Set the refreshLeeway to > expiresAt.
+  App.authenticator.refreshLeeway = 120;
 
   Ember.run(function() {
     App.authenticator.restore(data).then(function() {
