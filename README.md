@@ -103,7 +103,17 @@ token = {
 In this case the token expire name is using the default `exp` as set by the
 `Config.tokenExpireName` property.
 
-An automatic token refresh request would be sent out at token[Config.tokenExpireName] - now()
+An automatic token refresh request would be sent out at token[Config.tokenExpireName] - now(). Best practice with regards to token refreshing is to also set a "leeway" on your server-side Jwt decode method. An example in ruby:
+
+```ruby
+require 'ruby-jwt'
+
+def decode_jwt
+  token = request.headers['Authorization'].split(' ').last
+  JWT.decode(token, 'secret', true, {leeway: 10}) # adds 10 seconds of leeway to decode the jwt post-expiry
+end
+
+```
 
 ## The Authorizer
 
