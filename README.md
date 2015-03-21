@@ -87,10 +87,24 @@ export default Ember.Controller.extend(LoginControllerMixin, {
 
 Please note, the JWT authenticator will decode a token and look for the
 expiration time found by looking up the token[Config.tokenExpireName]. It then
-calculates the difference between the current time and the token expire time
-to determine when to make the next automatic token refresh request.
+calculates the difference between the current time and the token expire time —
+from which the *refreshLeeway* is subtracted — to determine when to make the
+next automatic token refresh request.
 
-For example, your decoded token might look like this:
+For example, with the following configuration:
+
+```
+  ENV['simple-auth'] = {
+    authorizer: 'simple-auth-authorizer:token'
+  };
+  ENV['simple-auth-token'] = {
+    refreshAccessTokens: true,
+    timeFactor: 1,
+    refreshLeeway: 300 // Refresh the token 5 minutes (300s) before it expires.
+  };
+```
+
+Your decoded token might look like this:
 
 ```
 token = {
@@ -100,10 +114,11 @@ token = {
 }
 ```
 
-In this case the token expire name is using the default `exp` as set by the
-`Config.tokenExpireName` property.
+*In this case the token expire name is using the default `exp` as set by the
+`Config.tokenExpireName` property.*
 
-An automatic token refresh request would be sent out at token[Config.tokenExpireName] - now()
+If the token issued was valid for an hour, an automatic token refresh request
+would be sent out five minutes before the expiration time of the token.
 
 ## The Authorizer
 
@@ -145,5 +160,6 @@ For the JWT authenticator (in addition to the Token authenticator fields):
   refreshAccessTokens: true,
   serverTokenRefreshEndpoint: '/api-token-refresh/',
   tokenExpireName: 'exp',
+  refreshLeeway: 0,
   timeFactor: 1  // example - set to "1000" to convert incoming seconds to milliseconds.
 ```
