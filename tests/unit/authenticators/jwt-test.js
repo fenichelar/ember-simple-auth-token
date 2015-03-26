@@ -505,6 +505,6 @@ test('#getTokenData returns correct data', function() {
   var objectToken = createFakeToken(objectTokenData);
   var stringToken = createFakeToken(stringTokenData);
   
-  equal(jwt.getTokenData(objectToken), objectTokenData, 'Object data returned');
+  deepEqual(jwt.getTokenData(objectToken), objectTokenData, 'Object data returned');
   equal(jwt.getTokenData(stringToken), stringTokenData, 'String data returned');
 });
