@@ -493,3 +493,18 @@ test('#refreshAccessToken triggers the `sessionDataUpdated` event on successful 
     deepEqual(data.token, token);
   });
 });
+
+test('#getTokenData returns correct data', function() {
+  var jwt = JWT.create();
+  
+  var stringTokenData = 'test@test.com';
+  var objectTokenData = {};
+  
+  objectTokenData[jwt.identificationField] = stringTokenData;
+
+  var objectToken = createFakeToken(objectTokenData);
+  var stringToken = createFakeToken(stringTokenData);
+  
+  deepEqual(jwt.getTokenData(objectToken), objectTokenData, 'Object data returned');
+  equal(jwt.getTokenData(stringToken), stringTokenData, 'String data returned');
+});

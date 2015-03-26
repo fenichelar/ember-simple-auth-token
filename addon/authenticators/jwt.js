@@ -254,7 +254,14 @@ export default TokenAuthenticator.extend({
     @return {object} An object with properties for the session.
   */
   getTokenData: function(token) {
-    return JSON.parse(atob(token.split('.')[1]));
+    var tokenData = atob(token.split('.')[1]);
+    
+    try {
+      return JSON.parse(tokenData);
+    } catch (e) {
+      //jshint unused:false
+      return tokenData;
+    }
   },
 
   /**
