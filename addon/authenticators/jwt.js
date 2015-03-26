@@ -12,7 +12,7 @@ import TokenAuthenticator from './token';
 
   @class JWT
   @namespace SimpleAuth.Authenticators
-  @module simple-auth-token/authenticators/jwt
+  @module simple-auth-token/authenticgators/jwt
   @extends TokenAuthenticator
 */
 export default TokenAuthenticator.extend({
@@ -254,7 +254,14 @@ export default TokenAuthenticator.extend({
     @return {object} An object with properties for the session.
   */
   getTokenData: function(token) {
-    return JSON.parse(atob(token.split('.')[1]));
+    var tokenData = atob(token.split('.')[1]);
+    
+    try {
+      return JSON.parse(tokenData);
+    } catch (e) {
+      //jshint unused:false
+      return tokenData;
+    }
   },
 
   /**
