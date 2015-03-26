@@ -12,7 +12,7 @@ import TokenAuthenticator from './token';
 
   @class JWT
   @namespace SimpleAuth.Authenticators
-  @module simple-auth-token/authenticgators/jwt
+  @module simple-auth-token/authenticators/jwt
   @extends TokenAuthenticator
 */
 export default TokenAuthenticator.extend({
