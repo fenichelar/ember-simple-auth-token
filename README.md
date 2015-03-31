@@ -117,8 +117,7 @@ token = {
 *In this case the token expire name is using the default `exp` as set by the
 `Config.tokenExpireName` property.*
 
-If the token issued was valid for an hour, an automatic token refresh request
-would be sent out five minutes before the expiration time of the token.
+An automatic token refresh request would be sent out at token[Config.tokenExpireName] - now(). A good practice with regards to token refreshing is to also set a "leeway" when decoding JSON Web Tokens in the server-side. Some libraries like [PyJWT](https://github.com/jpadilla/pyjwt) and [ruby-jwt](https://github.com/progrium/ruby-jwt) already support this.
 
 ## The Authorizer
 
