@@ -215,7 +215,6 @@ test('#restore resolves when `expiresAt` is greater than `now`', function() {
       // Check that Ember.run.later was not called.
       deepEqual(Ember.run.later.getCall(0), null);
     }).catch(function (err) {
-      console.log(err.message);
       ok(false);
     });
   });
