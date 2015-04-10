@@ -48,7 +48,10 @@ module.exports = function(environment) {
   };
 
   ENV['simple-auth-token'] = {
-    serverTokenEndpoint: '/api/api-token-auth/'
+    serverTokenEndpoint: '/api/api-token-auth/',
+    serverTokenRefreshEndpoint: '/api/api-token-refresh/',
+    timeFactor: 1000,
+    refreshLeeway: 5
   };
 
   return ENV;
