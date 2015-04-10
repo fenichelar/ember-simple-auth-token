@@ -25,6 +25,17 @@ module.exports = function(environment) {
     // ENV.APP.LOG_TRANSITIONS = true;
     // ENV.APP.LOG_TRANSITIONS_INTERNAL = true;
     // ENV.APP.LOG_VIEW_LOOKUPS = true;
+    ENV['simple-auth'] = {
+      authorizer: 'simple-auth-authorizer:token'
+    };
+
+    ENV['simple-auth-token'] = {
+      serverTokenEndpoint: '/api/api-token-auth/',
+      serverTokenRefreshEndpoint: '/api/api-token-refresh/',
+      timeFactor: 1000,
+      refreshLeeway: 5
+    };
+
   }
 
   if (environment === 'test') {
@@ -42,17 +53,6 @@ module.exports = function(environment) {
   if (environment === 'production') {
 
   }
-
-  ENV['simple-auth'] = {
-    authorizer: 'simple-auth-authorizer:token'
-  };
-
-  ENV['simple-auth-token'] = {
-    serverTokenEndpoint: '/api/api-token-auth/',
-    serverTokenRefreshEndpoint: '/api/api-token-refresh/',
-    timeFactor: 1000,
-    refreshLeeway: 5
-  };
 
   return ENV;
 };
