@@ -28,6 +28,7 @@
     "broccoli-asset-rev": "^2.0.2",
     "broccoli-merge-trees": "^0.2.1",
     "broccoli-static-compiler": "^0.2.1",
+    "connect-restreamer": "^1.0.2",
     "ember-cli": "0.2.3",
     "ember-cli-app-version": "0.3.3",
     "ember-cli-content-security-policy": "0.4.0",
@@ -40,7 +41,11 @@
     "ember-data": "1.0.0-beta.16.1",
     "ember-disable-prototype-extensions": "^1.0.0",
     "ember-export-application-global": "^1.0.2",
-    "ember-try": "0.0.4"
+    "ember-try": "0.0.4",
+    "express": "^4.12.3",
+    "glob": "^4.5.3",
+    "jsonwebtoken": "^4.2.2",
+    "morgan": "^1.5.2"
   },
   "keywords": [
     "ember-addon",

@@ -43,5 +43,13 @@ module.exports = function(environment) {
 
   }
 
+  ENV['simple-auth'] = {
+    authorizer: 'simple-auth-authorizer:token'
+  };
+
+  ENV['simple-auth-token'] = {
+    serverTokenEndpoint: '/api/api-token-auth/'
+  };
+
   return ENV;
 };
