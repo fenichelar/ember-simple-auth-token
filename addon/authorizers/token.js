@@ -94,6 +94,6 @@ export default Base.extend({
     @return {String}
   */
   buildToken: function() {
-    return this.get('session.' + this.tokenPropertyName);
+    return this.get('session.secure.' + this.tokenPropertyName);
   }
 });
