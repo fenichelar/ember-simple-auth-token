@@ -1,17 +1,13 @@
-# See http://help.github.com/ignore-files/ for more about ignoring files.
+bower_components/
+tests/
+tmp/
 
-# compiled output
-/dist
-/tmp
-
-# dependencies
-/node_modules
-/bower_components/*
-
-# misc
-/.sass-cache
-/connect.lock
-/coverage/*
-/libpeerconnection.log
-npm-debug.log
-testem.log
+.bowerrc
+.editorconfig
+.ember-cli
+.travis.yml
+.npmignore
+**/.gitkeep
+bower.json
+Brocfile.js
+testem.json

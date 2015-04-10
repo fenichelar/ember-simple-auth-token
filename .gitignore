@@ -6,7 +6,7 @@
 
 # dependencies
 /node_modules
-/bower_components/*
+/bower_components
 
 # misc
 /.sass-cache
@@ -15,4 +15,3 @@
 /libpeerconnection.log
 npm-debug.log
 testem.log
-*.sw[po]
