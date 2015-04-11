@@ -127,7 +127,7 @@ export default TokenAuthenticator.extend({
         var wait = expiresAt - now - (_this.refreshLeeway * 1000);
         if (wait > 0) {
           if (_this.refreshAccessTokens) {
-            _this.scheduleAccessTokenRefresh(expiresAt, token);
+            _this.scheduleAccessTokenRefresh(dataObject.get('expiresAt'), token);
           }
           resolve(data);
         } else if (_this.refreshAccessTokens) {
