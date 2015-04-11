@@ -235,7 +235,7 @@ test('#restore schedules a token refresh when `refreshAccessTokens` is true.', f
   data[jwt.tokenPropertyName] = token;
   data[jwt.tokenExpireName] = expiresAt;
 
-  // TODO: find out of there is another way besides setting Ember.testing.
+  // TODO: find out if there is another way besides setting Ember.testing.
   Ember.testing = false;
 
   Ember.run(function() {

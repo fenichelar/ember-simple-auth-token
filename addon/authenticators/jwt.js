@@ -104,13 +104,13 @@ export default TokenAuthenticator.extend({
 
     return new Ember.RSVP.Promise(function(resolve, reject) {
       var now = (new Date()).getTime(),
-        expiresAt = _this.resolveTime(dataObject.get('expiresAt')),
+        expiresAt = _this.resolveTime(dataObject.get(_this.tokenExpireName)),
         token = dataObject.get(_this.tokenPropertyName);
+
       if (Ember.isEmpty(token)) {
         return reject(new Error('empty token'));
       }
-
-       if (Ember.isEmpty(expiresAt)) {
+      if (Ember.isEmpty(expiresAt)) {
         // Fetch the expire time from the token data since `expiresAt`
         // wasn't included in the data object that was passed in.
         var tokenData = _this.getTokenData(data[_this.tokenPropertyName]);
@@ -118,7 +118,6 @@ export default TokenAuthenticator.extend({
         if (Ember.isEmpty(expiresAt)) {
           return resolve(data);
         }
-
       }
       if (expiresAt !== expiresAt) {
         return reject(new Error('invalid expiration'));
@@ -127,7 +126,7 @@ export default TokenAuthenticator.extend({
         var wait = expiresAt - now - (_this.refreshLeeway * 1000);
         if (wait > 0) {
           if (_this.refreshAccessTokens) {
-            _this.scheduleAccessTokenRefresh(dataObject.get('expiresAt'), token);
+            _this.scheduleAccessTokenRefresh(dataObject.get(_this.tokenExpireName), token);
           }
           resolve(data);
         } else if (_this.refreshAccessTokens) {
@@ -207,7 +206,7 @@ export default TokenAuthenticator.extend({
 
       if (!Ember.isEmpty(token) && !Ember.isEmpty(expiresAt) && wait > 0) {
         Ember.run.cancel(this._refreshTokenTimeout);
-
+        
         delete this._refreshTokenTimeout;
 
         if (!Ember.testing) {
