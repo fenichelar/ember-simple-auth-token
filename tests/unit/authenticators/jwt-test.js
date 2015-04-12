@@ -506,8 +506,8 @@ test('#refreshAccessToken triggers the `sessionDataUpdated` event on successful 
   App.authenticator.refreshAccessToken(token);
 
   App.authenticator.one('sessionDataUpdated', function(data) {
-    ok(data.expiresAt, 'Verify expiresAt was added to response');
-    ok(data.expiresAt > (new Date()).getTime(), 'Verify is greater than now');
+    ok(data[jwt.tokenExpireName], 'Verify expiresAt was added to response');
+    ok(data[jwt.tokenExpireName] > (new Date()).getTime(), 'Verify is greater than now');
     deepEqual(data.token, token);
   });
 });
