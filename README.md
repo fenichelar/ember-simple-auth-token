@@ -1,4 +1,5 @@
-# Ember Simple Auth Token [![Build Status](https://travis-ci.org/jpadilla/ember-cli-simple-auth-token.svg?branch=master)](https://travis-ci.org/jpadilla/ember-cli-simple-auth-token)
+# Ember Simple Auth Token
+[![Build Status](https://travis-ci.org/jpadilla/ember-cli-simple-auth-token.svg?branch=master)](https://travis-ci.org/jpadilla/ember-cli-simple-auth-token) [![Ember Observer Score](http://emberobserver.com/badges/ember-cli-simple-auth-token.svg)](http://emberobserver.com/addons/ember-cli-simple-auth-token)
 
 This is an extension to the Ember Simple Auth library that provides a default token authenticator, an enhanced authenticator with automatic refresh capability, and an authorizer that are compatible with APIs with token-based authentication.
 
