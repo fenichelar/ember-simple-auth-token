@@ -130,7 +130,8 @@ export default TokenAuthenticator.extend({
           }
           resolve(data);
         } else if (_this.refreshAccessTokens) {
-            resolve(_this.refreshAccessToken(data.token).then(function () {
+            resolve(_this.refreshAccessToken(
+              dataObject.get(_this.tokenPropertyName)).then(function () {
             return data;
           }));
         } else {
