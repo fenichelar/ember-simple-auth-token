@@ -103,14 +103,14 @@ export default TokenAuthenticator.extend({
       dataObject = Ember.Object.create(data);
 
     return new Ember.RSVP.Promise(function(resolve, reject) {
-      var now = (new Date()).getTime(),
-        expiresAt = _this.resolveTime(dataObject.get('expiresAt')),
-        token = dataObject.get(_this.tokenPropertyName);
+      var now = (new Date()).getTime();
+      var expiresAt = _this.resolveTime(dataObject.get(_this.tokenExpireName));
+      var token = dataObject.get(_this.tokenPropertyName);
+
       if (Ember.isEmpty(token)) {
         return reject(new Error('empty token'));
       }
-
-       if (Ember.isEmpty(expiresAt)) {
+      if (Ember.isEmpty(expiresAt)) {
         // Fetch the expire time from the token data since `expiresAt`
         // wasn't included in the data object that was passed in.
         var tokenData = _this.getTokenData(data[_this.tokenPropertyName]);
@@ -118,7 +118,6 @@ export default TokenAuthenticator.extend({
         if (Ember.isEmpty(expiresAt)) {
           return resolve(data);
         }
-
       }
       if (expiresAt !== expiresAt) {
         return reject(new Error('invalid expiration'));
@@ -127,11 +126,12 @@ export default TokenAuthenticator.extend({
         var wait = expiresAt - now - (_this.refreshLeeway * 1000);
         if (wait > 0) {
           if (_this.refreshAccessTokens) {
-            _this.scheduleAccessTokenRefresh(expiresAt, token);
+            _this.scheduleAccessTokenRefresh(dataObject.get(_this.tokenExpireName), token);
           }
           resolve(data);
         } else if (_this.refreshAccessTokens) {
-          resolve(_this.refreshAccessToken(data.token).then(function () {
+            resolve(_this.refreshAccessToken(
+              dataObject.get(_this.tokenPropertyName)).then(function () {
             return data;
           }));
         } else {
@@ -240,14 +240,15 @@ export default TokenAuthenticator.extend({
     return new Ember.RSVP.Promise(function(resolve, reject) {
       _this.makeRequest(_this.serverTokenRefreshEndpoint, data).then(function(response) {
         Ember.run(function() {
-          var tokenData = _this.getTokenData(response[_this.tokenPropertyName]),
-            expiresAt = tokenData[_this.tokenExpireName],
-            data = Ember.merge(response, {
-              expiresAt: expiresAt
-            });
+          var tokenData = _this.getTokenData(response[_this.tokenPropertyName]);
+          var expiresAt = tokenData[_this.tokenExpireName];
+          var tokenExpireData = {};
+
+          tokenExpireData[_this.tokenExpireName] = expiresAt;
+
+          data = Ember.merge(response, tokenExpireData);
 
           _this.scheduleAccessTokenRefresh(expiresAt, response.token);
-
           _this.trigger('sessionDataUpdated', data);
 
           resolve(response);

@@ -235,7 +235,7 @@ test('#restore schedules a token refresh when `refreshAccessTokens` is true.', f
   data[jwt.tokenPropertyName] = token;
   data[jwt.tokenExpireName] = expiresAt;
 
-  // TODO: find out of there is another way besides setting Ember.testing.
+  // TODO: find out if there is another way besides setting Ember.testing.
   Ember.testing = false;
 
   Ember.run(function() {
@@ -506,8 +506,8 @@ test('#refreshAccessToken triggers the `sessionDataUpdated` event on successful 
   App.authenticator.refreshAccessToken(token);
 
   App.authenticator.one('sessionDataUpdated', function(data) {
-    ok(data.expiresAt, 'Verify expiresAt was added to response');
-    ok(data.expiresAt > (new Date()).getTime(), 'Verify is greater than now');
+    ok(data[jwt.tokenExpireName], 'Verify expiresAt was added to response');
+    ok(data[jwt.tokenExpireName] > (new Date()).getTime(), 'Verify is greater than now');
     deepEqual(data.token, token);
   });
 });
