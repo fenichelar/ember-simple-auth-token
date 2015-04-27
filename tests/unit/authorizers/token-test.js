@@ -40,7 +40,7 @@ test('#authorize when authenticated adds token to request', function() {
   expect(3);
 
   App.authorizer.set('session.isAuthenticated', true);
-  App.authorizer.set('session.token', 'secret token!');
+  App.authorizer.set('session.secure', {token: 'secret token!'});
   App.authorizer.authorize(App.request, {});
 
   ok(setRequestHeader);
@@ -53,7 +53,8 @@ test('#authorize when authenticated adds token to request', function() {
 });
 
 test('#authorize when session does not contain token', function() {
-  App.authorizer.set('session.user_token', null);
+  App.authorizer.set('session.isAuthenticated', true);
+  App.authorizer.set('session.secure', {});
   App.authorizer.authorize(App.request, {});
 
   ok(!setRequestHeader);
@@ -61,6 +62,7 @@ test('#authorize when session does not contain token', function() {
 
 test('#authorize when session is not authenticated', function() {
   App.authorizer.set('session.isAuthenticated', false);
+  App.authorizer.set('session.secure', {token: 'secret token!'});
   App.authorizer.authorize(App.request, {});
 
   ok(!setRequestHeader);
