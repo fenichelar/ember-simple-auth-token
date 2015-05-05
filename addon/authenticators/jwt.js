@@ -71,6 +71,7 @@ export default TokenAuthenticator.extend({
   init: function() {
     this.serverTokenEndpoint = Configuration.serverTokenEndpoint;
     this.serverTokenRefreshEndpoint = Configuration.serverTokenRefreshEndpoint;
+    this.basicAuthentication = Configuration.basicAuthentication;
     this.identificationField = Configuration.identificationField;
     this.tokenPropertyName = Configuration.tokenPropertyName;
     this.refreshAccessTokens = Configuration.refreshAccessTokens;
@@ -284,17 +285,34 @@ export default TokenAuthenticator.extend({
     @private
   */
   makeRequest: function(url, data) {
-    return Ember.$.ajax({
-      url: url,
-      type: 'POST',
-      data: JSON.stringify(data),
-      dataType: 'json',
-      contentType: 'application/json',
-      beforeSend: function(xhr, settings) {
-        xhr.setRequestHeader('Accept', settings.accepts.json);
-      },
-      headers: this.headers
-    });
+    if (this.basicAuthentication) {
+      var username = data.username,
+        password = data.password,
+        token = username + ':' + password,
+        hash = btoa(token),
+        header = "Basic " + hash;
+        return Ember.$.ajax({
+          url: url,
+          type: 'GET',
+          dataType: 'json',
+          headers: this.headers,
+          beforeSend: function (xhr) {
+            xhr.setRequestHeader("Authorization", header);
+          }
+        });
+    } else {
+      return Ember.$.ajax({
+        url: url,
+        type: 'POST',
+        data: JSON.stringify(data),
+        dataType: 'json',
+        contentType: 'application/json',
+        beforeSend: function(xhr, settings) {
+          xhr.setRequestHeader('Accept', settings.accepts.json);
+        },
+        headers: this.headers
+      });
+    }
   },
 
   /**

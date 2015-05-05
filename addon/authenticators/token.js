@@ -27,6 +27,14 @@ export default Base.extend({
   serverTokenEndpoint: '/api-token-auth/',
 
   /**
+    Sets whether the authenticator uses basic authentication.
+    @property basicAuthentication
+    @type Boolean
+    @default false
+  */
+  basicAuthentication: false,
+
+  /**
     The attribute-name that is used for the identification field when sending the
     authentication data to the server.
 
@@ -82,6 +90,7 @@ export default Base.extend({
   */
   init: function() {
     this.serverTokenEndpoint = Configuration.serverTokenEndpoint;
+    this.basicAuthentication = Configuration.basicAuthentication;
     this.identificationField = Configuration.identificationField;
     this.passwordField = Configuration.passwordField;
     this.tokenPropertyName = Configuration.tokenPropertyName;
@@ -178,16 +187,33 @@ export default Base.extend({
     @private
   */
   makeRequest: function(data) {
-    return Ember.$.ajax({
-      url: this.serverTokenEndpoint,
-      type: 'POST',
-      data: JSON.stringify(data),
-      dataType: 'json',
-      contentType: 'application/json',
-      beforeSend: function(xhr, settings) {
-        xhr.setRequestHeader('Accept', settings.accepts.json);
-      },
-      headers: this.headers
-    });
+    if (this.basicAuthentication) {
+      var username = data.username,
+        password = data.password,
+        token = username + ':' + password,
+        hash = btoa(token),
+        header = "Basic " + hash;
+        return Ember.$.ajax({
+          url: this.serverTokenEndpoint,
+          type: 'GET',
+          dataType: 'json',
+          headers: this.headers,
+          beforeSend: function (xhr) {
+            xhr.setRequestHeader("Authorization", header);
+          }
+        });
+    } else {
+      return Ember.$.ajax({
+        url: this.serverTokenEndpoint,
+        type: 'POST',
+        data: JSON.stringify(data),
+        dataType: 'json',
+        contentType: 'application/json',
+        beforeSend: function(xhr, settings) {
+          xhr.setRequestHeader('Accept', settings.accepts.json);
+        },
+        headers: this.headers
+      });
+    }
   }
 });

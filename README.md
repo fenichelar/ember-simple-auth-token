@@ -145,6 +145,7 @@ For the Token authenticator:
 // config/environment.js
 ENV['simple-auth-token'] = {
   serverTokenEndpoint: '/api-token-auth/',
+  basicAuthentication: false,
   identificationField: 'username',
   passwordField: 'password',
   tokenPropertyName: 'token',

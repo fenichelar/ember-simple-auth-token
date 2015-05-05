@@ -28,6 +28,14 @@ test('assigns serverTokenEndpoint from the configuration object', function() {
   Configuration.load({}, {});
 });
 
+test('assigns basicAuthentication from the configuration object', function() {
+  Configuration.basicAuthentication = 'basicAuthentication';
+
+  equal(Token.create().basicAuthentication, 'basicAuthentication');
+
+  Configuration.load({}, {});
+});
+
 test('assigns identificationField from the configuration object', function() {
   Configuration.identificationField = 'identificationField';
 
@@ -128,6 +136,32 @@ test('#authenticate sends an AJAX request to the sign in endpoint', function() {
       headers: {}
     });
 
+    Ember.$.ajax.restore();
+  });
+});
+
+test('#authenticate sends an AJAX request to the sign for basic authentication', function() {
+  sinon.spy(Ember.$, 'ajax');
+
+  var credentials = {
+    identification: 'username',
+    password: 'password'
+  };
+  
+  App.authenticator.basicAuthentication = true;
+
+  App.authenticator.authenticate(credentials);
+
+  Ember.run.next(function() {
+    var args = Ember.$.ajax.getCall(0).args[0];
+    delete args.beforeSend;
+    deepEqual(args, {
+      url: '/api-token-auth/',
+      type: 'GET',
+      dataType: 'json',
+      headers: {}
+    });
+    
     Ember.$.ajax.restore();
   });
 });
