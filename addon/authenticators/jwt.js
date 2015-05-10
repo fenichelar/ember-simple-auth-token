@@ -171,7 +171,7 @@ export default TokenAuthenticator.extend({
           var tokenData = _this.getTokenData(response[_this.tokenPropertyName]),
             expiresAt = tokenData[_this.tokenExpireName];
 
-          _this.scheduleAccessTokenRefresh(expiresAt, response.token);
+          _this.scheduleAccessTokenRefresh(expiresAt, response[_this.tokenPropertyName]);
 
           response = Ember.merge(response, {
             expiresAt: expiresAt
@@ -233,9 +233,8 @@ export default TokenAuthenticator.extend({
   */
   refreshAccessToken: function(token) {
     var _this = this,
-      data = {
-        token: token
-      };
+      data = {};
+    data[_this.tokenPropertyName] = token;
 
     return new Ember.RSVP.Promise(function(resolve, reject) {
       _this.makeRequest(_this.serverTokenRefreshEndpoint, data).then(function(response) {
@@ -248,7 +247,7 @@ export default TokenAuthenticator.extend({
 
           data = Ember.merge(response, tokenExpireData);
 
-          _this.scheduleAccessTokenRefresh(expiresAt, response.token);
+          _this.scheduleAccessTokenRefresh(expiresAt, response[_this.tokenPropertyName]);
           _this.trigger('sessionDataUpdated', data);
 
           resolve(response);
