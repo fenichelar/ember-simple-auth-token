@@ -51,12 +51,9 @@ This route displays the login form with fields for `identification`,
 </form>
 ```
 
-The `authenticate` action that is triggered by submitting the form is provided
-by the `LoginControllerMixin` that the respective controller in the application
-can include (the controller can also implement its own action and use the
-session API directly; see the
-[API docs for `Session`](http://ember-simple-auth.simplabs.com/ember-simple-auth-api-docs.html#SimpleAuth-Session)).
-It then also needs to specify the Token authenticator to be used:
+To handle the `authenticate` action that is triggered by submitting the form you can do the following in the respective controller:
+
+Note: This was previously handled using Simple Auth's now deprecated `LoginControllerMixin`.
 
 **Token Authenticator**
 
@@ -65,10 +62,16 @@ Default base implementation for token authentication.
 ```js
 // app/controllers/login.js
 import Ember from 'ember';
-import LoginControllerMixin from 'simple-auth/mixins/login-controller-mixin';
 
-export default Ember.Controller.extend(LoginControllerMixin, {
-  authenticator: 'simple-auth-authenticator:token'
+export default Ember.Controller.extend({
+  actions: {
+    authenticate: function() {
+      var credentials = this.getProperties('identification', 'password'),
+        authenticator = 'simple-auth-authenticator:token';
+
+      this.get('session').authenticate(authenticator, credentials);
+    }
+  }
 });
 ```
 
@@ -79,10 +82,16 @@ Extends the Token Authenticator and adds automatic token refresh functionality.
 ```js
 // app/controllers/login.js
 import Ember from 'ember';
-import LoginControllerMixin from 'simple-auth/mixins/login-controller-mixin';
 
-export default Ember.Controller.extend(LoginControllerMixin, {
-  authenticator: 'simple-auth-authenticator:jwt'
+export default Ember.Controller.extend({
+  actions: {
+    authenticate: function() {
+      var credentials = this.getProperties('identification', 'password'),
+        authenticator = 'simple-auth-authenticator:jwt';
+
+      this.get('session').authenticate(authenticator, credentials);
+    }
+  }
 });
 ```
 
