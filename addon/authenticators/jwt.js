@@ -130,8 +130,7 @@ export default TokenAuthenticator.extend({
           }
           resolve(data);
         } else if (_this.refreshAccessTokens) {
-            resolve(_this.refreshAccessToken(
-              dataObject.get(_this.tokenPropertyName)).then(function () {
+            resolve(_this.refreshAccessToken(token).then(function () {
             return data;
           }));
         } else {
@@ -168,10 +167,11 @@ export default TokenAuthenticator.extend({
 
       _this.makeRequest(_this.serverTokenEndpoint, data).then(function(response) {
         Ember.run(function() {
-          var tokenData = _this.getTokenData(response[_this.tokenPropertyName]),
+          var token = response[_this.tokenPropertyName],
+            tokenData = _this.getTokenData(token),
             expiresAt = tokenData[_this.tokenExpireName];
 
-          _this.scheduleAccessTokenRefresh(expiresAt, response[_this.tokenPropertyName]);
+          _this.scheduleAccessTokenRefresh(expiresAt, token);
 
           response = Ember.merge(response, {
             expiresAt: expiresAt
@@ -234,20 +234,22 @@ export default TokenAuthenticator.extend({
   refreshAccessToken: function(token) {
     var _this = this,
       data = {};
+
     data[_this.tokenPropertyName] = token;
 
     return new Ember.RSVP.Promise(function(resolve, reject) {
       _this.makeRequest(_this.serverTokenRefreshEndpoint, data).then(function(response) {
         Ember.run(function() {
-          var tokenData = _this.getTokenData(response[_this.tokenPropertyName]);
-          var expiresAt = tokenData[_this.tokenExpireName];
-          var tokenExpireData = {};
+          var token = response[_this.tokenPropertyName],
+            tokenData = _this.getTokenData(token),
+            expiresAt = tokenData[_this.tokenExpireName],
+            tokenExpireData = {};
 
           tokenExpireData[_this.tokenExpireName] = expiresAt;
 
           data = Ember.merge(response, tokenExpireData);
 
-          _this.scheduleAccessTokenRefresh(expiresAt, response[_this.tokenPropertyName]);
+          _this.scheduleAccessTokenRefresh(expiresAt, response.token);
           _this.trigger('sessionDataUpdated', data);
 
           resolve(response);
