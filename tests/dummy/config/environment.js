@@ -35,17 +35,7 @@ module.exports = function(environment) {
     // ENV.APP.LOG_TRANSITIONS = true;
     // ENV.APP.LOG_TRANSITIONS_INTERNAL = true;
     // ENV.APP.LOG_VIEW_LOOKUPS = true;
-    ENV['simple-auth'] = {
-      authorizer: 'simple-auth-authorizer:token'
-    };
-
-    ENV['simple-auth-token'] = {
-      serverTokenEndpoint: '/api/api-token-auth/',
-      serverTokenRefreshEndpoint: '/api/api-token-refresh/',
-      timeFactor: 1000,
-      refreshLeeway: 5
-    };
-
+    ENV['API_URL'] = '';
   }
 
   if (environment === 'test') {
@@ -61,8 +51,19 @@ module.exports = function(environment) {
   }
 
   if (environment === 'production') {
-
+    ENV['API_URL'] = 'https://simple-auth-token-server.herokuapp.com';
   }
+
+  ENV['simple-auth'] = {
+    authorizer: 'simple-auth-authorizer:token'
+  };
+
+  ENV['simple-auth-token'] = {
+    serverTokenEndpoint: ENV['API_URL'] + '/api/api-token-auth/',
+    serverTokenRefreshEndpoint: ENV['API_URL'] + '/api/api-token-refresh/',
+    timeFactor: 1000,
+    refreshLeeway: 5
+  };
 
   return ENV;
 };
