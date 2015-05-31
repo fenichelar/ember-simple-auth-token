@@ -1,4 +1,4 @@
-<h2 id="title">Welcome to Ember.js</h2>
+<h2 id="title">Demo: simple-auth-token</h2>
 
 <ul>
   {{#link-to 'index' tagName='li'}}
@@ -16,3 +16,22 @@
 </ul>
 
 {{outlet}}
+
+<hr>
+
+<p>Settings</p>
+<pre>
+  ENV['simple-auth-token'] = {
+    serverTokenEndpoint: '/api/api-token-auth/',
+    serverTokenRefreshEndpoint: '/api/api-token-refresh/',
+    timeFactor: 1000,
+    refreshLeeway: 5
+  };
+</pre>
+
+<p>Session Contents:</p>
+<pre>{{sessionData}}</pre>
+
+<p>Token Contents:</p>
+<pre>{{tokenData}}</pre>
+
