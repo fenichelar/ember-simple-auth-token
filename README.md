@@ -8,6 +8,10 @@ Ember.js app and the server you have to make sure that this connection uses HTTP
 
 Based on [ember-simple-auth-devise](https://github.com/simplabs/ember-simple-auth/tree/master/packages/ember-simple-auth-devise).
 
+## Live Demo
+
+View a live demo here: https://jpadilla.github.io/ember-cli-simple-auth-token/
+
 ## Installation
 
 To install Ember Simple Auth Token in an Ember.js application that uses [Ember CLI](https://github.com/stefanpenner/ember-cli):
