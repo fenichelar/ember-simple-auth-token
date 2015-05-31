@@ -30,12 +30,17 @@ module.exports = function(environment) {
   };
 
   if (environment === 'development') {
-    // ENV.APP.LOG_RESOLVER = true;
-    // ENV.APP.LOG_ACTIVE_GENERATION = true;
-    // ENV.APP.LOG_TRANSITIONS = true;
-    // ENV.APP.LOG_TRANSITIONS_INTERNAL = true;
-    // ENV.APP.LOG_VIEW_LOOKUPS = true;
-    ENV.API_URL = '';
+    ENV['simple-auth'] = {
+      authorizer: 'simple-auth-authorizer:token',
+      applicationRootUrl: ENV.baseURL
+    };
+
+    ENV['simple-auth-token'] = {
+      serverTokenEndpoint: '/api/api-token-auth/',
+      serverTokenRefreshEndpoint: '/api/api-token-refresh/',
+      timeFactor: 1000,
+      refreshLeeway: 5
+    };
   }
 
   if (environment === 'test') {
@@ -53,20 +58,20 @@ module.exports = function(environment) {
   if (environment === 'production') {
     ENV.baseURL = '/ember-cli-simple-auth-token';
     ENV.API_URL = 'https://simple-auth-token-server.herokuapp.com';
+
+    ENV['simple-auth'] = {
+      authorizer: 'simple-auth-authorizer:token',
+      applicationRootUrl: ENV.baseURL,
+      crossOriginWhitelist: [ENV.API_URL]
+    };
+
+    ENV['simple-auth-token'] = {
+      serverTokenEndpoint: ENV['API_URL'] + '/api/api-token-auth/',
+      serverTokenRefreshEndpoint: ENV['API_URL'] + '/api/api-token-refresh/',
+      timeFactor: 1000,
+      refreshLeeway: 5
+    };
   }
-
-  ENV['simple-auth'] = {
-    authorizer: 'simple-auth-authorizer:token',
-    applicationRootUrl: ENV.baseURL,
-    crossOriginWhitelist: [ENV.API_URL]
-  };
-
-  ENV['simple-auth-token'] = {
-    serverTokenEndpoint: ENV['API_URL'] + '/api/api-token-auth/',
-    serverTokenRefreshEndpoint: ENV['API_URL'] + '/api/api-token-refresh/',
-    timeFactor: 1000,
-    refreshLeeway: 5
-  };
 
   return ENV;
 };
