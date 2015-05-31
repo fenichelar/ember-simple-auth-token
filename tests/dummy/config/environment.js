@@ -5,7 +5,7 @@ module.exports = function(environment) {
     modulePrefix: 'dummy',
     environment: environment,
     baseURL: '/',
-    locationType: 'auto',
+    locationType: 'hash',
     EmberENV: {
       FEATURES: {
         // Here you can enable experimental features on an ember canary build
@@ -56,7 +56,8 @@ module.exports = function(environment) {
   }
 
   ENV['simple-auth'] = {
-    authorizer: 'simple-auth-authorizer:token'
+    authorizer: 'simple-auth-authorizer:token',
+    applicationRootUrl: ENV.baseURL
   };
 
   ENV['simple-auth-token'] = {
