@@ -57,7 +57,8 @@ module.exports = function(environment) {
 
   ENV['simple-auth'] = {
     authorizer: 'simple-auth-authorizer:token',
-    applicationRootUrl: ENV.baseURL
+    applicationRootUrl: ENV.baseURL,
+    crossOriginWhitelist: [ENV.API_URL]
   };
 
   ENV['simple-auth-token'] = {
