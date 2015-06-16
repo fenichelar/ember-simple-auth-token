@@ -139,7 +139,6 @@ export default TokenAuthenticator.extend({
       } else {
         reject(new Error('token is expired'));
       }
-
     });
   },
 
@@ -169,13 +168,14 @@ export default TokenAuthenticator.extend({
         Ember.run(function() {
           var token = response[_this.tokenPropertyName],
             tokenData = _this.getTokenData(token),
-            expiresAt = tokenData[_this.tokenExpireName];
+            expiresAt = tokenData[_this.tokenExpireName],
+            tokenExpireData = {};
 
           _this.scheduleAccessTokenRefresh(expiresAt, token);
 
-          response = Ember.merge(response, {
-            expiresAt: expiresAt
-          });
+          tokenExpireData[_this.tokenExpireName] = expiresAt;
+
+          response = Ember.merge(response, tokenExpireData);
 
           resolve(_this.getResponseData(response));
         });
