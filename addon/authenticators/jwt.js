@@ -123,13 +123,7 @@ export default TokenAuthenticator.extend({
         return reject(new Error('invalid expiration'));
       }
       if (expiresAt > now) {
-        var wait = expiresAt - now - (_this.refreshLeeway * 1000);
-        if (wait > 0) {
-          if (_this.refreshAccessTokens) {
-            _this.scheduleAccessTokenRefresh(dataObject.get(_this.tokenExpireName), token);
-          }
-          resolve(data);
-        } else if (_this.refreshAccessTokens) {
+        if (_this.refreshAccessTokens) {
             resolve(_this.refreshAccessToken(token).then(function () {
             return data;
           }));
@@ -169,13 +163,14 @@ export default TokenAuthenticator.extend({
         Ember.run(function() {
           var token = response[_this.tokenPropertyName],
             tokenData = _this.getTokenData(token),
-            expiresAt = tokenData[_this.tokenExpireName];
+            expiresAt = tokenData[_this.tokenExpireName],
+            tokenExpireData = {};
 
           _this.scheduleAccessTokenRefresh(expiresAt, token);
 
-          response = Ember.merge(response, {
-            expiresAt: expiresAt
-          });
+          tokenExpireData[_this.tokenExpireName] = expiresAt;
+
+          response = Ember.merge(response, tokenExpireData);
 
           resolve(_this.getResponseData(response));
         });
@@ -249,7 +244,7 @@ export default TokenAuthenticator.extend({
 
           data = Ember.merge(response, tokenExpireData);
 
-          _this.scheduleAccessTokenRefresh(expiresAt, token);
+          _this.scheduleAccessTokenRefresh(expiresAt, response.token);
           _this.trigger('sessionDataUpdated', data);
 
           resolve(response);
