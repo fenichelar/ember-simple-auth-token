@@ -123,7 +123,13 @@ export default TokenAuthenticator.extend({
         return reject(new Error('invalid expiration'));
       }
       if (expiresAt > now) {
-        if (_this.refreshAccessTokens) {
+        var wait = expiresAt - now - (_this.refreshLeeway * 1000);
+        if (wait > 0) {
+          if (_this.refreshAccessTokens) {
+            _this.scheduleAccessTokenRefresh(dataObject.get(_this.tokenExpireName), token);
+          }
+          resolve(data);
+        } else if (_this.refreshAccessTokens) {
             resolve(_this.refreshAccessToken(token).then(function () {
             return data;
           }));
