@@ -149,7 +149,11 @@ export default Base.extend({
     var authentication = {};
     authentication[this.passwordField] = credentials.password;
     authentication[this.identificationField] = credentials.identification;
-    return authentication;
+
+    delete credentials.password;
+    delete credentials.identification;
+
+    return Ember.$.extend(authentication, credentials);
   },
 
   /**
