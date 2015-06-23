@@ -163,6 +163,33 @@ test('#authenticate sends an AJAX request to the sign in endpoint with custom fi
   });
 });
 
+test('#authenticate sends AJAX requests to the sign in endpoint with extra params', function () {
+  sinon.spy(Ember.$, 'ajax');
+
+  var credentials = {
+    identification: 'username',
+    password: 'password',
+    extra: 'extra'
+  };
+
+  App.authenticator.authenticate(credentials);
+
+  Ember.run.next(function() {
+    var args = Ember.$.ajax.getCall(0).args[0];
+    delete args.beforeSend;
+    deepEqual(args, {
+      url: '/api-token-auth/',
+      type: 'POST',
+      data: '{"password":"password","username":"username","extra":"extra"}',
+      dataType: 'json',
+      contentType: 'application/json',
+      headers: {}
+    });
+
+    Ember.$.ajax.restore();
+  });
+});
+
 test('#authenticate successfully resolves with the correct data', function() {
   sinon.spy(Ember.$, 'ajax');
 
