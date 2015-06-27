@@ -1,6 +1,7 @@
 import Configuration from 'simple-auth-token/configuration';
 import TokenAuthenticator from 'simple-auth-token/authenticators/token';
 import JWTAuthenticator from 'simple-auth-token/authenticators/jwt';
+import JWTResolvedAuthenticator from 'simple-auth-token/authenticators/jwt-resolved';
 import Authorizer from 'simple-auth-token/authorizers/token';
 import ENV from '../config/environment';
 
@@ -16,5 +17,6 @@ export default {
     container.register('simple-auth-authorizer:token', Authorizer);
     container.register('simple-auth-authenticator:token', TokenAuthenticator);
     container.register('simple-auth-authenticator:jwt', JWTAuthenticator);
+    container.register('simple-auth-authenticator:jwt-resolved', JWTResolvedAuthenticator);
   }
 };
