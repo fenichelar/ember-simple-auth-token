@@ -3,6 +3,7 @@ import loadConfig from './utils/load-config';
 var defaults = {
   serverTokenEndpoint: '/api-token-auth/',
   serverTokenRefreshEndpoint: '/api-token-refresh/',
+  basicAuthentication: false,
   identificationField: 'username',
   passwordField: 'password',
   tokenPropertyName: 'token',
@@ -52,6 +53,14 @@ export default {
     @default '/api-token-refresh/'
   */
   serverTokenRefreshEndpoint: defaults.serverTokenRefreshEndpoint,
+  
+  /**
+    Sets whether the authenticator uses basic authentication.
+    @property basicAuthentication
+    @type Boolean
+    @default false
+  */
+  basicAuthentication: defaults.basicAuthentication,
 
 
   /**

@@ -351,6 +351,35 @@ test('#authenticate sends an ajax request to the token endpoint', function() {
   });
 });
 
+test('#authenticate sends an ajax request to the token endpoint for basic authentication', function() {
+  expect(1);
+  sinon.spy(Ember.$, 'ajax');
+
+  var jwt = JWT.create();
+
+  var credentials = {
+    identification: 'username',
+    password: 'password'
+  };
+  
+  App.authenticator.basicAuthentication = true;
+
+  App.authenticator.authenticate(credentials);
+
+  Ember.run.next(function() {
+    var args = Ember.$.ajax.getCall(0).args[0];
+    delete args.beforeSend;
+    
+    deepEqual(args, {
+      url: jwt.serverTokenEndpoint,
+      type: 'GET',
+      dataType: 'json',
+      headers: {}
+    });
+    Ember.$.ajax.restore();
+  });
+});
+
 test('#authenticate rejects with invalid credentials', function() {
   expect(1);
   var jwt = JWT.create(),
