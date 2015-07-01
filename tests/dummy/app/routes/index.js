@@ -4,6 +4,6 @@ import ENV from '../config/environment';
 
 export default Ember.Route.extend(AuthenticatedRouteMixin, {
   model: function() {
-    return Ember.$.getJSON(ENV['API_URL'] + '/api/users/');
+    return Ember.$.getJSON(ENV['API_URL'] || '' + '/api/users/');
   }
 });

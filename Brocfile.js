@@ -12,8 +12,7 @@ var EmberAddon = require('ember-cli/lib/broccoli/ember-addon');
 */
 
 var app = new EmberAddon();
-var pickFiles = require('broccoli-static-compiler');
-var mergeTrees = require('broccoli-merge-trees');
+var Funnel = require('broccoli-funnel');
 
 app.import(app.bowerDirectory + '/ember-simple-auth/simple-auth.amd.js', {
   exports: {
@@ -33,10 +32,10 @@ app.import(app.bowerDirectory + '/ember-simple-auth/simple-auth.amd.js', {
   }
 });
 
-var sinon = pickFiles(app.bowerDirectory + '/sinon', {
+var extraAssets = new Funnel(app.bowerDirectory + '/sinon', {
   srcDir: '/',
   files: ['index.js'],
   destDir: '/assets/sinon'
 });
 
-module.exports = mergeTrees([app.toTree(), sinon]);
+module.exports = app.toTree(extraAssets);
