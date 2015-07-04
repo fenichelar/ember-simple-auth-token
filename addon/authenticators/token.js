@@ -180,7 +180,7 @@ export default Base.extend({
   makeRequest: function(data) {
     return Ember.$.ajax({
       url: this.serverTokenEndpoint,
-      type: 'POST',
+      method: 'POST',
       data: JSON.stringify(data),
       dataType: 'json',
       contentType: 'application/json',

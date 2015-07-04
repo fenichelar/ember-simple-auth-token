@@ -121,7 +121,7 @@ test('#authenticate sends an AJAX request to the sign in endpoint', function() {
     delete args.beforeSend;
     deepEqual(args, {
       url: '/api-token-auth/',
-      type: 'POST',
+      method: 'POST',
       data: '{"password":"password","username":"username"}',
       dataType: 'json',
       contentType: 'application/json',
@@ -152,7 +152,7 @@ test('#authenticate sends an AJAX request to the sign in endpoint with custom fi
 
     deepEqual(args, {
       url: '/api-token-auth/',
-      type: 'POST',
+      method: 'POST',
       data: '{"api-key":"password","api-user":"username"}',
       dataType: 'json',
       contentType: 'application/json',
@@ -209,7 +209,7 @@ test('#authenticate sends an AJAX request with custom headers', function() {
     delete args.beforeSend;
     deepEqual(args, {
       url: '/api-token-auth/',
-      type: 'POST',
+      method: 'POST',
       data: '{"password":"password","username":"username"}',
       dataType: 'json',
       contentType: 'application/json',

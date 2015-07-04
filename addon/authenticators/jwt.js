@@ -287,7 +287,7 @@ export default TokenAuthenticator.extend({
   makeRequest: function(url, data) {
     return Ember.$.ajax({
       url: url,
-      type: 'POST',
+      method: 'POST',
       data: JSON.stringify(data),
       dataType: 'json',
       contentType: 'application/json',

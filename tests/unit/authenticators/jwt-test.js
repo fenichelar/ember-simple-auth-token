@@ -341,7 +341,7 @@ test('#authenticate sends an ajax request to the token endpoint', function() {
     delete args.beforeSend;
     deepEqual(args, {
       url: jwt.serverTokenEndpoint,
-      type: 'POST',
+      method: 'POST',
       data: '{"password":"password","username":"username"}',
       dataType: 'json',
       contentType: 'application/json',
@@ -474,7 +474,7 @@ test('#refreshAccessToken makes an AJAX request to the token endpoint.', functio
     delete args.beforeSend;
     deepEqual(args, {
       url: jwt.serverTokenRefreshEndpoint,
-      type: 'POST',
+      method: 'POST',
       data: JSON.stringify({
         'token': token
       }),
