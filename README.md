@@ -133,6 +133,27 @@ token = {
 
 An automatic token refresh request would be sent out at token[Config.tokenExpireName] - now(). A good practice with regards to token refreshing is to also set a "leeway", usually no more than a few minutes, to account for clock skew when decoding JSON Web Tokens in the server-side. Some libraries like [PyJWT](https://github.com/jpadilla/pyjwt) and [ruby-jwt](https://github.com/progrium/ruby-jwt) already support this.
 
+**Resolved JWT Authenticator**
+
+Extends the JWT Token Authenticator to take an existing token instead of credentials
+
+```js
+// app/controllers/login.js
+import Ember from 'ember';
+
+export default Ember.Controller.extend({
+  actions: {
+    authenticate: function() {
+      //Assumes we have a token from somewhere else
+      let token = this.get('token');
+      let authenticator = 'simple-auth-authenticator:jwt-resolved';
+
+      this.get('session').authenticate(authenticator, token);
+    }
+  }
+});
+```
+
 ## The Authorizer
 
 The authorizer authorizes requests by adding `token` property from the session in the `Authorization` header:
