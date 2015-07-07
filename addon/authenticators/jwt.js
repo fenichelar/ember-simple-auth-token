@@ -160,32 +160,44 @@ export default TokenAuthenticator.extend({
   */
   authenticate: function(credentials) {
     var _this = this;
-
     return new Ember.RSVP.Promise(function(resolve, reject) {
-      var data = _this.getAuthenticateData(credentials);
+      if(_this.tokenPropertyName in credentials){
+        let token = credentials[_this.tokenPropertyName];
+        let tokenData = _this.getTokenData(token);
+        let expiresAt = tokenData[_this.tokenExpireName];
+        let response  = {};
+        response[_this.tokenPropertyName] = token;
+        response[_this.tokenExpireName] = expiresAt;
+        _this.scheduleAccessTokenRefresh(expiresAt, token);
 
-      _this.makeRequest(_this.serverTokenEndpoint, data).then(function(response) {
-        Ember.run(function() {
-          var token = response[_this.tokenPropertyName],
-            tokenData = _this.getTokenData(token),
-            expiresAt = tokenData[_this.tokenExpireName],
-            tokenExpireData = {};
+        resolve(_this.getResponseData(response));
+      } else {
+        var data = _this.getAuthenticateData(credentials);
 
-          _this.scheduleAccessTokenRefresh(expiresAt, token);
+        _this.makeRequest(_this.serverTokenEndpoint, data).then(function(response) {
+          Ember.run(function() {
+            var token = response[_this.tokenPropertyName],
+              tokenData = _this.getTokenData(token),
+              expiresAt = tokenData[_this.tokenExpireName],
+              tokenExpireData = {};
 
-          tokenExpireData[_this.tokenExpireName] = expiresAt;
+            _this.scheduleAccessTokenRefresh(expiresAt, token);
 
-          response = Ember.merge(response, tokenExpireData);
+            tokenExpireData[_this.tokenExpireName] = expiresAt;
 
-          resolve(_this.getResponseData(response));
+            response = Ember.merge(response, tokenExpireData);
+
+            resolve(_this.getResponseData(response));
+          });
+        }, function(xhr) {
+          Ember.run(function() {
+            reject(xhr.responseJSON || xhr.responseText);
+          });
         });
-      }, function(xhr) {
-        Ember.run(function() {
-          reject(xhr.responseJSON || xhr.responseText);
-        });
-      });
+      }
     });
   },
+
 
   /**
     Schedules a token refresh request to be sent to the backend after a calculated

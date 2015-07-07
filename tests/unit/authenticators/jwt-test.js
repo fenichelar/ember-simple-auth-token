@@ -323,7 +323,7 @@ test('#restore does not schedule a token refresh when `expiresAt` - `refreshLeew
   });
 });
 
-test('#authenticate sends an ajax request to the token endpoint', function() {
+test('#authenticate with username and password sends an ajax request to the token endpoint', function() {
   expect(1);
   sinon.spy(Ember.$, 'ajax');
 
@@ -381,6 +381,76 @@ test('#authenticate rejects with invalid credentials', function() {
     App.authenticator.authenticate(credentials).then(null, function() {
       // Check that Ember.run.later was not called.
       deepEqual(Ember.run.later.getCall(0), null);
+    });
+  });
+});
+
+test('#authenticate with token', function() {
+  expect(4);
+  var expiresAt = (new Date()).getTime() + 60000;
+  var jwt = JWT.create();
+  var data = {};
+  data[jwt.identificationField] = 'test@test.com';
+  data[jwt.tokenExpireName] = expiresAt;
+  var token = createFakeToken(data);
+
+  var credentials = {};
+  credentials[jwt.tokenPropertyName] = token;
+
+  App.authenticator.authenticate(credentials).then(response => {
+    ok(jwt.tokenExpireName in response);
+    ok(jwt.tokenPropertyName in response);
+    equal(expiresAt, response[jwt.tokenExpireName]);
+    deepEqual(jwt.getTokenData(response[jwt.tokenPropertyName]), data);
+  });
+  
+});
+
+test('#authenticate with token schedules a token refresh when `refreshAccessTokens` is true', function() {
+  var jwt = JWT.create(),
+    expiresAt = (new Date()).getTime() + 60000;
+
+  var token = {};
+  token[jwt.identificationField] = 'test@test.com';
+  token[jwt.tokenExpireName] = expiresAt;
+
+  token = createFakeToken(token);
+  
+  var credentials = {};
+  credentials[jwt.tokenPropertyName] = token;
+  Ember.testing = false;
+  Ember.run(function() {
+    App.authenticator.authenticate(credentials).then(function(content) {
+      var spyCall = Ember.run.later.getCall(0);
+      deepEqual(spyCall.args[1], App.authenticator.refreshAccessToken);
+      deepEqual(spyCall.args[2], token);
+    });
+  });
+});
+
+test('#authenticate does not schedule a token refresh when `refreshAccessTokens` is false', function() {
+  var jwt = JWT.create(),
+    expiresAt = (new Date()).getTime() + 60000;
+
+  var token = {};
+  token[jwt.identificationField] = 'test@test.com';
+  token[jwt.tokenExpireName] = expiresAt;
+
+  token = createFakeToken(token);
+  
+  var credentials = {};
+  credentials[jwt.tokenPropertyName] = token;
+
+  App.authenticator.refreshAccessTokens = false;
+
+  // TODO: find out of there is another way besides setting Ember.testing.
+  Ember.testing = false;
+
+  Ember.run(function() {
+    App.authenticator.authenticate(credentials).then(function(content) {
+      // Check that Ember.run.later ran.
+      var spyCall = Ember.run.later.getCall(0);
+      deepEqual(spyCall, null);
     });
   });
 });
