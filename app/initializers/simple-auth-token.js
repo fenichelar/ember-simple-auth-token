@@ -2,7 +2,7 @@ import TokenAuthenticator from 'simple-auth-token/authenticators/token';
 import JWTAuthenticator from 'simple-auth-token/authenticators/jwt';
 import Authorizer from 'simple-auth-token/authorizers/token';
 import Configuration from 'simple-auth-token/configuration';
-import getGlobalConfig from 'simple-auth-token/utils/get-global-config';
+import ENV from '../config/environment';
 
 /**
   Ember Simple Auth Token's Initializer.
@@ -12,7 +12,7 @@ export default {
   name: 'simple-auth-token',
   before: 'simple-auth',
   initialize: function(container) {
-    Configuration.load(container, getGlobalConfig('simple-auth-token'));
+    Configuration.load(container, ENV['simple-auth-token'] || {});
     container.register('simple-auth-authorizer:token', Authorizer);
     container.register('simple-auth-authenticator:token', TokenAuthenticator);
     container.register('simple-auth-authenticator:jwt', JWTAuthenticator);

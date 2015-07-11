@@ -1,11 +1,11 @@
 import Configuration from 'simple-auth/configuration';
-import getGlobalConfig from 'simple-auth-token/utils/get-global-config';
 import setup from 'simple-auth/setup';
+import ENV from '../config/environment';
 
 export default {
   name: 'simple-auth',
   initialize: function(container, application) {
-    Configuration.load(container, getGlobalConfig('simple-auth'));
+    Configuration.load(container, ENV['simple-auth'] || {});
     setup(container, application);
   }
 };
