@@ -99,6 +99,28 @@ export default Ember.Controller.extend({
 });
 ```
 
+***Authenticating with existing token***
+
+If you already have a JWT from a previous request or some other source you 
+can use that to authenticate directly.
+
+```js
+// app/controllers/login.js
+import Ember from 'ember';
+
+export default Ember.Controller.extend({
+  actions: {
+    authenticate: function() {
+      //Assumes we have a token from somewhere else
+      let existingToken = this.get('token');
+      let authenticator = 'simple-auth-authenticator:jwt';
+
+      this.get('session').authenticate(authenticator, {token: existingToken});
+    }
+  }
+});
+```
+
 Please note, the JWT authenticator will decode a token and look for the
 expiration time found by looking up the token[Config.tokenExpireName]. It then
 calculates the difference between the current time and the token expire time —
