@@ -160,6 +160,7 @@ ENV['simple-auth-token'] = {
   serverTokenEndpoint: '/api-token-auth/',
   identificationField: 'username',
   passwordField: 'password',
+  rootName: null,
   tokenPropertyName: 'token',
   authorizationPrefix: 'Bearer ',
   authorizationHeaderName: 'Authorization',

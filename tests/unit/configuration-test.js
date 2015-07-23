@@ -22,6 +22,10 @@ test('identificationField', function() {
   equal(Configuration.identificationField, 'username', 'defaults to "username"');
 });
 
+test('rootName', function() {
+  equal(Configuration.rootName, null, 'defaults to "null"');
+});
+
 test('tokenPropertyName', function() {
   equal(Configuration.tokenPropertyName, 'token', 'defaults to "token"');
 });
