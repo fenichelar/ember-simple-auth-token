@@ -60,6 +60,14 @@ test('assigns custom headers from the configuration object', function() {
   Configuration.load({}, {});
 });
 
+test('assigns custom rootName from the configuration object', function() {
+  Configuration.rootName = 'credentials';
+
+  equal(Token.create().rootName, 'rootName');
+
+  Configuration.load({}, {});
+});
+
 test('#restore resolves with the correct data', function() {
   var properties = {
     token: 'secret token!'

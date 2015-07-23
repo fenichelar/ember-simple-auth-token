@@ -67,6 +67,18 @@ export default {
   identificationField: defaults.identificationField,
 
   /**
+    The attribute-name that is used for the object rootname field when sending
+    the authentication data to the server.
+
+    @property rootName
+    @readOnly
+    @static
+    @type String
+    @default null
+  */
+  rootName: defaults.rootName,
+
+  /**
     The attribute-name that is used for the password field when sending
     the authentication data to the server.
 

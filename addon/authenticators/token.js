@@ -27,6 +27,19 @@ export default Base.extend({
   serverTokenEndpoint: '/api-token-auth/',
 
   /**
+    The attribute-name that is used for the rootname object when sending the
+    authentication data to the server.
+
+    This value can be configured via
+    [`SimpleAuth.Configuration.Token#rootName`](#SimpleAuth-Configuration-Token-rootName).
+
+    @property rootName
+    @type String
+    @default null
+  */
+  rootName: null,
+
+  /**
     The attribute-name that is used for the identification field when sending the
     authentication data to the server.
 
@@ -82,6 +95,7 @@ export default Base.extend({
   */
   init: function() {
     this.serverTokenEndpoint = Configuration.serverTokenEndpoint;
+    this.rootName = Configuration.rootName;
     this.identificationField = Configuration.identificationField;
     this.passwordField = Configuration.passwordField;
     this.tokenPropertyName = Configuration.tokenPropertyName;
@@ -146,9 +160,15 @@ export default Base.extend({
     @return {object} An object with properties for authentication.
   */
   getAuthenticateData: function(credentials) {
-    var authentication = {};
+    var authentication = {},
+    withRootObject = {};
+
     authentication[this.passwordField] = credentials.password;
     authentication[this.identificationField] = credentials.identification;
+    if(this.rootName){
+      withRootObject[this.rootName] = authentication;
+      return withRootObject;
+    }    
     return authentication;
   },
 
