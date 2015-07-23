@@ -181,7 +181,7 @@ export default TokenAuthenticator.extend({
         });
       }, function(xhr) {
         Ember.run(function() {
-          reject(xhr.responseJSON || xhr.responseText);
+          reject(xhr);
         });
       });
     });
