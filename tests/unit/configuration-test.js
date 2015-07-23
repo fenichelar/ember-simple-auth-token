@@ -23,7 +23,7 @@ test('identificationField', function() {
 });
 
 test('rootName', function() {
-  equal(Configuration.rootName, 'credentials', 'defaults to "null"');
+  equal(Configuration.rootName, null, 'defaults to "null"');
 });
 
 test('tokenPropertyName', function() {
