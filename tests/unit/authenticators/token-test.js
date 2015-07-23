@@ -61,7 +61,7 @@ test('assigns custom headers from the configuration object', function() {
 });
 
 test('assigns custom rootName from the configuration object', function() {
-  Configuration.rootName = null;
+  Configuration.rootName = 'rootName';
 
   equal(Token.create().rootName, 'rootName');
 
