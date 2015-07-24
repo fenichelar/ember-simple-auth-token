@@ -334,7 +334,10 @@ test('#authenticate sends an ajax request to the token endpoint', function() {
     password: 'password'
   };
 
-  App.authenticator.authenticate(credentials);
+  App.authenticator.authenticate(credentials).catch(function(err) {
+    // because authenticate() rejects the promise and the error is no longer empty,
+    // we need to handle the error case in order for the test to pass...
+  });
 
   Ember.run.next(function() {
     var args = Ember.$.ajax.getCall(0).args[0];
