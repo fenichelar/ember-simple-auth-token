@@ -1,5 +1,5 @@
-import Configuration from 'simple-auth/configuration';
-import setup from 'simple-auth/setup';
+import Configuration from 'ember-simple-auth/configuration';
+import setup from 'ember-simple-auth/setup';
 import ENV from '../config/environment';
 
 export default {
