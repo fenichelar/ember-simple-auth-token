@@ -7,28 +7,28 @@ module.exports = {
     {
       name: 'ember-release',
       dependencies: {
-        'ember': 'components/ember#release'
-      },
-      resolutions: {
-        'ember': 'release'
+        ember: 'release',
+        'ember-data': 'release'
       }
     },
     {
       name: 'ember-beta',
       dependencies: {
-        'ember': 'components/ember#beta'
+        ember: 'beta',
+        'ember-data': 'beta'
       },
       resolutions: {
-        'ember': 'beta'
+        ember: 'beta'
       }
     },
     {
       name: 'ember-canary',
       dependencies: {
-        'ember': 'components/ember#canary'
+        ember: 'canary',
+        'ember-data': 'canary'
       },
       resolutions: {
-        'ember': 'canary'
+        ember: 'canary'
       }
     }
   ]

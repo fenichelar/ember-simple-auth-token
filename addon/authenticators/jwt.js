@@ -324,5 +324,5 @@ export default TokenAuthenticator.extend({
       return time;
     }
     return new Date(time * this.timeFactor).getTime();
-  },
+  }
 });

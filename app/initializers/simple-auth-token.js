@@ -10,7 +10,7 @@ import ENV from '../config/environment';
 */
 export default {
   name: 'simple-auth-token',
-  before: 'simple-auth',
+  before: 'ember-simple-auth',
   initialize: function(container) {
     Configuration.load(container, ENV['simple-auth-token'] || {});
     container.register('simple-auth-authorizer:token', Authorizer);
