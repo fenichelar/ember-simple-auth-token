@@ -87,6 +87,8 @@ export default Base.extend({
     }
   },
 
+  session: Ember.service.inject('session'),
+
   /**
     Builds the token string. It can be overriden for inclusion of quotes.
 
@@ -94,6 +96,6 @@ export default Base.extend({
     @return {String}
   */
   buildToken: function() {
-    return this.get('session.secure.' + this.tokenPropertyName);
+    return this.get('session.authenticated.' + this.tokenPropertyName);
   }
 });
