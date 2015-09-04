@@ -83,11 +83,11 @@ export default Base.extend({
         token = this.authorizationPrefix + token;
       }
 
-      jqXHR.setRequestHeader(this.authorizationHeaderName, token);
+      jqXHR(this.authorizationHeaderName, token);
     }
   },
 
-  session: Ember.inject.service('session'),
+  session: Ember.inject.service('session:main'),
 
   /**
     Builds the token string. It can be overriden for inclusion of quotes.
@@ -96,6 +96,6 @@ export default Base.extend({
     @return {String}
   */
   buildToken: function() {
-    return this.get('session.authenticated.' + this.tokenPropertyName);
+    return this.get(`session.session.authenticated.${this.tokenPropertyName}`);
   }
 });
