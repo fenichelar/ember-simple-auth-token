@@ -87,7 +87,7 @@ export default Base.extend({
     }
   },
 
-  session: Ember.service.inject('session'),
+  session: Ember.Service.inject('session'),
 
   /**
     Builds the token string. It can be overriden for inclusion of quotes.
