@@ -1,5 +1,5 @@
 import Ember from 'ember';
-import Base from 'simple-auth/authorizers/base';
+import Base from 'ember-simple-auth/authorizers/base';
 import Configuration from '../configuration';
 
 /**
@@ -83,7 +83,7 @@ export default Base.extend({
         token = this.authorizationPrefix + token;
       }
 
-      jqXHR.setRequestHeader(this.authorizationHeaderName, token);
+      jqXHR(this.authorizationHeaderName, token);
     }
   },
 
@@ -94,6 +94,6 @@ export default Base.extend({
     @return {String}
   */
   buildToken: function() {
-    return this.get('session.secure.' + this.tokenPropertyName);
+    return this.get(`session.session.authenticated.${this.tokenPropertyName}`);
   }
 });

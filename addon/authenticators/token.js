@@ -1,5 +1,5 @@
 import Ember from 'ember';
-import Base from 'simple-auth/authenticators/base';
+import Base from 'ember-simple-auth/authenticators/base';
 import Configuration from '../configuration';
 
 /**
@@ -180,7 +180,7 @@ export default Base.extend({
   makeRequest: function(data) {
     return Ember.$.ajax({
       url: this.serverTokenEndpoint,
-      method: 'POST',
+      type: 'POST',
       data: JSON.stringify(data),
       dataType: 'json',
       contentType: 'application/json',
