@@ -75,7 +75,7 @@ export default Base.extend({
     @method authorize
     @param {jqXHR} jqXHR The XHR request to authorize (see http://api.jquery.com/jQuery.ajax/#jqXHR)
   */
-  authorize: function(jqXHR) {
+  authorize: function(data, block) {
     var token = this.buildToken();
 
     if (this.get('session.isAuthenticated') && !Ember.isEmpty(token)) {
@@ -83,7 +83,7 @@ export default Base.extend({
         token = this.authorizationPrefix + token;
       }
 
-      jqXHR(this.authorizationHeaderName, token);
+      block(this.authorizationHeaderName, token);
     }
   },
 
