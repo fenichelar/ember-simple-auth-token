@@ -1,5 +1,5 @@
 import Ember from 'ember';
-import Base from 'simple-auth/authorizers/base';
+import Base from 'ember-simple-auth/authorizers/base';
 import Configuration from '../configuration';
 
 /**
@@ -75,7 +75,7 @@ export default Base.extend({
     @method authorize
     @param {jqXHR} jqXHR The XHR request to authorize (see http://api.jquery.com/jQuery.ajax/#jqXHR)
   */
-  authorize: function(jqXHR) {
+  authorize: function(data, block) {
     var token = this.buildToken();
 
     if (this.get('session.isAuthenticated') && !Ember.isEmpty(token)) {
@@ -83,9 +83,11 @@ export default Base.extend({
         token = this.authorizationPrefix + token;
       }
 
-      jqXHR.setRequestHeader(this.authorizationHeaderName, token);
+      block(this.authorizationHeaderName, token);
     }
   },
+
+  session: Ember.inject.service('session:main'),
 
   /**
     Builds the token string. It can be overriden for inclusion of quotes.
@@ -94,6 +96,6 @@ export default Base.extend({
     @return {String}
   */
   buildToken: function() {
-    return this.get('session.secure.' + this.tokenPropertyName);
+    return this.get(`session.session.authenticated.${this.tokenPropertyName}`);
   }
 });
