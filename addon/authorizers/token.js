@@ -1,5 +1,5 @@
 import Ember from 'ember';
-import Base from 'simple-auth/authorizers/base';
+import Base from 'ember-simple-auth/authorizers/base';
 import Configuration from '../configuration';
 
 /**
