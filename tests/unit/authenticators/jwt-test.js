@@ -62,7 +62,7 @@ test('assigns timeFactor from the configuration object', function() {
 test('#restore resolves when the data includes `token` and `expiresAt`', function() {
   expect(1);
   var jwt = JWT.create(),
-    expiresAt = (new Date()).getTime() + 60000;
+    expiresAt = 300;
 
   var token = {};
   token[jwt.identificationField] = 'test@test.com';
@@ -94,7 +94,7 @@ test('#restore resolves when the data includes `token` and `expiresAt`', functio
 test('#restore resolves when the data includes `token` and excludes `expiresAt`', function() {
   expect(1);
   var jwt = JWT.create(),
-    expiresAt = (new Date()).getTime() + 60000;
+    expiresAt = 300;
 
   var token = {};
   token[jwt.identificationField] = 'test@test.com';
@@ -123,7 +123,7 @@ test('#restore resolves when the data includes `token` and excludes `expiresAt`'
 test('#restore rejects when `refreshAccessTokens` is false and token is expired', function() {
   expect(1);
   var jwt = JWT.create(),
-    expiresAt = (new Date()).getTime();
+    expiresAt = 0;
 
   var token = {};
   token[jwt.identificationField] = 'test@test.com';
@@ -157,7 +157,7 @@ test('#restore rejects when `refreshAccessTokens` is false and token is expired'
 test('#restore rejects when `token` is excluded.', function() {
   expect(1);
   var jwt = JWT.create(),
-    expiresAt = (new Date()).getTime() + 60000;
+    expiresAt = 300;
 
   var token = {};
   token[jwt.identificationField] = 'test@test.com';
@@ -186,10 +186,10 @@ test('#restore rejects when `token` is excluded.', function() {
   });
 });
 
-test('#restore resolves when `expiresAt` is greater than `now`', function() {
+test('#restore resolves when `expiresAt` is greater than `0`', function() {
   expect(1);
   var jwt = JWT.create(),
-    expiresAt = (new Date()).getTime() + 60000;
+    expiresAt = 300;
 
   var token = {};
   token[jwt.identificationField] = 'test@test.com';
@@ -223,7 +223,7 @@ test('#restore resolves when `expiresAt` is greater than `now`', function() {
 test('#restore schedules a token refresh when `refreshAccessTokens` is true.', function() {
   expect(2);
   var jwt = JWT.create(),
-    expiresAt = (new Date()).getTime() + 60000;
+    expiresAt = 300;
 
   var token = {};
   token[jwt.identificationField] = 'test@test.com';
@@ -251,7 +251,7 @@ test('#restore schedules a token refresh when `refreshAccessTokens` is true.', f
 test('#restore does not schedule a token refresh when `refreshAccessTokens` is false.', function() {
   expect(1);
   var jwt = JWT.create(),
-    expiresAt = (new Date()).getTime() + 60000;
+    expiresAt = 300;
 
   var token = {};
   token[jwt.identificationField] = 'test@test.com';
@@ -274,10 +274,10 @@ test('#restore does not schedule a token refresh when `refreshAccessTokens` is f
   });
 });
 
-test('#restore does not schedule a token refresh when `expiresAt` < now.', function() {
+test('#restore does not schedule a token refresh when `expiresAt` <= `0`.', function() {
   expect(1);
   var jwt = JWT.create(),
-    expiresAt = (new Date()).getTime() - 10;
+    expiresAt = -1;
 
   var token = {};
   token[jwt.identificationField] = 'test@test.com';
@@ -297,10 +297,10 @@ test('#restore does not schedule a token refresh when `expiresAt` < now.', funct
   });
 });
 
-test('#restore does not schedule a token refresh when `expiresAt` - `refreshLeeway` < now.', function() {
+test('#restore does not schedule a token refresh when `expiresAt` - `refreshLeeway` < `0`.', function() {
   expect(1);
   var jwt = JWT.create(),
-    expiresAt = (new Date()).getTime() + 60000;
+    expiresAt = 60;
 
   var token = {};
   token[jwt.identificationField] = 'test@test.com';
@@ -354,7 +354,7 @@ test('#authenticate sends an ajax request to the token endpoint', function() {
 test('#authenticate rejects with invalid credentials', function() {
   expect(1);
   var jwt = JWT.create(),
-    expiresAt = (new Date()).getTime() + 60000;
+    expiresAt = 300;
 
   var token = {};
   token[jwt.identificationField] = 'test@test.com';
@@ -387,7 +387,7 @@ test('#authenticate rejects with invalid credentials', function() {
 
 test('#authenticate schedules a token refresh when `refreshAccessTokens` is true', function() {
   var jwt = JWT.create(),
-    expiresAt = (new Date()).getTime() + 60000;
+    expiresAt = 300;
 
   var token = {};
   token[jwt.identificationField] = 'test@test.com';
@@ -421,7 +421,7 @@ test('#authenticate schedules a token refresh when `refreshAccessTokens` is true
 
 test('#authenticate does not schedule a token refresh when `refreshAccessTokens` is false', function() {
   var jwt = JWT.create(),
-    expiresAt = (new Date()).getTime() + 60000;
+    expiresAt = 300;
 
   var token = {};
   token[jwt.identificationField] = 'test@test.com';
@@ -459,7 +459,7 @@ test('#refreshAccessToken makes an AJAX request to the token endpoint.', functio
   sinon.spy(Ember.$, 'ajax');
 
   var jwt = JWT.create(),
-    expiresAt = (new Date()).getTime() + 60000;
+    expiresAt = 300;
 
   var token = {};
   token[jwt.identificationField] = 'test@test.com';
@@ -488,7 +488,7 @@ test('#refreshAccessToken makes an AJAX request to the token endpoint.', functio
 
 test('#refreshAccessToken triggers the `sessionDataUpdated` event on successful request.', function() {
   var jwt = JWT.create(),
-    expiresAt = (new Date()).getTime() + 60000;
+    expiresAt = 300;
 
   var token = {};
   token[jwt.identificationField] = 'test@test.com';
@@ -507,7 +507,7 @@ test('#refreshAccessToken triggers the `sessionDataUpdated` event on successful 
 
   App.authenticator.one('sessionDataUpdated', function(data) {
     ok(data[jwt.tokenExpireName], 'Verify expiresAt was added to response');
-    ok(data[jwt.tokenExpireName] > (new Date()).getTime(), 'Verify is greater than now');
+    ok(data[jwt.tokenExpireName] > 0, 'Verify is greater than `0`');
     deepEqual(data.token, token);
   });
 });

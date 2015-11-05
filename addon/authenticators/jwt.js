@@ -120,20 +120,20 @@ export default TokenAuthenticator.extend({
           return resolve(data);
         }
       }
-      if (expiresAt !== expiresAt) {
-        return reject(new Error('invalid expiration'));
-      }
-      if (expiresAt > now) {
-        var wait = expiresAt - now - (_this.refreshLeeway * 1000);
+
+      if (expiresAt > 0) {
+        var wait = expiresAt - _this.refreshLeeway;
         if (wait > 0) {
           if (_this.refreshAccessTokens) {
             _this.scheduleAccessTokenRefresh(dataObject.get(_this.tokenExpireName), token);
           }
           resolve(data);
         } else if (_this.refreshAccessTokens) {
-            resolve(_this.refreshAccessToken(token).then(function () {
-            return data;
-          }));
+          resolve(
+            _this.refreshAccessToken(token).then(function () {
+              return data;
+            })
+          );
         } else {
           reject(new Error('unable to refresh token'));
         }
@@ -203,8 +203,7 @@ export default TokenAuthenticator.extend({
     if (this.refreshAccessTokens) {
       expiresAt = this.resolveTime(expiresAt);
 
-      var now = (new Date()).getTime(),
-        wait = expiresAt - now - (this.refreshLeeway * 1000);
+      var wait = (expiresAt - this.refreshLeeway) * 1000;
 
       if (!Ember.isEmpty(token) && !Ember.isEmpty(expiresAt) && wait > 0) {
         Ember.run.cancel(this._refreshTokenTimeout);
@@ -324,6 +323,6 @@ export default TokenAuthenticator.extend({
     if (Ember.isEmpty(time)) {
       return time;
     }
-    return new Date(time * this.timeFactor).getTime();
+    return time * this.timeFactor;
   }
 });
