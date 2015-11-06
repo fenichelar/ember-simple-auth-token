@@ -1,7 +1,7 @@
 import { test, moduleForComponent } from 'ember-qunit';
 import startApp from './../helpers/start-app';
 import Ember from 'ember';
-import Configuration from 'simple-auth-token/configuration';
+import Configuration from 'ember-simple-auth-token/configuration';
 
 var App;
 

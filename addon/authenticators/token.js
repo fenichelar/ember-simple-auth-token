@@ -6,11 +6,11 @@ import Configuration from '../configuration';
   Authenticator that works with token-based authentication like JWT.
 
   _The factory for this authenticator is registered as
-  `'simple-auth-authenticator:token'` in Ember's container._
+  `'authenticator:token'` in Ember's container._
 
   @class Token
   @namespace SimpleAuth.Authenticators
-  @module simple-auth-token/authenticators/token
+  @module ember-simple-auth-token/authenticators/token
   @extends Base
 */
 export default Base.extend({

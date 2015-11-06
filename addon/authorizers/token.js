@@ -7,11 +7,11 @@ import Configuration from '../configuration';
   by sending the `token` properties from the session in the `Authorization` header.
 
   _The factory for this authorizer is registered as
-  `'simple-auth-authorizer:token'` in Ember's container._
+  `'authorizer:token'` in Ember's container._
 
   @class Token
   @namespace SimpleAuth.Authorizers
-  @module simple-auth-token/authorizers/token
+  @module ember-simple-auth-token/authorizers/token
   @extends Base
 */
 export default Base.extend({

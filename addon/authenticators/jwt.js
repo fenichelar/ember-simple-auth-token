@@ -8,11 +8,11 @@ import TokenAuthenticator from './token';
   Inspired by [ember-simple-auth-oauth2](https://github.com/simplabs/ember-simple-auth/tree/master/packages/ember-simple-auth-oauth2)
 
   The factory for this authenticator is registered as
-  'simple-auth-authenticator:jwt` in Ember's container.
+  'authenticator:jwt` in Ember's container.
 
   @class JWT
   @namespace SimpleAuth.Authenticators
-  @module simple-auth-token/authenticators/jwt
+  @module ember-simple-auth-token/authenticators/jwt
   @extends TokenAuthenticator
 */
 export default TokenAuthenticator.extend({

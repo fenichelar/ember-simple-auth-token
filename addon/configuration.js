@@ -22,14 +22,14 @@ var defaults = {
   environment object:
 
   ```js
-  ENV['simple-auth-token'] = {
+  ENV['ember-simple-auth-token'] = {
     serverTokenEndpoint: '/some/other/endpoint'
   }
   ```
 
   @class Token
   @namespace SimpleAuth.Configuration
-  @module simple-auth/configuration
+  @module ember-simple-auth/configuration
 */
 export default {
   /**

@@ -1,7 +1,7 @@
 import { test, moduleForComponent } from 'ember-qunit';
 import startApp from '../../helpers/start-app';
 import Ember from 'ember';
-import Token from 'simple-auth-token/authorizers/token';
+import Token from 'ember-simple-auth-token/authorizers/token';
 import Session from 'ember-simple-auth/internal-session';
 import EphemeralStore from 'ember-simple-auth/session-stores/ephemeral';
 

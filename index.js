@@ -2,5 +2,5 @@
 'use strict';
 
 module.exports = {
-  name: 'simple-auth-token'
+  name: 'ember-simple-auth-token'
 };

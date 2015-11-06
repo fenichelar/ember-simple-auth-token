@@ -5,7 +5,7 @@ export default Ember.Controller.extend({
     return JSON.stringify(this.get('session.secure'), null, '\t');
   }),
   tokenData: Ember.computed('session.secure', function() {
-    var authenticator = this.container.lookup('simple-auth-authenticator:jwt'),
+    var authenticator = this.container.lookup('authenticator:jwt'),
         session = this.get('session.secure'),
         tokenData = {};
 
