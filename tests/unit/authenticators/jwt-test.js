@@ -70,8 +70,8 @@ test('assigns timeFactor from the configuration object', function() {
 test('#restore resolves when the data includes `token` and `expiresAt`', function() {
   expect(1);
   var jwt = JWT.create(),
-    currentTime = 1000,
-    expiresIn = 300,
+    currentTime = 10000,
+    expiresIn = 3000,
     expiresAt = currentTime + expiresIn;
 
   sinon.stub(App.authenticator, 'getCurrentTime', function() { return currentTime; });
@@ -84,7 +84,7 @@ test('#restore resolves when the data includes `token` and `expiresAt`', functio
 
   var data = {};
   data[jwt.tokenPropertyName] = token;
-  data.expiresAt = expiresAt;
+  data[jwt.tokenExpireName] = expiresAt;
 
   App.server.respondWith('POST', '/api/token-refresh/', [
     201, {
@@ -106,8 +106,8 @@ test('#restore resolves when the data includes `token` and `expiresAt`', functio
 test('#restore resolves when the data includes `token` and excludes `expiresAt`', function() {
   expect(1);
   var jwt = JWT.create(),
-    currentTime = 1000,
-    expiresIn = 300,
+    currentTime = 10000,
+    expiresIn = 3000,
     expiresAt = currentTime + expiresIn;
 
   sinon.stub(App.authenticator, 'getCurrentTime', function() { return currentTime; });
@@ -120,6 +120,8 @@ test('#restore resolves when the data includes `token` and excludes `expiresAt`'
 
   var data = {};
   data[jwt.tokenPropertyName] = token;
+  data[jwt.tokenExpireName] = expiresAt;
+
   App.server.respondWith('POST', '/api/token-refresh/', [
     201, {
       'Content-Type': 'application/json'
@@ -149,7 +151,7 @@ test('#restore rejects when `refreshAccessTokens` is false and token is expired'
 
   var data = {};
   data[jwt.tokenPropertyName] = token;
-  data['expiresAt'] = expiresAt;
+  data[jwt.tokenExpireName] = expiresAt;
 
   App.authenticator.refreshAccessTokens = false;
 
@@ -173,7 +175,7 @@ test('#restore rejects when `refreshAccessTokens` is false and token is expired'
 test('#restore rejects when `token` is excluded.', function() {
   expect(1);
   var jwt = JWT.create(),
-    expiresAt = 300;
+    expiresAt = 3000;
 
   var token = {};
   token[jwt.identificationField] = 'test@test.com';
@@ -182,7 +184,7 @@ test('#restore rejects when `token` is excluded.', function() {
   token = createFakeToken(token);
 
   var data = {};
-  data['expiresAt'] = expiresAt;
+  data[jwt.tokenExpireName] = expiresAt;
 
 
   App.server.respondWith('POST', '/api/token-refresh/', [
@@ -205,8 +207,8 @@ test('#restore rejects when `token` is excluded.', function() {
 test('#restore resolves when `expiresAt` is greater than `now`', function() {
   expect(1);
   var jwt = JWT.create(),
-    currentTime = 1000,
-    expiresIn = 300,
+    currentTime = 10000,
+    expiresIn = 3000,
     expiresAt = currentTime + expiresIn;
 
   sinon.stub(App.authenticator, 'getCurrentTime', function() { return currentTime; });
@@ -243,8 +245,8 @@ test('#restore resolves when `expiresAt` is greater than `now`', function() {
 test('#restore schedules a token refresh when `refreshAccessTokens` is true.', function() {
   expect(2);
   var jwt = JWT.create(),
-    currentTime = 1000,
-    expiresIn = 300,
+    currentTime = 10000,
+    expiresIn = 3000,
     expiresAt = currentTime + expiresIn;
 
   sinon.stub(App.authenticator, 'getCurrentTime', function() { return currentTime; });
@@ -289,8 +291,8 @@ test('#restore schedules a token refresh when `refreshAccessTokens` is true.', f
 test('#restore does not schedule a token refresh when `refreshAccessTokens` is false.', function() {
   expect(1);
   var jwt = JWT.create(),
-    currentTime = 1000,
-    expiresIn = 300,
+    currentTime = 10000,
+    expiresIn = 3000,
     expiresAt = currentTime + expiresIn;
 
   sinon.stub(App.authenticator, 'getCurrentTime', function() { return currentTime; });
@@ -342,7 +344,7 @@ test('#restore does not schedule a token refresh when `expiresAt` <= `now`.', fu
 test('#restore does not schedule a token refresh when `expiresAt` - `refreshLeeway` < `now`.', function() {
   expect(1);
   var jwt = JWT.create(),
-    expiresAt = 60;
+    expiresAt = 6000;
 
   var token = {};
   token[jwt.identificationField] = 'test@test.com';
@@ -368,8 +370,8 @@ test('#restore does not schedule a token refresh when `expiresAt` - `refreshLeew
 test('#restore schedule access token refresh and refreshes it when time is appropriate', function() {
   expect(1);
   var jwt = JWT.create(),
-    currentTime = 1000,
-    expiresIn = 300,
+    currentTime = 10000,
+    expiresIn = 3000,
     expiresAt = currentTime + expiresIn;
 
   let refreshAccessToken;
@@ -459,8 +461,7 @@ test('#authenticate sends an ajax request to the token endpoint', function() {
 
 test('#authenticate rejects with invalid credentials', function() {
   expect(1);
-  var jwt = JWT.create(),
-    expiresAt = 300;
+  var jwt = JWT.create();
 
   var credentials = {
     identification: 'username',
@@ -484,7 +485,7 @@ test('#authenticate rejects with invalid credentials', function() {
 
 test('#authenticate schedules a token refresh when `refreshAccessTokens` is true', function() {
   var jwt = JWT.create(),
-    expiresAt = 300;
+    expiresAt = 3000;
 
   var token = {};
   token[jwt.identificationField] = 'test@test.com';
@@ -515,7 +516,7 @@ test('#authenticate schedules a token refresh when `refreshAccessTokens` is true
 
 test('#authenticate does not schedule a token refresh when `refreshAccessTokens` is false', function() {
   var jwt = JWT.create(),
-    expiresAt = 300;
+    expiresAt = 3000;
 
   var token = {};
   token[jwt.identificationField] = 'test@test.com';
@@ -548,7 +549,7 @@ test('#authenticate does not schedule a token refresh when `refreshAccessTokens`
 
 test('#refreshAccessToken makes an AJAX request to the token endpoint.', function() {
   var jwt = JWT.create(),
-    expiresAt = 300;
+    expiresAt = 3000;
 
   var token = {};
   token[jwt.identificationField] = 'test@test.com';
@@ -576,7 +577,7 @@ test('#refreshAccessToken makes an AJAX request to the token endpoint.', functio
 
 test('#refreshAccessToken triggers the `sessionDataUpdated` event on successful request.', function() {
   var jwt = JWT.create(),
-    expiresAt = 300;
+    expiresAt = 3000;
 
   sinon.stub(App.authenticator, 'scheduleAccessTokenRefresh', function() { return null; });
 

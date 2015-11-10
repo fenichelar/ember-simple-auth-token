@@ -319,13 +319,13 @@ export default TokenAuthenticator.extend({
     @private
   */
   resolveTime: function(time) {
-    if (Ember.isEmpty(time)) {
-      return time;
+    if (Ember.isEmpty(time) || !time) {
+      return -1;
     }
     return new Date(time * this.timeFactor).getTime();
   },
 
   getCurrentTime: function() {
-    return (new Date()).getTime()/1000;
+    return (new Date()).getTime();
   }
 });
