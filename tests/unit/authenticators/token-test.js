@@ -7,16 +7,18 @@ import Configuration from 'ember-simple-auth-token/configuration';
 var App;
 
 module('Token Authenticator', {
-  setup: function() {
+  beforeEach: function() {
     App = startApp();
     App.xhr = sinon.useFakeXMLHttpRequest();
     App.server = sinon.fakeServer.create();
     App.server.autoRespond = true;
     App.authenticator = Token.create();
+    sinon.spy(Ember.$, 'ajax');
   },
-  teardown: function() {
-    Ember.run(App, App.destroy);
+  afterEach: function() {
+    Ember.$.ajax.restore();
     App.xhr.restore();
+    Ember.run(App, App.destroy);
   }
 });
 
@@ -107,8 +109,6 @@ test('#restore resolves custom token with the correct data', function() {
 });
 
 test('#authenticate sends an AJAX request to the sign in endpoint', function() {
-  sinon.spy(Ember.$, 'ajax');
-
   var credentials = {
     identification: 'username',
     password: 'password'
@@ -116,7 +116,7 @@ test('#authenticate sends an AJAX request to the sign in endpoint', function() {
 
   App.authenticator.authenticate(credentials);
 
-  Ember.run.next(function() {
+  Ember.run(function() {
     var args = Ember.$.ajax.getCall(0).args[0];
     delete args.beforeSend;
     deepEqual(args, {
@@ -127,14 +127,10 @@ test('#authenticate sends an AJAX request to the sign in endpoint', function() {
       contentType: 'application/json',
       headers: {}
     });
-
-    Ember.$.ajax.restore();
   });
 });
 
 test('#authenticate sends an AJAX request to the sign in endpoint with custom fields', function() {
-  sinon.spy(Ember.$, 'ajax');
-
   var credentials = {
     identification: 'username',
     password: 'password'
@@ -146,7 +142,7 @@ test('#authenticate sends an AJAX request to the sign in endpoint with custom fi
   App.authenticator = Token.create();
   App.authenticator.authenticate(credentials);
 
-  Ember.run.next(function() {
+  Ember.run(function() {
     var args = Ember.$.ajax.getCall(0).args[0];
     delete args.beforeSend;
 
@@ -158,14 +154,10 @@ test('#authenticate sends an AJAX request to the sign in endpoint with custom fi
       contentType: 'application/json',
       headers: {}
     });
-
-    Ember.$.ajax.restore();
   });
 });
 
 test('#authenticate successfully resolves with the correct data', function() {
-  sinon.spy(Ember.$, 'ajax');
-
   var credentials = {
     email: 'email@address.com',
     password: 'password'
@@ -178,20 +170,18 @@ test('#authenticate successfully resolves with the correct data', function() {
     '{ "access_token": "secret token!" }'
   ]);
 
-  Ember.run(function() {
-    App.authenticator.authenticate(credentials).then(function(data) {
+  return App.authenticator
+    .authenticate(credentials)
+    .then(
+    function (data) {
       deepEqual(data, {
         access_token: 'secret token!'
       });
-    });
-
-    Ember.$.ajax.restore();
-  });
+    }
+  );
 });
 
 test('#authenticate sends an AJAX request with custom headers', function() {
-  sinon.spy(Ember.$, 'ajax');
-
   var credentials = {
     identification: 'username',
     password: 'password'
@@ -204,7 +194,7 @@ test('#authenticate sends an AJAX request with custom headers', function() {
   App.authenticator = Token.create();
   App.authenticator.authenticate(credentials);
 
-  Ember.run.next(function() {
+  Ember.run(function() {
     var args = Ember.$.ajax.getCall(0).args[0];
     delete args.beforeSend;
     deepEqual(args, {
@@ -218,14 +208,10 @@ test('#authenticate sends an AJAX request with custom headers', function() {
         'X-ANOTHER-HEADER': 0
       }
     });
-
-    Ember.$.ajax.restore();
   });
 });
 
 test('#authenticate rejects with the correct error', function() {
-  sinon.spy(Ember.$, 'ajax');
-
   var credentials = {
     email: 'email@address.com',
     password: 'password'
@@ -244,8 +230,6 @@ test('#authenticate rejects with the correct error', function() {
         'error': 'invalid_grant'
       });
     });
-
-    Ember.$.ajax.restore();
   });
 });
 

@@ -12,7 +12,7 @@ var App,
     data = { token: 'secret token!' };
 
 module('Token Authenticator', {
-  setup: function() {
+  beforeEach: function() {
     App = startApp();
     App.authorizer = Token.create({
       session: Session.create({
@@ -20,7 +20,7 @@ module('Token Authenticator', {
       })
     });
   },
-  teardown: function() {
+  afterEach: function() {
     Ember.run(App, App.destroy);
   }
 });

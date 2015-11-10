@@ -104,7 +104,7 @@ export default TokenAuthenticator.extend({
       dataObject = Ember.Object.create(data);
 
     return new Ember.RSVP.Promise(function(resolve, reject) {
-      var now = (new Date()).getTime();
+      var now = _this.getCurrentTime();
       var expiresAt = _this.resolveTime(dataObject.get(_this.tokenExpireName));
       var token = dataObject.get(_this.tokenPropertyName);
 
@@ -121,8 +121,8 @@ export default TokenAuthenticator.extend({
         }
       }
 
-      if (expiresAt > 0) {
-        var wait = expiresAt - _this.refreshLeeway;
+      if (expiresAt > now) {
+        var wait = expiresAt - now - _this.refreshLeeway;
         if (wait > 0) {
           if (_this.refreshAccessTokens) {
             _this.scheduleAccessTokenRefresh(dataObject.get(_this.tokenExpireName), token);
@@ -169,7 +169,7 @@ export default TokenAuthenticator.extend({
         Ember.run(function() {
           var token = response[_this.tokenPropertyName],
             tokenData = _this.getTokenData(token),
-            expiresAt = tokenData[_this.tokenExpireName],
+            expiresAt = _this.getCurrentTime() + tokenData[_this.tokenExpireName],
             tokenExpireData = {};
 
           _this.scheduleAccessTokenRefresh(expiresAt, token);
@@ -203,16 +203,15 @@ export default TokenAuthenticator.extend({
     if (this.refreshAccessTokens) {
       expiresAt = this.resolveTime(expiresAt);
 
-      var wait = (expiresAt - this.refreshLeeway) * 1000;
+      var now = this.getCurrentTime(),
+        wait = expiresAt - now - this.refreshLeeway;
 
       if (!Ember.isEmpty(token) && !Ember.isEmpty(expiresAt) && wait > 0) {
         Ember.run.cancel(this._refreshTokenTimeout);
 
         delete this._refreshTokenTimeout;
 
-        if (!Ember.testing) {
-          this._refreshTokenTimeout = Ember.run.later(this, this.refreshAccessToken, token, wait);
-        }
+        this._refreshTokenTimeout = Ember.run.later(this, this.refreshAccessToken, token, wait);
       }
     }
   },
@@ -240,10 +239,10 @@ export default TokenAuthenticator.extend({
     return new Ember.RSVP.Promise(function(resolve, reject) {
       _this.makeRequest(_this.serverTokenRefreshEndpoint, data).then(function(response) {
         Ember.run(function() {
-          var token = response[_this.tokenPropertyName],
-            tokenData = _this.getTokenData(token),
-            expiresAt = tokenData[_this.tokenExpireName],
-            tokenExpireData = {};
+          var token = response[_this.tokenPropertyName];
+          var tokenData = _this.getTokenData(token);
+          var expiresAt = _this.getCurrentTime() + tokenData[_this.tokenExpireName];
+          var tokenExpireData = {};
 
           tokenExpireData[_this.tokenExpireName] = expiresAt;
 
@@ -323,6 +322,10 @@ export default TokenAuthenticator.extend({
     if (Ember.isEmpty(time)) {
       return time;
     }
-    return time * this.timeFactor;
+    return new Date(time * this.timeFactor).getTime();
+  },
+
+  getCurrentTime: function() {
+    return (new Date()).getTime()/1000;
   }
 });
