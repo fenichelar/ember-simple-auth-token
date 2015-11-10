@@ -20,7 +20,7 @@ module.exports = function(environment) {
 
     contentSecurityPolicy: {
       'default-src': "'none'",
-      'script-src': "'self'",
+      'script-src': "'self' 'unsafe-eval'",
       'font-src': "'self' https://maxcdn.bootstrapcdn.com",
       'connect-src': "'self'",
       'img-src': "'self'",
@@ -36,8 +36,8 @@ module.exports = function(environment) {
     };
 
     ENV['ember-simple-auth-token'] = {
-      serverTokenEndpoint: '/api/api-token-auth/',
-      serverTokenRefreshEndpoint: '/api/api-token-refresh/',
+      serverTokenEndpoint: '/api/token-auth/',
+      serverTokenRefreshEndpoint: '/api/token-refresh/',
       timeFactor: 1000,
       refreshLeeway: 5
     };
@@ -66,8 +66,8 @@ module.exports = function(environment) {
     };
 
     ENV['ember-simple-auth-token'] = {
-      serverTokenEndpoint: ENV['API_URL'] + '/api/api-token-auth/',
-      serverTokenRefreshEndpoint: ENV['API_URL'] + '/api/api-token-refresh/',
+      serverTokenEndpoint: ENV['API_URL'] + '/api/token-auth/',
+      serverTokenRefreshEndpoint: ENV['API_URL'] + '/api/token-refresh/',
       timeFactor: 1000,
       refreshLeeway: 5
     };

@@ -19,7 +19,9 @@ module('JWT Authenticator', {
     App.server.autoRespond = true;
     App.authenticator = JWT.create();
     sinon.spy(Ember.run, 'cancel');
-    sinon.spy(Ember.run, 'later');
+    sinon.stub(Ember.run, 'later', function(scope, callback, args, wait) {
+      callback.call(scope, args);
+    });
     sinon.spy(Ember.$, 'ajax');
 
   },
@@ -84,7 +86,7 @@ test('#restore resolves when the data includes `token` and `expiresAt`', functio
   data[jwt.tokenPropertyName] = token;
   data.expiresAt = expiresAt;
 
-  App.server.respondWith('POST', '/api-token-refresh/', [
+  App.server.respondWith('POST', '/api/token-refresh/', [
     201, {
       'Content-Type': 'application/json'
     },
@@ -118,7 +120,7 @@ test('#restore resolves when the data includes `token` and excludes `expiresAt`'
 
   var data = {};
   data[jwt.tokenPropertyName] = token;
-  App.server.respondWith('POST', '/api-token-refresh/', [
+  App.server.respondWith('POST', '/api/token-refresh/', [
     201, {
       'Content-Type': 'application/json'
     },
@@ -151,7 +153,7 @@ test('#restore rejects when `refreshAccessTokens` is false and token is expired'
 
   App.authenticator.refreshAccessTokens = false;
 
-  App.server.respondWith('POST', '/api-token-refresh/', [
+  App.server.respondWith('POST', '/api/token-refresh/', [
     201, {
       'Content-Type': 'application/json'
     },
@@ -183,7 +185,7 @@ test('#restore rejects when `token` is excluded.', function() {
   data['expiresAt'] = expiresAt;
 
 
-  App.server.respondWith('POST', '/api-token-refresh/', [
+  App.server.respondWith('POST', '/api/token-refresh/', [
     201, {
       'Content-Type': 'application/json'
     },
@@ -221,7 +223,7 @@ test('#restore resolves when `expiresAt` is greater than `now`', function() {
 
   App.authenticator.refreshAccessTokens = false;
 
-  App.server.respondWith('POST', '/api-token-refresh/', [
+  App.server.respondWith('POST', '/api/token-refresh/', [
     201, {
       'Content-Type': 'application/json'
     },
@@ -246,6 +248,7 @@ test('#restore schedules a token refresh when `refreshAccessTokens` is true.', f
     expiresAt = currentTime + expiresIn;
 
   sinon.stub(App.authenticator, 'getCurrentTime', function() { return currentTime; });
+  sinon.stub(App.authenticator, 'refreshAccessToken', function() { return null; });
 
   var token = {};
   token[jwt.identificationField] = 'test@test.com';
@@ -257,15 +260,31 @@ test('#restore schedules a token refresh when `refreshAccessTokens` is true.', f
   data[jwt.tokenPropertyName] = token;
   data[jwt.tokenExpireName] = expiresAt;
 
+  var refreshedToken = {};
+  refreshedToken[jwt.identificationField] = 'test@test.com';
+  refreshedToken[jwt.tokenExpireName] = expiresAt;
+
+  token = createFakeToken(refreshedToken);
+
+  App.server.respondWith('POST', '/api/token-refresh/', [
+    201, {
+      'Content-Type': 'application/json'
+    },
+    '{ "token": "' + token + '" }'
+  ]);
+
   Ember.run(function() {
     App.authenticator.restore(data).then(function(content) {
       // Check that Ember.run.later ran.
       var spyCall = Ember.run.later.getCall(0);
       deepEqual(spyCall.args[1], App.authenticator.refreshAccessToken);
       deepEqual(spyCall.args[2], token);
+
+      App.authenticator.refreshAccessToken.restore();
     });
   });
 });
+
 
 test('#restore does not schedule a token refresh when `refreshAccessTokens` is false.', function() {
   expect(1);
@@ -398,7 +417,7 @@ test('#restore schedule access token refresh and refreshes it when time is appro
 
   token = createFakeToken(refreshedToken);
 
-  App.server.respondWith('POST', '/api-token-refresh/', [
+  App.server.respondWith('POST', '/api/token-refresh/', [
     201, {
       'Content-Type': 'application/json'
     },
@@ -442,12 +461,6 @@ test('#authenticate rejects with invalid credentials', function() {
   expect(1);
   var jwt = JWT.create(),
     expiresAt = 300;
-
-  var token = {};
-  token[jwt.identificationField] = 'test@test.com';
-  token[jwt.tokenExpireName] = expiresAt;
-
-  token = createFakeToken(token);
 
   var credentials = {
     identification: 'username',
@@ -565,6 +578,8 @@ test('#refreshAccessToken triggers the `sessionDataUpdated` event on successful 
   var jwt = JWT.create(),
     expiresAt = 300;
 
+  sinon.stub(App.authenticator, 'scheduleAccessTokenRefresh', function() { return null; });
+
   var token = {};
   token[jwt.identificationField] = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
@@ -584,6 +599,7 @@ test('#refreshAccessToken triggers the `sessionDataUpdated` event on successful 
     ok(data[jwt.tokenExpireName], 'Verify expiresAt was added to response');
     ok(data[jwt.tokenExpireName] > 0, 'Verify is greater than `now`');
     deepEqual(data.token, token);
+    App.authenticator.scheduleAccessTokenRefresh.restore();
   });
 });
 

@@ -67,7 +67,7 @@ test('#restore resolves with the correct data', function() {
     token: 'secret token!'
   };
 
-  App.server.respondWith('POST', '/api-token-auth/', [
+  App.server.respondWith('POST', '/api/token-auth/', [
     201, {
       'Content-Type': 'application/json'
     },
@@ -94,7 +94,7 @@ test('#restore resolves custom token with the correct data', function() {
     }
   };
 
-  App.server.respondWith('POST', '/api-token-auth/', [
+  App.server.respondWith('POST', '/api/token-auth/', [
     201, {
       'Content-Type': 'application/json'
     },
@@ -120,7 +120,7 @@ test('#authenticate sends an AJAX request to the sign in endpoint', function() {
     var args = Ember.$.ajax.getCall(0).args[0];
     delete args.beforeSend;
     deepEqual(args, {
-      url: '/api-token-auth/',
+      url: '/api/token-auth/',
       method: 'POST',
       data: '{"password":"password","username":"username"}',
       dataType: 'json',
@@ -147,7 +147,7 @@ test('#authenticate sends an AJAX request to the sign in endpoint with custom fi
     delete args.beforeSend;
 
     deepEqual(args, {
-      url: '/api-token-auth/',
+      url: '/api/token-auth/',
       method: 'POST',
       data: '{"api-key":"password","api-user":"username"}',
       dataType: 'json',
@@ -163,7 +163,7 @@ test('#authenticate successfully resolves with the correct data', function() {
     password: 'password'
   };
 
-  App.server.respondWith('POST', '/api-token-auth/', [
+  App.server.respondWith('POST', '/api/token-auth/', [
     201, {
       'Content-Type': 'application/json'
     },
@@ -198,7 +198,7 @@ test('#authenticate sends an AJAX request with custom headers', function() {
     var args = Ember.$.ajax.getCall(0).args[0];
     delete args.beforeSend;
     deepEqual(args, {
-      url: '/api-token-auth/',
+      url: '/api/token-auth/',
       method: 'POST',
       data: '{"password":"password","username":"username"}',
       dataType: 'json',
@@ -217,7 +217,7 @@ test('#authenticate rejects with the correct error', function() {
     password: 'password'
   };
 
-  App.server.respondWith('POST', '/api-token-auth/', [
+  App.server.respondWith('POST', '/api/token-auth/', [
     400, {
       'Content-Type': 'application/json'
     },

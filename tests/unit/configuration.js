@@ -15,7 +15,7 @@ module('Configuration', {
 });
 
 test('serverTokenEndpoint', function() {
-  equal(Configuration.serverTokenEndpoint, '/api-token-auth/', 'defaults to "/api-token-auth/"');
+  equal(Configuration.serverTokenEndpoint, '/api/token-auth/', 'defaults to "/api/token-auth/"');
 });
 
 test('identificationField', function() {
@@ -35,7 +35,7 @@ test('authorizationHeaderName', function() {
 });
 
 test('serverTokenRefreshEndpoint', function() {
-  equal(Configuration.serverTokenRefreshEndpoint, '/api-token-refresh/', 'defaults to "/api-token-refresh/"');
+  equal(Configuration.serverTokenRefreshEndpoint, '/api/token-refresh/', 'defaults to "/api/token-refresh/"');
 });
 
 test('refreshAccessTokens', function() {

@@ -157,7 +157,7 @@ For the Token authenticator:
 ```js
 // config/environment.js
 ENV['ember-simple-auth-token'] = {
-  serverTokenEndpoint: '/api-token-auth/',
+  serverTokenEndpoint: '/api/token-auth/',
   identificationField: 'username',
   passwordField: 'password',
   tokenPropertyName: 'token',
@@ -171,7 +171,7 @@ For the JWT authenticator (in addition to the Token authenticator fields):
 
 ```
   refreshAccessTokens: true,
-  serverTokenRefreshEndpoint: '/api-token-refresh/',
+  serverTokenRefreshEndpoint: '/api/token-refresh/',
   tokenExpireName: 'exp',
   refreshLeeway: 0,
   timeFactor: 1  // example - set to "1000" to convert incoming seconds to milliseconds.

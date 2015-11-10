@@ -1,8 +1,8 @@
 import loadConfig from './utils/load-config';
 
 var defaults = {
-  serverTokenEndpoint: '/api-token-auth/',
-  serverTokenRefreshEndpoint: '/api-token-refresh/',
+  serverTokenEndpoint: '/api/token-auth/',
+  serverTokenRefreshEndpoint: '/api/token-refresh/',
   identificationField: 'username',
   passwordField: 'password',
   tokenPropertyName: 'token',
@@ -49,7 +49,7 @@ export default {
     The endpoint on the server where the authenticator refreshes a token.
     @property serverTokenRefreshEndpoint
     @type String
-    @default '/api-token-refresh/'
+    @default '/api/token-refresh/'
   */
   serverTokenRefreshEndpoint: defaults.serverTokenRefreshEndpoint,
 

@@ -13,5 +13,5 @@ module.exports = function(app) {
   });
 
   app.use(bodyParser.json());
-  app.use('/api/api-token-refresh', apiTokenRefreshRouter);
+  app.use('/api/token-refresh', apiTokenRefreshRouter);
 };

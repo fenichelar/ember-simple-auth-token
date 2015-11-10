@@ -20,9 +20,9 @@ export default TokenAuthenticator.extend({
     The endpoint on the server for refreshing a token.
     @property serverTokenRefreshEndpoint
     @type String
-    @default '/api-token-refresh/'
+    @default '/api/token-refresh/'
   */
-  serverTokenRefreshEndpoint: '/api-token-refresh/',
+  serverTokenRefreshEndpoint: '/api/token-refresh/',
 
   /**
     Sets whether the authenticator automatically refreshes access tokens.

@@ -9,7 +9,7 @@ export default Ember.Controller.extend({
         session = this.get('session.secure'),
         tokenData = {};
 
-    if(Ember.keys(session).length > 0) {
+    if(session && Ember.keys(session).length > 0) {
       tokenData = authenticator.getTokenData(session.token);
     }
 

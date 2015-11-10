@@ -22,9 +22,9 @@ export default Base.extend({
 
     @property serverTokenEndpoint
     @type String
-    @default '/api-token-auth/'
+    @default '/api/token-auth/'
   */
-  serverTokenEndpoint: '/api-token-auth/',
+  serverTokenEndpoint: '/api/token-auth/',
 
   /**
     The attribute-name that is used for the identification field when sending the

@@ -12,5 +12,5 @@ module.exports = function(app) {
   });
 
   app.use(bodyParser.json());
-  app.use('/api/api-token-auth', apiTokenAuthRouter);
+  app.use('/api/token-auth', apiTokenAuthRouter);
 };
