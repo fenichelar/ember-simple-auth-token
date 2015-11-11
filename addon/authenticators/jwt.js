@@ -60,9 +60,9 @@ export default TokenAuthenticator.extend({
     Default time unit.
     @property timeFactor
     @type Integer
-    @default 1 (seconds)
+    @default 1000 (1 second)
   */
-  timeFactor: 1,
+  timeFactor: 1000,
 
   /**
     @method init
@@ -105,7 +105,7 @@ export default TokenAuthenticator.extend({
 
     return new Ember.RSVP.Promise(function(resolve, reject) {
       var now = _this.getCurrentTime();
-      var expiresAt = _this.resolveTime(dataObject.get(_this.tokenExpireName));
+      var expiresAt = dataObject.get(_this.tokenExpireName);
       var token = dataObject.get(_this.tokenPropertyName);
 
       if (Ember.isEmpty(token)) {
@@ -115,7 +115,7 @@ export default TokenAuthenticator.extend({
         // Fetch the expire time from the token data since `expiresAt`
         // wasn't included in the data object that was passed in.
         var tokenData = _this.getTokenData(data[_this.tokenPropertyName]);
-        expiresAt = _this.resolveTime(tokenData[_this.tokenExpireName]);
+        expiresAt = tokenData[_this.tokenExpireName] * _this.timeFactor;
         if (Ember.isEmpty(expiresAt)) {
           return resolve(data);
         }
@@ -169,7 +169,7 @@ export default TokenAuthenticator.extend({
         Ember.run(function() {
           var token = response[_this.tokenPropertyName],
             tokenData = _this.getTokenData(token),
-            expiresAt = _this.getCurrentTime() + tokenData[_this.tokenExpireName],
+            expiresAt = _this.getCurrentTime() + tokenData[_this.tokenExpireName] * _this.timeFactor,
             tokenExpireData = {};
 
           _this.scheduleAccessTokenRefresh(expiresAt, token);
@@ -201,8 +201,6 @@ export default TokenAuthenticator.extend({
   */
   scheduleAccessTokenRefresh: function(expiresAt, token) {
     if (this.refreshAccessTokens) {
-      expiresAt = this.resolveTime(expiresAt);
-
       var now = this.getCurrentTime(),
         wait = expiresAt - now - this.refreshLeeway;
 
@@ -241,7 +239,7 @@ export default TokenAuthenticator.extend({
         Ember.run(function() {
           var token = response[_this.tokenPropertyName];
           var tokenData = _this.getTokenData(token);
-          var expiresAt = _this.getCurrentTime() + tokenData[_this.tokenExpireName];
+          var expiresAt = _this.getCurrentTime() + tokenData[_this.tokenExpireName] * _this.timeFactor;
           var tokenExpireData = {};
 
           tokenExpireData[_this.tokenExpireName] = expiresAt;
@@ -310,19 +308,6 @@ export default TokenAuthenticator.extend({
     delete this._refreshTokenTimeout;
 
     return new Ember.RSVP.resolve();
-  },
-
-  /**
-    Handles converting between time units for data between different systems.
-    Default: seconds(1)
-    @method resolveTime
-    @private
-  */
-  resolveTime: function(time) {
-    if (Ember.isEmpty(time) || !time) {
-      return -1;
-    }
-    return new Date(time * this.timeFactor).getTime();
   },
 
   getCurrentTime: function() {
