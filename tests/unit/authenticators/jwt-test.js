@@ -11,6 +11,10 @@ var createFakeToken = function(obj) {
   return 'a.' + token + '.b';
 };
 
+var getConvertedTime = function(time) {
+  return time * 1000;
+};
+
 module('JWT Authenticator', {
   beforeEach() {
     App = startApp();
@@ -70,8 +74,8 @@ test('assigns timeFactor from the configuration object', function() {
 test('#restore resolves when the data includes `token` and `expiresAt`', function() {
   expect(1);
   var jwt = JWT.create(),
-    currentTime = 10000,
-    expiresAt = currentTime + 3000;
+    currentTime = getConvertedTime(10000),
+    expiresAt = currentTime + getConvertedTime(3000);
 
   sinon.stub(App.authenticator, 'getCurrentTime', function() { return currentTime; });
 
@@ -105,8 +109,8 @@ test('#restore resolves when the data includes `token` and `expiresAt`', functio
 test('#restore resolves when the data includes `token` and excludes `expiresAt`', function() {
   expect(1);
   var jwt = JWT.create(),
-    currentTime = 10000,
-    expiresAt = currentTime + 3000;
+    currentTime = getConvertedTime(10000),
+    expiresAt = currentTime + getConvertedTime(3000);
 
   sinon.stub(App.authenticator, 'getCurrentTime', function() { return currentTime; });
 
@@ -205,8 +209,8 @@ test('#restore rejects when `token` is excluded.', function() {
 test('#restore resolves when `expiresAt` is greater than `now`', function() {
   expect(1);
   var jwt = JWT.create(),
-    currentTime = 10000,
-    expiresAt = currentTime + 3000;
+    currentTime = getConvertedTime(10000),
+    expiresAt = currentTime + getConvertedTime(3000);
 
   sinon.stub(App.authenticator, 'getCurrentTime', function() { return currentTime; });
 
@@ -242,8 +246,8 @@ test('#restore resolves when `expiresAt` is greater than `now`', function() {
 test('#restore schedules a token refresh when `refreshAccessTokens` is true.', function() {
   expect(2);
   var jwt = JWT.create(),
-    currentTime = 10000,
-    expiresAt = currentTime + 3000;
+    currentTime = getConvertedTime(10000),
+    expiresAt = currentTime + getConvertedTime(3000);
 
   sinon.stub(App.authenticator, 'getCurrentTime', function() { return currentTime; });
   sinon.stub(App.authenticator, 'refreshAccessToken', function() { return null; });
@@ -287,8 +291,8 @@ test('#restore schedules a token refresh when `refreshAccessTokens` is true.', f
 test('#restore does not schedule a token refresh when `refreshAccessTokens` is false.', function() {
   expect(1);
   var jwt = JWT.create(),
-    currentTime = 10000,
-    expiresAt = currentTime + 3000;
+    currentTime = getConvertedTime(10000),
+    expiresAt = currentTime + getConvertedTime(3000);
 
   sinon.stub(App.authenticator, 'getCurrentTime', function() { return currentTime; });
 
@@ -339,7 +343,7 @@ test('#restore does not schedule a token refresh when `expiresAt` <= `now`.', fu
 test('#restore does not schedule a token refresh when `expiresAt` - `refreshLeeway` < `now`.', function() {
   expect(1);
   var jwt = JWT.create(),
-    expiresAt = 6000;
+    expiresAt = getConvertedTime(6000);
 
   var token = {};
   token[jwt.identificationField] = 'test@test.com';
@@ -365,8 +369,8 @@ test('#restore does not schedule a token refresh when `expiresAt` - `refreshLeew
 test('#restore schedule access token refresh and refreshes it when time is appropriate', function() {
   expect(1);
   var jwt = JWT.create(),
-    currentTime = 10000,
-    expiresAt = currentTime + 3000;
+    currentTime = getConvertedTime(10000),
+    expiresAt = currentTime + getConvertedTime(3000);
 
   let refreshAccessToken;
   let refreshAccessTokenTarget;
@@ -403,7 +407,7 @@ test('#restore schedule access token refresh and refreshes it when time is appro
     });
   });
 
-  currentTime = 1250;
+  currentTime = getConvertedTime(1250);
   App.authenticator.getCurrentTime.restore();
   sinon.stub(App.authenticator, 'getCurrentTime', function() { return currentTime; });
 
@@ -422,7 +426,7 @@ test('#restore schedule access token refresh and refreshes it when time is appro
 
   Ember.run(function() {
     refreshAccessToken.call(refreshAccessTokenTarget, refreshAccessTokenArgs).then(function(response) {
-      deepEqual(response, { exp: expiresAt + currentTime, token: token });
+      deepEqual(response, { exp: expiresAt, token: token });
     });
   });
 });
@@ -479,7 +483,7 @@ test('#authenticate rejects with invalid credentials', function() {
 
 test('#authenticate schedules a token refresh when `refreshAccessTokens` is true', function() {
   var jwt = JWT.create(),
-    expiresAt = 3;
+    expiresAt = new Date().getTime() + 300000;
 
   var token = {};
   token[jwt.identificationField] = 'test@test.com';
