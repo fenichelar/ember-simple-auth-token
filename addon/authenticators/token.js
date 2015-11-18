@@ -146,10 +146,16 @@ export default Base.extend({
     @return {object} An object with properties for authentication.
   */
   getAuthenticateData: function(credentials) {
-    var authentication = {};
-    authentication[this.passwordField] = credentials.password;
-    authentication[this.identificationField] = credentials.identification;
-    return authentication;
+    var password = credentials.password;
+    var identification = credentials.identification;
+
+    delete credentials.password;
+    delete credentials.identification;
+
+    credentials[this.passwordField] = password;
+    credentials[this.identificationField] = identification;
+
+    return credentials;
   },
 
   /**
