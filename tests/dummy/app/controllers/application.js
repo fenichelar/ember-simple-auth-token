@@ -1,12 +1,15 @@
 import Ember from 'ember';
 
 export default Ember.Controller.extend({
-  sessionData: Ember.computed('session.secure', function() {
-    return JSON.stringify(this.get('session.secure'), null, '\t');
+  session: Ember.inject.service('session'),
+
+  sessionData: Ember.computed('session.session.content.authenticated', function() {
+    return JSON.stringify(this.get('session.session.content.authenticated'), null, '\t');
   }),
-  tokenData: Ember.computed('session.secure', function() {
+
+  tokenData: Ember.computed('session.session.content.authenticated', function() {
     var authenticator = this.container.lookup('authenticator:jwt'),
-        session = this.get('session.secure'),
+        session = this.get('session.session.content.authenticated'),
         tokenData = {};
 
     if(session && Ember.keys(session).length > 0) {
