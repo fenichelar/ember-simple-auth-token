@@ -154,18 +154,19 @@ export default TokenAuthenticator.extend({
     response and the promise resolved.
 
     @method authenticate
-    @param {Object} options The credentials to authenticate the session with
+    @param {Object} credentials The credentials to authenticate the session with
+    @param {Object} headers Additional headers to be sent to server
     @return {Ember.RSVP.Promise} A promise that resolves when an auth token is
                                  successfully acquired from the server and rejects
                                  otherwise
   */
-  authenticate: function(credentials) {
+  authenticate: function(credentials, headers) {
     var _this = this;
 
     return new Ember.RSVP.Promise(function(resolve, reject) {
       var data = _this.getAuthenticateData(credentials);
 
-      _this.makeRequest(_this.serverTokenEndpoint, data).then(function(response) {
+      _this.makeRequest(_this.serverTokenEndpoint, data, headers).then(function(response) {
         Ember.run(function() {
           var token = response[_this.tokenPropertyName],
             tokenData = _this.getTokenData(token),
@@ -230,14 +231,14 @@ export default TokenAuthenticator.extend({
     @method refreshAccessToken
     @private
   */
-  refreshAccessToken: function(token) {
+  refreshAccessToken: function(token, headers) {
     var _this = this,
       data = {};
 
     data[_this.tokenPropertyName] = token;
 
     return new Ember.RSVP.Promise(function(resolve, reject) {
-      _this.makeRequest(_this.serverTokenRefreshEndpoint, data).then(function(response) {
+      _this.makeRequest(_this.serverTokenRefreshEndpoint, data, headers).then(function(response) {
         Ember.run(function() {
           var token = response[_this.tokenPropertyName];
           var tokenData = _this.getTokenData(token);
@@ -283,7 +284,7 @@ export default TokenAuthenticator.extend({
     @method makeRequest
     @private
   */
-  makeRequest: function(url, data) {
+  makeRequest: function(url, data, headers) {
     return Ember.$.ajax({
       url: url,
       method: 'POST',
@@ -292,6 +293,12 @@ export default TokenAuthenticator.extend({
       contentType: 'application/json',
       beforeSend: function(xhr, settings) {
         xhr.setRequestHeader('Accept', settings.accepts.json);
+
+        if (headers) {
+          Object.keys(headers).forEach(function(key) {
+            xhr.setRequestHeader(key, headers[key]);
+          });
+        }
       },
       headers: this.headers
     });

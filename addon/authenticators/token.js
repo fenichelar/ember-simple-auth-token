@@ -120,14 +120,15 @@ export default Base.extend({
     promise that rejects with the server error is returned.
 
     @method authenticate
-    @param {Object} options The credentials to authenticate the session with
+    @param {Object} credentials The credentials to authenticate the session with
+    @param {Object} headers Additional headers to pass with request
     @return {Ember.RSVP.Promise} A promise that resolves when an auth token is successfully acquired from the server and rejects otherwise
   */
-  authenticate: function(credentials) {
+  authenticate: function(credentials, headers) {
     var _this = this;
     return new Ember.RSVP.Promise(function(resolve, reject) {
       var data = _this.getAuthenticateData(credentials);
-      _this.makeRequest(data).then(function(response) {
+      _this.makeRequest(data, headers).then(function(response) {
         Ember.run(function() {
           resolve(_this.getResponseData(response));
         });
@@ -175,9 +176,11 @@ export default Base.extend({
 
   /**
     @method makeRequest
+    @param {Object} data Object that will be sent to server
+    @param {Object} headers Additional headers that will be sent to server
     @private
   */
-  makeRequest: function(data) {
+  makeRequest: function(data, headers) {
     return Ember.$.ajax({
       url: this.serverTokenEndpoint,
       method: 'POST',
@@ -186,6 +189,12 @@ export default Base.extend({
       contentType: 'application/json',
       beforeSend: function(xhr, settings) {
         xhr.setRequestHeader('Accept', settings.accepts.json);
+
+        if (headers) {
+          Object.keys(headers).forEach(function(key) {
+            xhr.setRequestHeader(key, headers[key]);
+          });
+        }
       },
       headers: this.headers
     });
