@@ -5,10 +5,18 @@ module.exports = function(app) {
   var apiTokenRefreshRouter = express.Router();
 
   apiTokenRefreshRouter.post('/', function(req, res) {
-    var decoded = jwt.verify(req.body.token, 'secret');
-
-    res.send({
-      token: jwt.sign(decoded, 'secret', {expiresInSeconds: 10})
+    jwt.verify(req.body.token, 'secret', function(err, decoded) {
+      if (err) {
+        res
+          .status(401)
+          .send({
+            error: err
+          });
+      } else {
+        res.send({
+          token: jwt.sign(decoded, 'secret', { expiresIn: 10 })
+        });
+      }
     });
   });
 
