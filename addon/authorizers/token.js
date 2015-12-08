@@ -80,9 +80,10 @@ export default Base.extend({
   */
   authorize: function(data = {}, block = () => {}) {
     const token = data[this.tokenPropertyName];
+    const prefix = this.authorizationPrefix ? this.authorizationPrefix : '';
 
     if (this.get('session.isAuthenticated') && !Ember.isEmpty(token)) {
-      block(this.authorizationHeaderName, this.authorizationPrefix + token);
+      block(this.authorizationHeaderName, prefix + token);
     }
   }
 });
