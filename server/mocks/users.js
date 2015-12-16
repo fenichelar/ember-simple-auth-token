@@ -4,9 +4,16 @@ module.exports = function(app) {
   var usersRouter = express.Router();
 
   usersRouter.get('/', function(req, res) {
-    var token = req.headers.authorization.split('Bearer ')[1];
-    var decoded = jwt.verify(token, 'secret');
-    res.send(decoded);
+    var authorizationHeader = req.headers.authorization || '';
+
+    var token = authorizationHeader.split('Bearer ')[1];
+
+    if (!token) {
+      res.send({}, 200);
+      return;
+    }
+
+    res.send(jwt.verify(token, 'secret'));
   });
 
   app.use('/api/users', usersRouter);

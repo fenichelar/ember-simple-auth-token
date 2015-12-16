@@ -8,11 +8,11 @@ import TokenAuthenticator from './token';
   Inspired by [ember-simple-auth-oauth2](https://github.com/simplabs/ember-simple-auth/tree/master/packages/ember-simple-auth-oauth2)
 
   The factory for this authenticator is registered as
-  'simple-auth-authenticator:jwt` in Ember's container.
+  'authenticator:jwt` in Ember's container.
 
   @class JWT
   @namespace SimpleAuth.Authenticators
-  @module simple-auth-token/authenticators/jwt
+  @module ember-simple-auth-token/authenticators/jwt
   @extends TokenAuthenticator
 */
 export default TokenAuthenticator.extend({
@@ -20,9 +20,9 @@ export default TokenAuthenticator.extend({
     The endpoint on the server for refreshing a token.
     @property serverTokenRefreshEndpoint
     @type String
-    @default '/api-token-refresh/'
+    @default '/api/token-refresh/'
   */
-  serverTokenRefreshEndpoint: '/api-token-refresh/',
+  serverTokenRefreshEndpoint: '/api/token-refresh/',
 
   /**
     Sets whether the authenticator automatically refreshes access tokens.
@@ -72,6 +72,7 @@ export default TokenAuthenticator.extend({
     this.serverTokenEndpoint = Configuration.serverTokenEndpoint;
     this.serverTokenRefreshEndpoint = Configuration.serverTokenRefreshEndpoint;
     this.identificationField = Configuration.identificationField;
+    this.passwordField = Configuration.passwordField;
     this.tokenPropertyName = Configuration.tokenPropertyName;
     this.refreshAccessTokens = Configuration.refreshAccessTokens;
     this.refreshLeeway = Configuration.refreshLeeway;
@@ -103,7 +104,7 @@ export default TokenAuthenticator.extend({
       dataObject = Ember.Object.create(data);
 
     return new Ember.RSVP.Promise(function(resolve, reject) {
-      var now = (new Date()).getTime();
+      var now = _this.getCurrentTime();
       var expiresAt = _this.resolveTime(dataObject.get(_this.tokenExpireName));
       var token = dataObject.get(_this.tokenPropertyName);
 
@@ -119,9 +120,7 @@ export default TokenAuthenticator.extend({
           return resolve(data);
         }
       }
-      if (expiresAt !== expiresAt) {
-        return reject(new Error('invalid expiration'));
-      }
+
       if (expiresAt > now) {
         var wait = expiresAt - now - (_this.refreshLeeway * 1000);
         if (wait > 0) {
@@ -130,9 +129,11 @@ export default TokenAuthenticator.extend({
           }
           resolve(data);
         } else if (_this.refreshAccessTokens) {
-            resolve(_this.refreshAccessToken(token).then(function () {
-            return data;
-          }));
+          resolve(
+            _this.refreshAccessToken(token).then(function () {
+              return data;
+            })
+          );
         } else {
           reject(new Error('unable to refresh token'));
         }
@@ -153,18 +154,19 @@ export default TokenAuthenticator.extend({
     response and the promise resolved.
 
     @method authenticate
-    @param {Object} options The credentials to authenticate the session with
+    @param {Object} credentials The credentials to authenticate the session with
+    @param {Object} headers Additional headers to be sent to server
     @return {Ember.RSVP.Promise} A promise that resolves when an auth token is
                                  successfully acquired from the server and rejects
                                  otherwise
   */
-  authenticate: function(credentials) {
+  authenticate: function(credentials, headers) {
     var _this = this;
 
     return new Ember.RSVP.Promise(function(resolve, reject) {
       var data = _this.getAuthenticateData(credentials);
 
-      _this.makeRequest(_this.serverTokenEndpoint, data).then(function(response) {
+      _this.makeRequest(_this.serverTokenEndpoint, data, headers).then(function(response) {
         Ember.run(function() {
           var token = response[_this.tokenPropertyName],
             tokenData = _this.getTokenData(token),
@@ -202,7 +204,7 @@ export default TokenAuthenticator.extend({
     if (this.refreshAccessTokens) {
       expiresAt = this.resolveTime(expiresAt);
 
-      var now = (new Date()).getTime(),
+      var now = this.getCurrentTime(),
         wait = expiresAt - now - (this.refreshLeeway * 1000);
 
       if (!Ember.isEmpty(token) && !Ember.isEmpty(expiresAt) && wait > 0) {
@@ -210,9 +212,7 @@ export default TokenAuthenticator.extend({
 
         delete this._refreshTokenTimeout;
 
-        if (!Ember.testing) {
-          this._refreshTokenTimeout = Ember.run.later(this, this.refreshAccessToken, token, wait);
-        }
+        this._refreshTokenTimeout = Ember.run.later(this, this.refreshAccessToken, token, wait);
       }
     }
   },
@@ -231,19 +231,19 @@ export default TokenAuthenticator.extend({
     @method refreshAccessToken
     @private
   */
-  refreshAccessToken: function(token) {
+  refreshAccessToken: function(token, headers) {
     var _this = this,
       data = {};
 
     data[_this.tokenPropertyName] = token;
 
     return new Ember.RSVP.Promise(function(resolve, reject) {
-      _this.makeRequest(_this.serverTokenRefreshEndpoint, data).then(function(response) {
+      _this.makeRequest(_this.serverTokenRefreshEndpoint, data, headers).then(function(response) {
         Ember.run(function() {
-          var token = response[_this.tokenPropertyName],
-            tokenData = _this.getTokenData(token),
-            expiresAt = tokenData[_this.tokenExpireName],
-            tokenExpireData = {};
+          var token = response[_this.tokenPropertyName];
+          var tokenData = _this.getTokenData(token);
+          var expiresAt = tokenData[_this.tokenExpireName];
+          var tokenExpireData = {};
 
           tokenExpireData[_this.tokenExpireName] = expiresAt;
 
@@ -284,7 +284,7 @@ export default TokenAuthenticator.extend({
     @method makeRequest
     @private
   */
-  makeRequest: function(url, data) {
+  makeRequest: function(url, data, headers) {
     return Ember.$.ajax({
       url: url,
       method: 'POST',
@@ -293,6 +293,12 @@ export default TokenAuthenticator.extend({
       contentType: 'application/json',
       beforeSend: function(xhr, settings) {
         xhr.setRequestHeader('Accept', settings.accepts.json);
+
+        if (headers) {
+          Object.keys(headers).forEach(function(key) {
+            xhr.setRequestHeader(key, headers[key]);
+          });
+        }
       },
       headers: this.headers
     });
@@ -313,6 +319,10 @@ export default TokenAuthenticator.extend({
     return new Ember.RSVP.resolve();
   },
 
+  getCurrentTime: function() {
+    return (new Date()).getTime();
+  },
+
   /**
     Handles converting between time units for data between different systems.
     Default: seconds(1)
@@ -324,5 +334,5 @@ export default TokenAuthenticator.extend({
       return time;
     }
     return new Date(time * this.timeFactor).getTime();
-  },
+  }
 });

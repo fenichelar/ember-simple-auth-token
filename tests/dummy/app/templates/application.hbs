@@ -1,4 +1,4 @@
-<h2 id="title">Demo: simple-auth-token</h2>
+<h2 id="title">Demo: ember-simple-auth-token</h2>
 
 <ul>
   {{#link-to 'index' tagName='li'}}
@@ -21,9 +21,9 @@
 
 <p>Settings</p>
 <pre>
-  ENV['simple-auth-token'] = {
-    serverTokenEndpoint: '/api/api-token-auth/',
-    serverTokenRefreshEndpoint: '/api/api-token-refresh/',
+  ENV['ember-simple-auth-token'] = {
+    serverTokenEndpoint: '/api/token-auth/',
+    serverTokenRefreshEndpoint: '/api/token-refresh/',
     timeFactor: 1000,
     refreshLeeway: 5
   };

@@ -27,7 +27,7 @@ To install simply run:
 
 ```
 npm install --save-dev ember-cli-simple-auth-token
-ember generate simple-auth-token
+ember generate ember-simple-auth-token
 ```
 
 ## The Authenticators
@@ -71,7 +71,7 @@ export default Ember.Controller.extend({
   actions: {
     authenticate: function() {
       var credentials = this.getProperties('identification', 'password'),
-        authenticator = 'simple-auth-authenticator:token';
+        authenticator = 'authenticator:token';
 
       this.get('session').authenticate(authenticator, credentials);
     }
@@ -91,7 +91,7 @@ export default Ember.Controller.extend({
   actions: {
     authenticate: function() {
       var credentials = this.getProperties('identification', 'password'),
-        authenticator = 'simple-auth-authenticator:jwt';
+        authenticator = 'authenticator:jwt';
 
       this.get('session').authenticate(authenticator, credentials);
     }
@@ -108,10 +108,10 @@ next automatic token refresh request.
 For example, with the following configuration:
 
 ```
-  ENV['simple-auth'] = {
-    authorizer: 'simple-auth-authorizer:token'
+  ENV['ember-simple-auth'] = {
+    authorizer: 'authorizer:token'
   };
-  ENV['simple-auth-token'] = {
+  ENV['ember-simple-auth-token'] = {
     refreshAccessTokens: true,
     timeFactor: 1,
     refreshLeeway: 300 // Refresh the token 5 minutes (300s) before it expires.
@@ -145,8 +145,8 @@ To use the authorizer, configure it in the global environment object:
 
 ```js
 // config/environment.js
-ENV['simple-auth'] = {
-  authorizer: 'simple-auth-authorizer:token'
+ENV['ember-simple-auth'] = {
+  authorizer: 'authorizer:token'
 };
 ```
 
@@ -156,8 +156,8 @@ For the Token authenticator:
 
 ```js
 // config/environment.js
-ENV['simple-auth-token'] = {
-  serverTokenEndpoint: '/api-token-auth/',
+ENV['ember-simple-auth-token'] = {
+  serverTokenEndpoint: '/api/token-auth/',
   identificationField: 'username',
   passwordField: 'password',
   tokenPropertyName: 'token',
@@ -171,7 +171,7 @@ For the JWT authenticator (in addition to the Token authenticator fields):
 
 ```
   refreshAccessTokens: true,
-  serverTokenRefreshEndpoint: '/api-token-refresh/',
+  serverTokenRefreshEndpoint: '/api/token-refresh/',
   tokenExpireName: 'exp',
   refreshLeeway: 0,
   timeFactor: 1  // example - set to "1000" to convert incoming seconds to milliseconds.

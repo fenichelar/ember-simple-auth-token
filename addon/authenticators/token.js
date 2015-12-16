@@ -1,16 +1,16 @@
 import Ember from 'ember';
-import Base from 'simple-auth/authenticators/base';
+import Base from 'ember-simple-auth/authenticators/base';
 import Configuration from '../configuration';
 
 /**
   Authenticator that works with token-based authentication like JWT.
 
   _The factory for this authenticator is registered as
-  `'simple-auth-authenticator:token'` in Ember's container._
+  `'authenticator:token'` in Ember's container._
 
   @class Token
   @namespace SimpleAuth.Authenticators
-  @module simple-auth-token/authenticators/token
+  @module ember-simple-auth-token/authenticators/token
   @extends Base
 */
 export default Base.extend({
@@ -22,9 +22,9 @@ export default Base.extend({
 
     @property serverTokenEndpoint
     @type String
-    @default '/api-token-auth/'
+    @default '/api/token-auth/'
   */
-  serverTokenEndpoint: '/api-token-auth/',
+  serverTokenEndpoint: '/api/token-auth/',
 
   /**
     The attribute-name that is used for the identification field when sending the
@@ -120,14 +120,15 @@ export default Base.extend({
     promise that rejects with the server error is returned.
 
     @method authenticate
-    @param {Object} options The credentials to authenticate the session with
+    @param {Object} credentials The credentials to authenticate the session with
+    @param {Object} headers Additional headers to pass with request
     @return {Ember.RSVP.Promise} A promise that resolves when an auth token is successfully acquired from the server and rejects otherwise
   */
-  authenticate: function(credentials) {
+  authenticate: function(credentials, headers) {
     var _this = this;
     return new Ember.RSVP.Promise(function(resolve, reject) {
       var data = _this.getAuthenticateData(credentials);
-      _this.makeRequest(data).then(function(response) {
+      _this.makeRequest(data, headers).then(function(response) {
         Ember.run(function() {
           resolve(_this.getResponseData(response));
         });
@@ -175,9 +176,11 @@ export default Base.extend({
 
   /**
     @method makeRequest
+    @param {Object} data Object that will be sent to server
+    @param {Object} headers Additional headers that will be sent to server
     @private
   */
-  makeRequest: function(data) {
+  makeRequest: function(data, headers) {
     return Ember.$.ajax({
       url: this.serverTokenEndpoint,
       method: 'POST',
@@ -186,6 +189,12 @@ export default Base.extend({
       contentType: 'application/json',
       beforeSend: function(xhr, settings) {
         xhr.setRequestHeader('Accept', settings.accepts.json);
+
+        if (headers) {
+          Object.keys(headers).forEach(function(key) {
+            xhr.setRequestHeader(key, headers[key]);
+          });
+        }
       },
       headers: this.headers
     });
