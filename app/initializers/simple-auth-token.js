@@ -11,7 +11,7 @@ import ENV from '../config/environment';
 export default {
   name: 'ember-simple-auth-token',
   before: 'ember-simple-auth',
-  initialize: function(container) {
+  initialize(container) {
     Configuration.load(container, ENV['ember-simple-auth-token'] || {});
     container.register('authorizer:token', Authorizer);
     container.register('authenticator:token', TokenAuthenticator);

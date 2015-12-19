@@ -57,7 +57,7 @@ export default Base.extend({
     @method init
     @private
   */
-  init: function() {
+  init() {
     this.tokenPropertyName = Configuration.tokenPropertyName;
     this.authorizationHeaderName = Configuration.authorizationHeaderName;
 
@@ -78,7 +78,7 @@ export default Base.extend({
     @param {object} data
     @param {function} block
   */
-  authorize: function(data = {}, block = () => {}) {
+  authorize(data = {}, block = () => {}) {
     const token = data[this.tokenPropertyName];
     const prefix = this.authorizationPrefix ? this.authorizationPrefix : '';
 
