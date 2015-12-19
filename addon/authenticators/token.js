@@ -80,7 +80,7 @@ export default Base.extend({
     @method init
     @private
   */
-  init: function() {
+  init() {
     this.serverTokenEndpoint = Configuration.serverTokenEndpoint;
     this.identificationField = Configuration.identificationField;
     this.passwordField = Configuration.passwordField;
@@ -97,12 +97,11 @@ export default Base.extend({
     @param {Object} properties The properties to restore the session from
     @return {Ember.RSVP.Promise} A promise that when it resolves results in the session being authenticated
   */
-  restore: function(properties) {
-    var _this = this,
-        propertiesObject = Ember.Object.create(properties);
+  restore(properties) {
+    const propertiesObject = Ember.Object.create(properties);
 
-    return new Ember.RSVP.Promise(function(resolve, reject) {
-      if (!Ember.isEmpty(propertiesObject.get(_this.tokenPropertyName))) {
+    return new Ember.RSVP.Promise((resolve, reject) => {
+      if (!Ember.isEmpty(propertiesObject.get(this.tokenPropertyName))) {
         resolve(properties);
       } else {
         reject();
@@ -124,13 +123,13 @@ export default Base.extend({
     @param {Object} headers Additional headers to pass with request
     @return {Ember.RSVP.Promise} A promise that resolves when an auth token is successfully acquired from the server and rejects otherwise
   */
-  authenticate: function(credentials, headers) {
-    var _this = this;
-    return new Ember.RSVP.Promise(function(resolve, reject) {
-      var data = _this.getAuthenticateData(credentials);
-      _this.makeRequest(data, headers).then(function(response) {
-        Ember.run(function() {
-          resolve(_this.getResponseData(response));
+  authenticate(credentials, headers) {
+    return new Ember.RSVP.Promise((resolve, reject) => {
+      const data = this.getAuthenticateData(credentials);
+
+      this.makeRequest(data, headers).then(response => {
+        Ember.run(() => {
+          resolve(this.getResponseData(response));
         });
       }, function(xhr) {
         Ember.run(function() {
@@ -146,10 +145,12 @@ export default Base.extend({
     @method getAuthenticateData
     @return {object} An object with properties for authentication.
   */
-  getAuthenticateData: function(credentials) {
-    var authentication = {};
-    authentication[this.passwordField] = credentials.password;
-    authentication[this.identificationField] = credentials.identification;
+  getAuthenticateData(credentials) {
+    let authentication = {
+      [this.passwordField]: credentials.password,
+      [this.identificationField]: credentials.identification
+    };
+
     return authentication;
   },
 
@@ -160,7 +161,7 @@ export default Base.extend({
     @method getResponseData
     @return {object} An object with properties for the session.
   */
-  getResponseData: function(response) {
+  getResponseData(response) {
     return response;
   },
 
@@ -170,7 +171,7 @@ export default Base.extend({
     @method invalidate
     @return {Ember.RSVP.Promise} A resolving promise
   */
-  invalidate: function() {
+  invalidate() {
     return Ember.RSVP.resolve();
   },
 
@@ -180,7 +181,7 @@ export default Base.extend({
     @param {Object} headers Additional headers that will be sent to server
     @private
   */
-  makeRequest: function(data, headers) {
+  makeRequest(data, headers) {
     return Ember.$.ajax({
       url: this.serverTokenEndpoint,
       method: 'POST',

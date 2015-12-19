@@ -162,7 +162,6 @@ export default TokenAuthenticator.extend({
                                  otherwise
   */
   authenticate(credentials, headers) {
-    // var _this = this;
 
     return new Ember.RSVP.Promise((resolve, reject) => {
       const data = this.getAuthenticateData(credentials);
@@ -233,9 +232,9 @@ export default TokenAuthenticator.extend({
     @private
   */
   refreshAccessToken(token, headers) {
-    let data = {};
-
-    data[this.tokenPropertyName] = token;
+    let data = {
+      [this.tokenPropertyName]: token
+    };
 
     return new Ember.RSVP.Promise((resolve, reject) => {
       this.makeRequest(this.serverTokenRefreshEndpoint, data, headers).then((response) => {
@@ -268,7 +267,7 @@ export default TokenAuthenticator.extend({
     @return {object} An object with properties for the session.
   */
   getTokenData(token) {
-    var tokenData = atob(token.split('.')[1]);
+    const tokenData = atob(token.split('.')[1]);
 
     try {
       return JSON.parse(tokenData);
