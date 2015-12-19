@@ -1,6 +1,6 @@
 import Ember from 'ember';
 
-export default function(defaults, callback) {
+export default function(defaults) {
   return function(container, config) {
     let wrappedConfig = Ember.Object.create(config);
 
@@ -8,9 +8,6 @@ export default function(defaults, callback) {
       if (this.hasOwnProperty(property) && Ember.typeOf(this[property]) !== 'function') {
         this[property] = wrappedConfig.getWithDefault(property, defaults[property]);
       }
-    }
-    if (callback) {
-      callback.apply(this, [container, config]);
     }
   };
 }

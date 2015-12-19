@@ -131,10 +131,8 @@ export default Base.extend({
         Ember.run(() => {
           resolve(this.getResponseData(response));
         });
-      }, function(xhr) {
-        Ember.run(function() {
-          reject(xhr.responseJSON || xhr.responseText);
-        });
+      }, xhr => {
+        Ember.run(() => { reject(xhr.responseJSON || xhr.responseText); });
       });
     });
   },
@@ -146,7 +144,7 @@ export default Base.extend({
     @return {object} An object with properties for authentication.
   */
   getAuthenticateData(credentials) {
-    let authentication = {
+    const authentication = {
       [this.passwordField]: credentials.password,
       [this.identificationField]: credentials.identification
     };
@@ -188,16 +186,16 @@ export default Base.extend({
       data: JSON.stringify(data),
       dataType: 'json',
       contentType: 'application/json',
-      beforeSend: function(xhr, settings) {
+      headers: this.headers,
+      beforeSend: (xhr, settings) => {
         xhr.setRequestHeader('Accept', settings.accepts.json);
 
         if (headers) {
-          Object.keys(headers).forEach(function(key) {
+          Object.keys(headers).forEach(key => {
             xhr.setRequestHeader(key, headers[key]);
           });
         }
-      },
-      headers: this.headers
+      }
     });
   }
 });

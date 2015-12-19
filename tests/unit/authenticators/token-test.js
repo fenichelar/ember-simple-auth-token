@@ -1,4 +1,5 @@
-import { test, moduleForComponent } from 'ember-qunit';
+import { test } from 'ember-qunit';
+import sinon from 'sinon';
 import startApp from '../../helpers/start-app';
 import Ember from 'ember';
 import Token from 'ember-simple-auth-token/authenticators/token';
@@ -7,7 +8,7 @@ import Configuration from 'ember-simple-auth-token/configuration';
 var App;
 
 module('Token Authenticator', {
-  beforeEach: function() {
+  beforeEach: () => {
     App = startApp();
     App.xhr = sinon.useFakeXMLHttpRequest();
     App.server = sinon.fakeServer.create();
@@ -15,55 +16,55 @@ module('Token Authenticator', {
     App.authenticator = Token.create();
     sinon.spy(Ember.$, 'ajax');
   },
-  afterEach: function() {
+  afterEach: () => {
     Ember.$.ajax.restore();
     App.xhr.restore();
     Ember.run(App, App.destroy);
   }
 });
 
-test('assigns serverTokenEndpoint from the configuration object', function() {
+test('assigns serverTokenEndpoint from the configuration object', assert => {
   Configuration.serverTokenEndpoint = 'serverTokenEndpoint';
 
-  equal(Token.create().serverTokenEndpoint, 'serverTokenEndpoint');
+  assert.equal(Token.create().serverTokenEndpoint, 'serverTokenEndpoint');
 
   Configuration.load({}, {});
 });
 
-test('assigns identificationField from the configuration object', function() {
+test('assigns identificationField from the configuration object', assert => {
   Configuration.identificationField = 'identificationField';
 
-  equal(Token.create().identificationField, 'identificationField');
+  assert.equal(Token.create().identificationField, 'identificationField');
 
   Configuration.load({}, {});
 });
 
-test('assigns passwordField from the configuration object', function() {
+test('assigns passwordField from the configuration object', assert => {
   Configuration.passwordField = 'passwordField';
 
-  equal(Token.create().passwordField, 'passwordField');
+  assert.equal(Token.create().passwordField, 'passwordField');
 
   Configuration.load({}, {});
 });
 
-test('assigns tokenPropertyName from the configuration object', function() {
+test('assigns tokenPropertyName from the configuration object', assert => {
   Configuration.tokenPropertyName = 'tokenPropertyName';
 
-  equal(Token.create().tokenPropertyName, 'tokenPropertyName');
+  assert.equal(Token.create().tokenPropertyName, 'tokenPropertyName');
 
   Configuration.load({}, {});
 });
 
-test('assigns custom headers from the configuration object', function() {
+test('assigns custom headers from the configuration object', assert => {
   Configuration.headers = 'headers';
 
-  equal(Token.create().headers, 'headers');
+  assert.equal(Token.create().headers, 'headers');
 
   Configuration.load({}, {});
 });
 
-test('#restore resolves with the correct data', function() {
-  var properties = {
+test('#restore resolves with the correct data', assert => {
+  const properties = {
     token: 'secret token!'
   };
 
@@ -74,19 +75,19 @@ test('#restore resolves with the correct data', function() {
     '{ "token": "secret token!" }'
   ]);
 
-  Ember.run(function() {
-    App.authenticator.restore(properties).then(function(content) {
-      deepEqual(content, properties);
+  Ember.run(() => {
+    App.authenticator.restore(properties).then(content => {
+      assert.deepEqual(content, properties);
     });
   });
 });
 
-test('#restore resolves custom token with the correct data', function() {
+test('#restore resolves custom token with the correct data', assert => {
   Configuration.tokenPropertyName = 'user.data.token';
 
   App.authenticator = Token.create();
 
-  var properties = {
+  const properties = {
     user: {
       data: {
         token: 'secret token!'
@@ -101,25 +102,25 @@ test('#restore resolves custom token with the correct data', function() {
     '{ "token": "secret token!" }'
   ]);
 
-  Ember.run(function() {
-    App.authenticator.restore(properties).then(function(content) {
-      deepEqual(content, properties);
+  Ember.run(() => {
+    App.authenticator.restore(properties).then(content => {
+      assert.deepEqual(content, properties);
     });
   });
 });
 
-test('#authenticate sends an AJAX request to the sign in endpoint', function() {
-  var credentials = {
+test('#authenticate sends an AJAX request to the sign in endpoint', assert => {
+  const credentials = {
     identification: 'username',
     password: 'password'
   };
 
   App.authenticator.authenticate(credentials);
 
-  Ember.run(function() {
+  Ember.run(() => {
     var args = Ember.$.ajax.getCall(0).args[0];
     delete args.beforeSend;
-    deepEqual(args, {
+    assert.deepEqual(args, {
       url: '/api/token-auth/',
       method: 'POST',
       data: '{"password":"password","username":"username"}',
@@ -130,8 +131,8 @@ test('#authenticate sends an AJAX request to the sign in endpoint', function() {
   });
 });
 
-test('#authenticate sends an AJAX request to the sign in endpoint with custom fields', function() {
-  var credentials = {
+test('#authenticate sends an AJAX request to the sign in endpoint with custom fields', assert => {
+  const credentials = {
     identification: 'username',
     password: 'password'
   };
@@ -142,11 +143,11 @@ test('#authenticate sends an AJAX request to the sign in endpoint with custom fi
   App.authenticator = Token.create();
   App.authenticator.authenticate(credentials);
 
-  Ember.run(function() {
+  Ember.run(() => {
     var args = Ember.$.ajax.getCall(0).args[0];
     delete args.beforeSend;
 
-    deepEqual(args, {
+    assert.deepEqual(args, {
       url: '/api/token-auth/',
       method: 'POST',
       data: '{"api-key":"password","api-user":"username"}',
@@ -157,8 +158,8 @@ test('#authenticate sends an AJAX request to the sign in endpoint with custom fi
   });
 });
 
-test('#authenticate successfully resolves with the correct data', function() {
-  var credentials = {
+test('#authenticate successfully resolves with the correct data', assert => {
+  const credentials = {
     email: 'email@address.com',
     password: 'password'
   };
@@ -172,17 +173,14 @@ test('#authenticate successfully resolves with the correct data', function() {
 
   return App.authenticator
     .authenticate(credentials)
-    .then(
-    function (data) {
-      deepEqual(data, {
-        access_token: 'secret token!'
-      });
+    .then(data => {
+      assert.deepEqual(data, { access_token: 'secret token!' });
     }
   );
 });
 
-test('#authenticate sends an AJAX request with custom headers', function() {
-  var credentials = {
+test('#authenticate sends an AJAX request with custom headers', assert => {
+  const credentials = {
     identification: 'username',
     password: 'password'
   };
@@ -194,10 +192,10 @@ test('#authenticate sends an AJAX request with custom headers', function() {
   App.authenticator = Token.create();
   App.authenticator.authenticate(credentials);
 
-  Ember.run(function() {
+  Ember.run(() => {
     var args = Ember.$.ajax.getCall(0).args[0];
     delete args.beforeSend;
-    deepEqual(args, {
+    assert.deepEqual(args, {
       url: '/api/token-auth/',
       method: 'POST',
       data: '{"password":"password","username":"username"}',
@@ -211,8 +209,8 @@ test('#authenticate sends an AJAX request with custom headers', function() {
   });
 });
 
-test('#authenticate rejects with the correct error', function() {
-  var credentials = {
+test('#authenticate rejects with the correct error', assert => {
+  const credentials = {
     email: 'email@address.com',
     password: 'password'
   };
@@ -224,17 +222,15 @@ test('#authenticate rejects with the correct error', function() {
     '{ "error": "invalid_grant" }'
   ]);
 
-  Ember.run(function() {
-    App.authenticator.authenticate(credentials).then(null, function(error) {
-      deepEqual(error, {
-        'error': 'invalid_grant'
-      });
+  Ember.run(() => {
+    App.authenticator.authenticate(credentials).then(null, error => {
+      assert.deepEqual(error, { error: 'invalid_grant' });
     });
   });
 });
 
-test('#invalidate returns a resolving promise', function() {
-  App.authenticator.invalidate().then(function() {
-    ok(true);
+test('#invalidate returns a resolving promise', assert => {
+  App.authenticator.invalidate().then(() => {
+    assert.ok(true);
   });
 });

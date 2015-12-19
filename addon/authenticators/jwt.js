@@ -130,11 +130,7 @@ export default TokenAuthenticator.extend({
           }
           resolve(data);
         } else if (this.refreshAccessTokens) {
-          resolve(
-            this.refreshAccessToken(token).then(function () {
-              return data;
-            })
-          );
+          resolve(this.refreshAccessToken(token).then(() => { return data; }));
         } else {
           reject(new Error('unable to refresh token'));
         }
@@ -166,12 +162,12 @@ export default TokenAuthenticator.extend({
     return new Ember.RSVP.Promise((resolve, reject) => {
       const data = this.getAuthenticateData(credentials);
 
-      this.makeRequest(this.serverTokenEndpoint, data, headers).then((response) => {
+      this.makeRequest(this.serverTokenEndpoint, data, headers).then(response => {
         Ember.run(() => {
           const token = response[this.tokenPropertyName];
           const tokenData = this.getTokenData(token);
           const expiresAt = tokenData[this.tokenExpireName];
-          let tokenExpireData = {};
+          const tokenExpireData = {};
 
           this.scheduleAccessTokenRefresh(expiresAt, token);
 
@@ -181,10 +177,8 @@ export default TokenAuthenticator.extend({
 
           resolve(this.getResponseData(response));
         });
-      }, function(xhr) {
-        Ember.run(function() {
-          reject(xhr.responseJSON || xhr.responseText);
-        });
+      }, xhr => {
+        Ember.run(() => { reject(xhr.responseJSON || xhr.responseText); });
       });
     });
   },
@@ -237,12 +231,12 @@ export default TokenAuthenticator.extend({
     };
 
     return new Ember.RSVP.Promise((resolve, reject) => {
-      this.makeRequest(this.serverTokenRefreshEndpoint, data, headers).then((response) => {
+      this.makeRequest(this.serverTokenRefreshEndpoint, data, headers).then(response => {
         Ember.run(() => {
           const resToken = response[this.tokenPropertyName];
           const tokenData = this.getTokenData(resToken);
           const expiresAt = tokenData[this.tokenExpireName];
-          let tokenExpireData = {};
+          const tokenExpireData = {};
 
           tokenExpireData[this.tokenExpireName] = expiresAt;
 
@@ -253,8 +247,8 @@ export default TokenAuthenticator.extend({
 
           resolve(response);
         });
-      }, function(xhr, status, error) {
-        Ember.Logger.warn('Access token could not be refreshed - server responded with ' + error + '.');
+      }, (xhr, status, error) => {
+        Ember.Logger.warn(`Access token could not be refreshed - server responded with ${error}.`);
         reject();
       });
     });
@@ -272,7 +266,6 @@ export default TokenAuthenticator.extend({
     try {
       return JSON.parse(tokenData);
     } catch (e) {
-      //jshint unused:false
       return tokenData;
     }
   },
@@ -290,16 +283,16 @@ export default TokenAuthenticator.extend({
       data: JSON.stringify(data),
       dataType: 'json',
       contentType: 'application/json',
-      beforeSend: function(xhr, settings) {
+      headers: this.headers,
+      beforeSend: (xhr, settings) => {
         xhr.setRequestHeader('Accept', settings.accepts.json);
 
         if (headers) {
-          Object.keys(headers).forEach(function(key) {
+          Object.keys(headers).forEach(key => {
             xhr.setRequestHeader(key, headers[key]);
           });
         }
-      },
-      headers: this.headers
+      }
     });
   },
 
