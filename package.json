@@ -21,7 +21,8 @@
     "url": "http://jpadilla.com"
   },
   "contributors": [
-    "Giovanni Collazo <hello@gcollazo.com>"
+    "Giovanni Collazo <hello@gcollazo.com>",
+    "Emmanuel Luciano <emma.luciano11@gmail.com>"
   ],
   "license": "MIT",
   "devDependencies": {
