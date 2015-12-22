@@ -1,5 +1,5 @@
 # Ember Simple Auth Token
-[![Build Status](https://travis-ci.org/jpadilla/ember-cli-simple-auth-token.svg?branch=master)](https://travis-ci.org/jpadilla/ember-cli-simple-auth-token) [![Ember Observer Score](http://emberobserver.com/badges/ember-cli-simple-auth-token.svg)](http://emberobserver.com/addons/ember-cli-simple-auth-token)
+[![Build Status](https://travis-ci.org/jpadilla/ember-simple-auth-token.svg?branch=master)](https://travis-ci.org/jpadilla/ember-simple-auth-token) [![Ember Observer Score](http://emberobserver.com/badges/ember-simple-auth-token.svg)](http://emberobserver.com/addons/ember-simple-auth-token)
 
 This is an extension to the Ember Simple Auth library that provides a default token authenticator, an enhanced authenticator with automatic refresh capability, and an authorizer that are compatible with APIs with token-based authentication.
 
@@ -10,24 +10,22 @@ Based on [ember-simple-auth-devise](https://github.com/simplabs/ember-simple-aut
 
 ## Live Demo
 
-View a live demo here: https://jpadilla.github.io/ember-cli-simple-auth-token/
+View a live demo here: https://jpadilla.github.io/ember-simple-auth-token/
 
 ## Installation
 
 To install Ember Simple Auth Token in an Ember.js application that uses [Ember CLI](https://github.com/stefanpenner/ember-cli):
 
-Make sure you have [ember-cli-simple-auth](https://github.com/simplabs/ember-cli-simple-auth) installed:
+Make sure you have [ember-simple-auth](https://github.com/simplabs/ember-simple-auth) installed:
 
 ```
-npm install --save-dev ember-cli-simple-auth
-ember generate ember-cli-simple-auth
+ember install ember-simple-auth
 ```
 
 To install simply run:
 
 ```
-npm install --save-dev ember-cli-simple-auth-token
-ember generate ember-simple-auth-token
+ember install ember-simple-auth-token
 ```
 
 ## The Authenticators
@@ -68,6 +66,8 @@ Default base implementation for token authentication.
 import Ember from 'ember';
 
 export default Ember.Controller.extend({
+  session: Ember.inject.service(),
+  
   actions: {
     authenticate: function() {
       var credentials = this.getProperties('identification', 'password'),
@@ -88,6 +88,8 @@ Extends the Token Authenticator and adds automatic token refresh functionality.
 import Ember from 'ember';
 
 export default Ember.Controller.extend({
+  session: Ember.inject.service(),
+  
   actions: {
     authenticate: function() {
       var credentials = this.getProperties('identification', 'password'),
