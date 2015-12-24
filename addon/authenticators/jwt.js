@@ -164,9 +164,9 @@ export default TokenAuthenticator.extend({
 
       this.makeRequest(this.serverTokenEndpoint, data, headers).then(response => {
         Ember.run(() => {
-          const token = response[this.tokenPropertyName];
+          const token = Ember.get(response, this.tokenPropertyName);
           const tokenData = this.getTokenData(token);
-          const expiresAt = tokenData[this.tokenExpireName];
+          const expiresAt = Ember.get(tokenData, this.tokenExpireName);
           const tokenExpireData = {};
 
           this.scheduleAccessTokenRefresh(expiresAt, token);
@@ -233,9 +233,9 @@ export default TokenAuthenticator.extend({
     return new Ember.RSVP.Promise((resolve, reject) => {
       this.makeRequest(this.serverTokenRefreshEndpoint, data, headers).then(response => {
         Ember.run(() => {
-          const resToken = response[this.tokenPropertyName];
+          const resToken = Ember.get(response, this.tokenPropertyName);
           const tokenData = this.getTokenData(resToken);
-          const expiresAt = tokenData[this.tokenExpireName];
+          const expiresAt = Ember.get(tokenData, this.tokenExpireName);
           const tokenExpireData = {};
 
           tokenExpireData[this.tokenExpireName] = expiresAt;
