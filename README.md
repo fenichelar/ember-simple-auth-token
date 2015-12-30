@@ -1,22 +1,22 @@
 # Ember Simple Auth Token
-[![Build Status](https://travis-ci.org/jpadilla/ember-simple-auth-token.svg?branch=master)](https://travis-ci.org/jpadilla/ember-simple-auth-token) [![Ember Observer Score](http://emberobserver.com/badges/ember-simple-auth-token.svg)](http://emberobserver.com/addons/ember-simple-auth-token)
+
+[![build-status-image]][travis]
+[![ember-observer-score-image]][ember-observer]
 
 This is an extension to the Ember Simple Auth library that provides a default token authenticator, an enhanced authenticator with automatic refresh capability, and an authorizer that are compatible with APIs with token-based authentication.
 
 **As your user's credentials as well as the token are exchanged between the
 Ember.js app and the server you have to make sure that this connection uses HTTPS!**
 
-Based on [ember-simple-auth-devise](https://github.com/simplabs/ember-simple-auth/tree/master/packages/ember-simple-auth-devise).
-
 ## Live Demo
 
-View a live demo here: https://jpadilla.github.io/ember-simple-auth-token/
+View a live demo here: [https://jpadilla.github.io/ember-simple-auth-token/][demo]
 
 ## Installation
 
-To install Ember Simple Auth Token in an Ember.js application that uses [Ember CLI](https://github.com/stefanpenner/ember-cli):
+To install Ember Simple Auth Token in an Ember.js application that uses [Ember CLI][ember-cli]:
 
-Make sure you have [ember-simple-auth](https://github.com/simplabs/ember-simple-auth) installed:
+Make sure you have [ember-simple-auth][ember-simple-auth] installed:
 
 ```
 ember install ember-simple-auth
@@ -133,7 +133,7 @@ token = {
 *In this case the token expire name is using the default `exp` as set by the
 `Config.tokenExpireName` property.*
 
-An automatic token refresh request would be sent out at token[Config.tokenExpireName] - now(). A good practice with regards to token refreshing is to also set a "leeway", usually no more than a few minutes, to account for clock skew when decoding JSON Web Tokens in the server-side. Some libraries like [PyJWT](https://github.com/jpadilla/pyjwt) and [ruby-jwt](https://github.com/progrium/ruby-jwt) already support this.
+An automatic token refresh request would be sent out at token[Config.tokenExpireName] - now(). A good practice with regards to token refreshing is to also set a "leeway", usually no more than a few minutes, to account for clock skew when decoding JSON Web Tokens in the server-side. Some libraries like [PyJWT][pyjwt] and [ruby-jwt][ruby-jwt] already support this.
 
 ## The Authorizer
 
@@ -178,3 +178,14 @@ For the JWT authenticator (in addition to the Token authenticator fields):
   refreshLeeway: 0,
   timeFactor: 1  // example - set to "1000" to convert incoming seconds to milliseconds.
 ```
+
+[build-status-image]: https://travis-ci.org/jpadilla/ember-simple-auth-token.svg?branch=master
+[travis]: https://travis-ci.org/jpadilla/ember-simple-auth-token
+[ember-observer-score-image]: http://emberobserver.com/badges/ember-simple-auth-token.svg
+[ember-observer]: http://emberobserver.com/addons/ember-simple-auth-token
+
+[demo]: https://jpadilla.github.io/ember-simple-auth-token/
+[ember-cli]: http://ember-cli.com/
+[ember-simple-auth]: https://github.com/simplabs/ember-simple-auth
+[pyjwt]: https://github.com/jpadilla/pyjwt
+[ruby-jwt]: https://github.com/jwt/ruby-jwt
