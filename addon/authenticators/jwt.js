@@ -207,6 +207,10 @@ export default TokenAuthenticator.extend({
         delete this._refreshTokenTimeout;
 
         this._refreshTokenTimeout = Ember.run.later(this, this.refreshAccessToken, token, wait);
+      } else if (!Ember.isEmpty(token) && !Ember.isEmpty(expiresAt) && (expiresAt - now > 0)) {
+        //The expiresAt is in the future but the refreshLeeway
+        //is to large that it never catches the top case to refresh token
+        Ember.Logger.warn(`The refreshLeeway in configuration is to large preventing token refresh.`);
       }
     }
   },
