@@ -56,7 +56,7 @@ module.exports = function(environment) {
   }
 
   if (environment === 'production') {
-    ENV.baseURL = '/ember-cli-simple-auth-token';
+    ENV.baseURL = '/ember-simple-auth-token';
     ENV.API_URL = 'https://simple-auth-token-server.herokuapp.com';
 
     ENV['ember-simple-auth'] = {
@@ -66,8 +66,8 @@ module.exports = function(environment) {
     };
 
     ENV['ember-simple-auth-token'] = {
-      serverTokenEndpoint: ENV['API_URL'] + '/api/token-auth/',
-      serverTokenRefreshEndpoint: ENV['API_URL'] + '/api/token-refresh/',
+      serverTokenEndpoint: ENV.API_URL + '/api/token-auth/',
+      serverTokenRefreshEndpoint: ENV.API_URL + '/api/token-refresh/',
       timeFactor: 1000,
       refreshLeeway: 5
     };
