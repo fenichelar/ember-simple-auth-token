@@ -158,24 +158,13 @@ export default TokenAuthenticator.extend({
                                  otherwise
   */
   authenticate(credentials, headers) {
-
     return new Ember.RSVP.Promise((resolve, reject) => {
-      const data = this.getAuthenticateData(credentials);
+      let data = this.getAuthenticateData(credentials);
 
       this.makeRequest(this.serverTokenEndpoint, data, headers).then(response => {
         Ember.run(() => {
-          const token = Ember.get(response, this.tokenPropertyName);
-          const tokenData = this.getTokenData(token);
-          const expiresAt = Ember.get(tokenData, this.tokenExpireName);
-          const tokenExpireData = {};
-
-          this.scheduleAccessTokenRefresh(expiresAt, token);
-
-          tokenExpireData[this.tokenExpireName] = expiresAt;
-
-          response = Ember.merge(response, tokenExpireData);
-
-          resolve(this.getResponseData(response));
+          const sessionData = this.handleAuthResponse(response);
+          resolve(sessionData);
         });
       }, xhr => {
         Ember.run(() => { reject(xhr.responseJSON || xhr.responseText); });
@@ -231,19 +220,9 @@ export default TokenAuthenticator.extend({
     return new Ember.RSVP.Promise((resolve, reject) => {
       this.makeRequest(this.serverTokenRefreshEndpoint, data, headers).then(response => {
         Ember.run(() => {
-          const resToken = Ember.get(response, this.tokenPropertyName);
-          const tokenData = this.getTokenData(resToken);
-          const expiresAt = Ember.get(tokenData, this.tokenExpireName);
-          const tokenExpireData = {};
-
-          tokenExpireData[this.tokenExpireName] = expiresAt;
-
-          data = Ember.merge(response, tokenExpireData);
-
-          this.scheduleAccessTokenRefresh(expiresAt, resToken);
-          this.trigger('sessionDataUpdated', data);
-
-          resolve(response);
+          const sessionData = this.handleAuthResponse(response);
+          this.trigger('sessionDataUpdated', sessionData);
+          resolve(sessionData);
         });
       }, (xhr, status, error) => {
         Ember.Logger.warn(`Access token could not be refreshed - server responded with ${error}.`);
@@ -341,5 +320,23 @@ export default TokenAuthenticator.extend({
       return time;
     }
     return new Date(time * this.timeFactor).getTime();
+  },
+
+  /**
+    Handles authentication response from server, and returns session data
+
+    @method handleAuthResponse
+    @private
+   */
+  handleAuthResponse(response) {
+    const token = Ember.get(response, this.tokenPropertyName);
+    const tokenData = this.getTokenData(token);
+    const expiresAt = Ember.get(tokenData, this.tokenExpireName);
+    const tokenExpireData = {};
+    tokenExpireData[this.tokenExpireName] = expiresAt;
+
+    this.scheduleAccessTokenRefresh(expiresAt, token);
+
+    return Ember.merge(this.getResponseData(response), tokenExpireData);
   }
 });
