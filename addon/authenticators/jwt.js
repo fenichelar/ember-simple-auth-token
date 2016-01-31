@@ -226,9 +226,7 @@ export default TokenAuthenticator.extend({
     @private
   */
   refreshAccessToken(token, headers) {
-    let data = {
-      [this.tokenPropertyName]: token
-    };
+    let data = this.makeRefreshData(token);
 
     return new Ember.RSVP.Promise((resolve, reject) => {
       this.makeRequest(this.serverTokenRefreshEndpoint, data, headers).then(response => {
@@ -252,6 +250,22 @@ export default TokenAuthenticator.extend({
         reject();
       });
     });
+  },
+
+  makeRefreshData(token) {
+    let root = {};
+    let lastObject = root;
+    let nesting = this.tokenPropertyName.split('.');
+    let tokenPropertyName = nesting.pop();
+
+    nesting.forEach((nesting) => {
+      lastObject[nesting] = {};
+      lastObject = lastObject[nesting];
+    });
+
+    lastObject[tokenPropertyName] = token;
+
+    return root;
   },
 
   /**
