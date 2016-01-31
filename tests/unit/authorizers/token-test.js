@@ -39,7 +39,7 @@ test('#authorize when authenticated adds token to request, nested tokenPropertyN
   App.authorizer.set('session.isAuthenticated', true);
 
   data = {nested: {token: 'secret nested token!'}};
-  App.authorizer.tokenPropertyName = "nested.token";
+  App.authorizer.tokenPropertyName = 'nested.token';
 
   App.authorizer.authorize(data, (headerName, headerValue) => {
     assert.equal(headerName, 'Authorization');
