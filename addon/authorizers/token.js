@@ -79,7 +79,7 @@ export default Base.extend({
     @param {function} block
   */
   authorize(data = {}, block = () => {}) {
-    const token = data[this.tokenPropertyName];
+    const token = Ember.get(data, this.tokenPropertyName);
     const prefix = this.authorizationPrefix ? this.authorizationPrefix : '';
 
     if (this.get('session.isAuthenticated') && !Ember.isEmpty(token)) {
