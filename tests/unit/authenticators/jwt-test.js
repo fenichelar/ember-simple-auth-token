@@ -583,6 +583,36 @@ test('#refreshAccessToken makes an AJAX request to the token endpoint.', assert 
   });
 });
 
+test('#refreshAccessToken makes an AJAX request to the token endpoint with nested tokenPropertyName.', assert => {
+  const jwt = JWT.create();
+  const expiresAt = 3;
+
+  let token = {};
+  token[jwt.identificationField] = 'test@test.com';
+  token[jwt.tokenExpireName] = expiresAt;
+
+  token = createFakeToken(token);
+
+  let authenticator = App.authenticator;
+  let tokenPropertyNameWas = authenticator.tokenPropertyName;
+
+  authenticator.tokenPropertyName = 'auth.nested.token';
+  authenticator.refreshAccessToken(token);
+
+  Ember.run(() => {
+    var args = Ember.$.ajax.getCall(0).args[0];
+    delete args.beforeSend;
+    assert.deepEqual(args, {
+      url: jwt.serverTokenRefreshEndpoint,
+      method: 'POST',
+      data: JSON.stringify({auth: {nested: {token: token}}}),
+      dataType: 'json',
+      contentType: 'application/json',
+      headers: {}
+    });
+  });
+});
+
 test('#refreshAccessToken triggers the `sessionDataUpdated` event on successful request.', assert => {
   const jwt = JWT.create(),
     expiresAt = 3;
