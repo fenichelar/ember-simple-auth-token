@@ -261,7 +261,8 @@ export default TokenAuthenticator.extend({
     @return {object} An object with properties for the session.
   */
   getTokenData(token) {
-    const tokenData = atob(token.split('.')[1]);
+    const payload = token.split('.')[1];
+    const tokenData = decodeURIComponent(window.escape(atob(payload)));
 
     try {
       return JSON.parse(tokenData);
