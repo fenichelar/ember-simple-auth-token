@@ -238,12 +238,14 @@ export default TokenAuthenticator.extend({
           const expiresAt = Ember.get(tokenData, this.tokenExpireName);
           const tokenExpireData = {};
 
+          this.scheduleAccessTokenRefresh(expiresAt, resToken);
+
           tokenExpireData[this.tokenExpireName] = expiresAt;
 
-          data = Ember.merge(response, tokenExpireData);
+          response = Ember.merge(response, tokenExpireData);
+          response = this.getResponseData(response);
 
-          this.scheduleAccessTokenRefresh(expiresAt, resToken);
-          this.trigger('sessionDataUpdated', data);
+          this.trigger('sessionDataUpdated', response);
 
           resolve(response);
         });
