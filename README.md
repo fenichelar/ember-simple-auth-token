@@ -67,7 +67,7 @@ import Ember from 'ember';
 
 export default Ember.Controller.extend({
   session: Ember.inject.service(),
-  
+
   actions: {
     authenticate: function() {
       var credentials = this.getProperties('identification', 'password'),
@@ -89,7 +89,7 @@ import Ember from 'ember';
 
 export default Ember.Controller.extend({
   session: Ember.inject.service(),
-  
+
   actions: {
     authenticate: function() {
       var credentials = this.getProperties('identification', 'password'),
@@ -151,6 +151,22 @@ ENV['ember-simple-auth'] = {
   authorizer: 'authorizer:token'
 };
 ```
+
+## Sending token on API requests
+
+If you need your token to be present on every request to your API you will need to inject the `DataAdapterMixin` from `ember-simple-auth` on your application `adapter`.
+
+Example from the `ember-simple-auth` [documentation](http://ember-simple-auth.com/api/classes/DataAdapterMixin.html):
+```js
+// app/adapters/application.js
+import DS from 'ember-data';
+import DataAdapterMixin from 'ember-simple-auth/mixins/data-adapter-mixin';
+
+export default DS.JSONAPIAdapter.extend(DataAdapterMixin, {
+  authorizer: 'authorizer:application'
+});
+```
+*DataAdapterMixin is supported for Ember 1.13 and above*
 
 ## Available Customization Options
 
