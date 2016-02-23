@@ -101,10 +101,13 @@ export default TokenAuthenticator.extend({
   */
   restore(data) {
     const dataObject = Ember.Object.create(data);
+    // const tokenData = Ember.Object.create(data.data.attributes)
 
     return new Ember.RSVP.Promise((resolve, reject) => {
+      // const token = dataObject.get(this.tokenPropertyName); //theirs
+      // const token = tokenData.get(this.tokenPropertyName); //mine
       const now = this.getCurrentTime();
-      const token = dataObject.get(this.tokenPropertyName);
+      const token = Ember.get(dataObject.data.attributes, this.tokenPropertyName);
       let expiresAt = this.resolveTime(dataObject.get(this.tokenExpireName));
 
       if (Ember.isEmpty(token)) {
@@ -164,7 +167,9 @@ export default TokenAuthenticator.extend({
 
       this.makeRequest(this.serverTokenEndpoint, data, headers).then(response => {
         Ember.run(() => {
-          const token = Ember.get(response, this.tokenPropertyName);
+          // our token is in data.attributes['auth-token']
+          const token = Ember.get(response.data.attributes, this.tokenPropertyName);
+          // const token = Ember.get(response, this.tokenPropertyName); // this doesn't work
           const tokenData = this.getTokenData(token);
           const expiresAt = Ember.get(tokenData, this.tokenExpireName);
           const tokenExpireData = {};
