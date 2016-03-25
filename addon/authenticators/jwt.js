@@ -130,7 +130,7 @@ export default TokenAuthenticator.extend({
           }
           resolve(data);
         } else if (this.refreshAccessTokens) {
-          resolve(this.refreshAccessToken(token).then(() => { return data; }));
+          resolve(this.refreshAccessToken(token));
         } else {
           reject(new Error('unable to refresh token'));
         }
