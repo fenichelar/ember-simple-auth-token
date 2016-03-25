@@ -5,6 +5,8 @@
 
 This is an extension to the Ember Simple Auth library that provides a default token authenticator, an enhanced authenticator with automatic refresh capability, and an authorizer that are compatible with APIs with token-based authentication.
 
+If you're thinking about using this addon in combination with JSON Web Tokens, you can find more about why they're so awesome in [this article][medium-jwt].
+
 **As your user's credentials as well as the token are exchanged between the
 Ember.js app and the server you have to make sure that this connection uses HTTPS!**
 
@@ -205,3 +207,4 @@ For the JWT authenticator (in addition to the Token authenticator fields):
 [ember-simple-auth]: https://github.com/simplabs/ember-simple-auth
 [pyjwt]: https://github.com/jpadilla/pyjwt
 [ruby-jwt]: https://github.com/jwt/ruby-jwt
+[medium-jwt]: https://medium.com/@leo/why-json-web-tokens-are-truly-awesome-23fb80b7fc20
