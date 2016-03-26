@@ -178,8 +178,6 @@ For the Token authenticator:
 // config/environment.js
 ENV['ember-simple-auth-token'] = {
   serverTokenEndpoint: '/api/token-auth/',
-  identificationField: 'username',
-  passwordField: 'password',
   tokenPropertyName: 'token',
   authorizationPrefix: 'Bearer ',
   authorizationHeaderName: 'Authorization',

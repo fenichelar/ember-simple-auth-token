@@ -71,8 +71,6 @@ export default TokenAuthenticator.extend({
   init() {
     this.serverTokenEndpoint = Configuration.serverTokenEndpoint;
     this.serverTokenRefreshEndpoint = Configuration.serverTokenRefreshEndpoint;
-    this.identificationField = Configuration.identificationField;
-    this.passwordField = Configuration.passwordField;
     this.tokenPropertyName = Configuration.tokenPropertyName;
     this.refreshAccessTokens = Configuration.refreshAccessTokens;
     this.refreshLeeway = Configuration.refreshLeeway;
@@ -160,9 +158,7 @@ export default TokenAuthenticator.extend({
   authenticate(credentials, headers) {
 
     return new Ember.RSVP.Promise((resolve, reject) => {
-      const data = this.getAuthenticateData(credentials);
-
-      this.makeRequest(this.serverTokenEndpoint, data, headers).then(response => {
+      this.makeRequest(this.serverTokenEndpoint, credentials, headers).then(response => {
         Ember.run(() => {
           const token = Ember.get(response, this.tokenPropertyName);
           const tokenData = this.getTokenData(token);

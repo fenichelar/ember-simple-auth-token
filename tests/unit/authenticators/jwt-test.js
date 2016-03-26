@@ -82,7 +82,7 @@ test('#restore resolves when the data includes `token` and `expiresAt`', assert 
   sinon.stub(App.authenticator, 'getCurrentTime', () => { return currentTime; });
 
   let token = {};
-  token[jwt.identificationField] = 'test@test.com';
+  token['email'] = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
   token = createFakeToken(token);
@@ -118,7 +118,7 @@ test('#restore resolves when the data includes `token` and excludes `expiresAt`'
   sinon.stub(App.authenticator, 'getCurrentTime', () => { return currentTime; });
 
   let token = {};
-  token[jwt.identificationField] = 'test@test.com';
+  token['email'] = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
   token = createFakeToken(token);
@@ -149,7 +149,7 @@ test('#restore rejects when `refreshAccessTokens` is false and token is expired'
     expiresAt = 0;
 
   let token = {};
-  token[jwt.identificationField] = 'test@test.com';
+  token['email'] = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
   token = createFakeToken(token);
@@ -184,7 +184,7 @@ test('#restore rejects when `token` is excluded.', assert => {
     expiresAt = 3;
 
   let token = {};
-  token[jwt.identificationField] = 'test@test.com';
+  token['email'] = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
   token = createFakeToken(token);
@@ -219,7 +219,7 @@ test('#restore resolves when `expiresAt` is greater than `now`', assert => {
   sinon.stub(App.authenticator, 'getCurrentTime', () => { return currentTime; });
 
   let token = {};
-  token[jwt.identificationField] = 'test@test.com';
+  token['email'] = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
   token = createFakeToken(token);
@@ -258,7 +258,7 @@ test('#restore schedules a token refresh when `refreshAccessTokens` is true.', a
   sinon.stub(App.authenticator, 'refreshAccessToken', () => { return null; });
 
   let token = {};
-  token[jwt.identificationField] = 'test@test.com';
+  token['email'] = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
   token = createFakeToken(token);
@@ -268,7 +268,7 @@ test('#restore schedules a token refresh when `refreshAccessTokens` is true.', a
   data[jwt.tokenExpireName] = expiresAt;
 
   const refreshedToken = {};
-  refreshedToken[jwt.identificationField] = 'test@test.com';
+  refreshedToken['email'] = 'test@test.com';
   refreshedToken[jwt.tokenExpireName] = expiresAt;
 
   token = createFakeToken(refreshedToken);
@@ -303,7 +303,7 @@ test('#restore does not schedule a token refresh when `refreshAccessTokens` is f
   sinon.stub(App.authenticator, 'getCurrentTime', () => { return currentTime; });
 
   let token = {};
-  token[jwt.identificationField] = 'test@test.com';
+  token['email'] = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
   token = createFakeToken(token);
@@ -330,7 +330,7 @@ test('#restore does not schedule a token refresh when `expiresAt` <= `now`.', as
     expiresAt = -1;
 
   let token = {};
-  token[jwt.identificationField] = 'test@test.com';
+  token['email'] = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
   token = createFakeToken(token);
@@ -354,7 +354,7 @@ test('#restore does not schedule a token refresh when `expiresAt` - `refreshLeew
     expiresAt = getConvertedTime(6000);
 
   let token = {};
-  token[jwt.identificationField] = 'test@test.com';
+  token['email'] = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
   token = createFakeToken(token);
@@ -399,7 +399,7 @@ test('#restore schedule access token refresh and refreshes it when time is appro
   sinon.stub(App.authenticator, 'getCurrentTime', () => { return currentTime; });
 
   let token = {};
-  token[jwt.identificationField] = 'test@test.com';
+  token['email'] = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
   token = createFakeToken(token);
@@ -423,7 +423,7 @@ test('#restore schedule access token refresh and refreshes it when time is appro
   sinon.stub(App.authenticator, 'getCurrentTime', () => { return currentTime; });
 
   const refreshedToken = {};
-  refreshedToken[jwt.identificationField] = 'test@test.com';
+  refreshedToken['email'] = 'test@test.com';
   refreshedToken[jwt.tokenExpireName] = expiresAt;
 
   token = createFakeToken(refreshedToken);
@@ -460,7 +460,7 @@ test('#authenticate sends an ajax request to the token endpoint', assert => {
     assert.deepEqual(args, {
       url: jwt.serverTokenEndpoint,
       method: 'POST',
-      data: '{"password":"password","username":"username"}',
+      data: '{"identification":"username","password":"password"}',
       dataType: 'json',
       contentType: 'application/json',
       headers: {}
@@ -498,7 +498,7 @@ test('#authenticate schedules a token refresh when `refreshAccessTokens` is true
     expiresAt = new Date().getTime() + 300000;
 
   let token = {};
-  token[jwt.identificationField] = 'test@test.com';
+  token['email'] = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
   token = createFakeToken(token);
@@ -529,7 +529,7 @@ test('#authenticate does not schedule a token refresh when `refreshAccessTokens`
     expiresAt = 3;
 
   let token = {};
-  token[jwt.identificationField] = 'test@test.com';
+  token['email'] = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
   token = createFakeToken(token);
@@ -562,7 +562,7 @@ test('#refreshAccessToken makes an AJAX request to the token endpoint.', assert 
     expiresAt = 3;
 
   let token = {};
-  token[jwt.identificationField] = 'test@test.com';
+  token['email'] = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
   token = createFakeToken(token);
@@ -590,7 +590,7 @@ test('#refreshAccessToken triggers the `sessionDataUpdated` event on successful 
   sinon.stub(App.authenticator, 'scheduleAccessTokenRefresh', () => { return null; });
 
   let token = {};
-  token[jwt.identificationField] = 'test@test.com';
+  token['email'] = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
   token = createFakeToken(token);
@@ -618,7 +618,7 @@ test('#getTokenData returns correct data', assert => {
   const stringTokenData = 'test@test.com';
   const objectTokenData = {};
 
-  objectTokenData[jwt.identificationField] = stringTokenData;
+  objectTokenData['email'] = stringTokenData;
 
   const objectToken = createFakeToken(objectTokenData);
   const stringToken = createFakeToken(stringTokenData);

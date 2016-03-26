@@ -3,8 +3,6 @@ import loadConfig from './utils/load-config';
 var defaults = {
   serverTokenEndpoint: '/api/token-auth/',
   serverTokenRefreshEndpoint: '/api/token-refresh/',
-  identificationField: 'username',
-  passwordField: 'password',
   tokenPropertyName: 'token',
   refreshAccessTokens: true,
   refreshLeeway: 0,
@@ -53,30 +51,6 @@ export default {
   */
   serverTokenRefreshEndpoint: defaults.serverTokenRefreshEndpoint,
 
-
-  /**
-    The attribute-name that is used for the identification field when sending
-    the authentication data to the server.
-
-    @property identificationField
-    @readOnly
-    @static
-    @type String
-    @default 'username'
-  */
-  identificationField: defaults.identificationField,
-
-  /**
-    The attribute-name that is used for the password field when sending
-    the authentication data to the server.
-
-    @property passwordField
-    @readOnly
-    @static
-    @type String
-    @default 'password'
-  */
-  passwordField: defaults.passwordField,
 
   /**
     The name of the property in session that contains token
