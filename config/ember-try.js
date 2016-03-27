@@ -1,36 +1,49 @@
 /*jshint node:true*/
-module.exports = {
-  scenarios: [
-    {
-      name: 'default',
-      dependencies: { }
-    },
-    {
-      name: 'ember-release',
-      dependencies: {
-        'ember': 'components/ember#release'
+module.exports = function() {
+  return {
+    useVersionCompatibility: true,
+    scenarios: [
+      {
+        name: 'default',
+        bower: {
+          dependencies: { }
+        }
       },
-      resolutions: {
-        'ember': 'release'
-      }
-    },
-    {
-      name: 'ember-beta',
-      dependencies: {
-        'ember': 'components/ember#beta'
+      {
+        name: 'ember-release',
+        bower: {
+          dependencies: {
+            'ember': 'components/ember#release'
+          },
+          resolutions: {
+            'ember': 'release'
+          }
+        }
       },
-      resolutions: {
-        'ember': 'beta'
-      }
-    },
-    {
-      name: 'ember-canary',
-      dependencies: {
-        'ember': 'components/ember#canary'
+      {
+        name: 'ember-beta',
+        allowedToFail: true,
+        bower: {
+          dependencies: {
+            'ember': 'components/ember#beta'
+          },
+          resolutions: {
+            'ember': 'beta'
+          }
+        }
       },
-      resolutions: {
-        'ember': 'canary'
+      {
+        name: 'ember-canary',
+        allowedToFail: true,
+        bower: {
+          dependencies: {
+            'ember': 'components/ember#canary'
+          },
+          resolutions: {
+            'ember': 'canary'
+          }
+        }
       }
-    }
-  ]
+    ]
+  };
 };
