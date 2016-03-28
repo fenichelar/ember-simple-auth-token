@@ -352,7 +352,7 @@ export default TokenAuthenticator.extend({
     const token = Ember.get(response, this.tokenPropertyName);
 
     if(Ember.isEmpty(token)) {
-      throw new Error('TOKEN IS EMPTY OR A BETTER WARNING');
+      throw new Error('Token is empty. Please check your backend response.');
     }
 
     const tokenData = this.getTokenData(token);
