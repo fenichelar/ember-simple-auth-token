@@ -164,9 +164,9 @@ export default TokenAuthenticator.extend({
 
       this.makeRequest(this.serverTokenEndpoint, data, headers).then(response => {
         Ember.run(() => {
-          const sessionData = this.handleAuthResponse(response);
-
           try {
+            const sessionData = this.handleAuthResponse(response);
+
             resolve(sessionData);
           } catch(error) {
             reject(new Error(error));
@@ -226,11 +226,11 @@ export default TokenAuthenticator.extend({
     return new Ember.RSVP.Promise((resolve, reject) => {
       this.makeRequest(this.serverTokenRefreshEndpoint, data, headers).then(response => {
         Ember.run(() => {
-          const sessionData = this.handleAuthResponse(response);
-
           try {
-            resolve(sessionData);
+            const sessionData = this.handleAuthResponse(response);
+
             this.trigger('sessionDataUpdated', sessionData);
+            resolve(sessionData);
           } catch(error) {
             reject(new Error(error));
           }
