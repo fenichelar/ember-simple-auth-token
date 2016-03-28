@@ -159,7 +159,7 @@ export default TokenAuthenticator.extend({
   */
   authenticate(credentials, headers) {
     return new Ember.RSVP.Promise((resolve, reject) => {
-      let data = this.getAuthenticateData(credentials);
+      const data = this.getAuthenticateData(credentials);
 
       this.makeRequest(this.serverTokenEndpoint, data, headers).then(response => {
         Ember.run(() => {
@@ -215,7 +215,7 @@ export default TokenAuthenticator.extend({
     @private
   */
   refreshAccessToken(token, headers) {
-    let data = this.makeRefreshData(token);
+    const data = this.makeRefreshData(token);
 
     return new Ember.RSVP.Promise((resolve, reject) => {
       this.makeRequest(this.serverTokenRefreshEndpoint, data, headers).then(response => {
