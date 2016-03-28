@@ -110,6 +110,7 @@ export default TokenAuthenticator.extend({
       if (Ember.isEmpty(token)) {
         return reject(new Error('empty token'));
       }
+
       if (Ember.isEmpty(expiresAt)) {
         // Fetch the expire time from the token data since `expiresAt`
         // wasn't included in the data object that was passed in.
@@ -163,7 +164,7 @@ export default TokenAuthenticator.extend({
 
       this.makeRequest(this.serverTokenEndpoint, data, headers).then(response => {
         Ember.run(() => {
-          const sessionData = this.handleAuthResponse(response);
+          const sessionData = this.handleAuthResponse(response, reject);
           resolve(sessionData);
         });
       }, xhr => {
@@ -220,7 +221,7 @@ export default TokenAuthenticator.extend({
     return new Ember.RSVP.Promise((resolve, reject) => {
       this.makeRequest(this.serverTokenRefreshEndpoint, data, headers).then(response => {
         Ember.run(() => {
-          const sessionData = this.handleAuthResponse(response);
+          const sessionData = this.handleAuthResponse(response, reject);
           this.trigger('sessionDataUpdated', sessionData);
           resolve(sessionData);
         });
@@ -335,11 +336,17 @@ export default TokenAuthenticator.extend({
     @method handleAuthResponse
     @private
    */
-  handleAuthResponse(response) {
+  handleAuthResponse(response, reject) {
     const token = Ember.get(response, this.tokenPropertyName);
+
+    if(Ember.isEmpty(token)) {
+      return reject(new Error('empty token'));
+    }
+
     const tokenData = this.getTokenData(token);
     const expiresAt = Ember.get(tokenData, this.tokenExpireName);
     const tokenExpireData = {};
+
     tokenExpireData[this.tokenExpireName] = expiresAt;
 
     this.scheduleAccessTokenRefresh(expiresAt, token);
