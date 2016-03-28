@@ -164,8 +164,13 @@ export default TokenAuthenticator.extend({
 
       this.makeRequest(this.serverTokenEndpoint, data, headers).then(response => {
         Ember.run(() => {
-          const sessionData = this.handleAuthResponse(response, reject);
-          resolve(sessionData);
+          const sessionData = this.handleAuthResponse(response);
+
+          try {
+            resolve(sessionData);
+          } catch(error) {
+            reject(new Error(error));
+          }
         });
       }, xhr => {
         Ember.run(() => { reject(xhr.responseJSON || xhr.responseText); });
@@ -221,7 +226,14 @@ export default TokenAuthenticator.extend({
     return new Ember.RSVP.Promise((resolve, reject) => {
       this.makeRequest(this.serverTokenRefreshEndpoint, data, headers).then(response => {
         Ember.run(() => {
-          const sessionData = this.handleAuthResponse(response, reject);
+          const sessionData = this.handleAuthResponse(response);
+
+          try {
+            resolve(sessionData);
+          } catch(error) {
+            reject(new Error(error));
+          }
+
           this.trigger('sessionDataUpdated', sessionData);
           resolve(sessionData);
         });
@@ -336,11 +348,11 @@ export default TokenAuthenticator.extend({
     @method handleAuthResponse
     @private
    */
-  handleAuthResponse(response, reject) {
+  handleAuthResponse(response) {
     const token = Ember.get(response, this.tokenPropertyName);
 
     if(Ember.isEmpty(token)) {
-      return reject(new Error('empty token'));
+      throw new Error('TOKEN IS EMPTY OR A BETTER WARNING');
     }
 
     const tokenData = this.getTokenData(token);
