@@ -622,6 +622,8 @@ test('#refreshAccessToken makes an AJAX request to the token endpoint with neste
 
 test('#refreshAccessToken triggers the `sessionDataUpdated` event on successful request.', assert => {
   assert.expect(3);
+  const deferred = Ember.RSVP.defer();
+
   const jwt = JWT.create(),
     expiresAt = 3;
 
@@ -647,7 +649,11 @@ test('#refreshAccessToken triggers the `sessionDataUpdated` event on successful 
     assert.ok(data[jwt.tokenExpireName] > 0, 'Verify is greater than `now`');
     assert.deepEqual(data.token, token);
     App.authenticator.scheduleAccessTokenRefresh.restore();
+
+    deferred.resolve(true);
   });
+
+  return deferred.promise;
 });
 
 test('#getTokenData returns correct data', assert => {
