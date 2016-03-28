@@ -231,20 +231,27 @@ export default TokenAuthenticator.extend({
     });
   },
 
-  makeRefreshData(token) {
-    let root = {};
-    let lastObject = root;
-    let nesting = this.tokenPropertyName.split('.');
-    let tokenPropertyName = nesting.pop();
+  /**
+    Returns a nested object with the token property name.
+    Example:  If `tokenPropertyName` is "data.user.token", `makeRefreshData` will return {data: {user: {token: "token goes here"}}}
 
-    nesting.forEach((nesting) => {
+    @method makeRefreshData
+    @return {object} An object with the nested property name.
+  */
+  makeRefreshData(token) {
+    const data = {};
+    let lastObject = data;
+    const nestings = this.tokenPropertyName.split('.');
+    const tokenPropertyName = nestings.pop();
+
+    nestings.forEach((nesting) => {
       lastObject[nesting] = {};
       lastObject = lastObject[nesting];
     });
 
     lastObject[tokenPropertyName] = token;
 
-    return root;
+    return data;
   },
 
   /**
