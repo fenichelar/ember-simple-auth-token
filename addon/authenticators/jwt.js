@@ -230,12 +230,10 @@ export default TokenAuthenticator.extend({
 
           try {
             resolve(sessionData);
+            this.trigger('sessionDataUpdated', sessionData);
           } catch(error) {
             reject(new Error(error));
           }
-
-          this.trigger('sessionDataUpdated', sessionData);
-          resolve(sessionData);
         });
       }, (xhr, status, error) => {
         Ember.Logger.warn(`Access token could not be refreshed - server responded with ${error}.`);
