@@ -113,7 +113,7 @@ export default TokenAuthenticator.extend({
       if (Ember.isEmpty(expiresAt)) {
         // Fetch the expire time from the token data since `expiresAt`
         // wasn't included in the data object that was passed in.
-        const tokenData = this.getTokenData(data[this.tokenPropertyName]);
+        const tokenData = this.getTokenData(Ember.get(token, this.tokenPropertyName));
 
         expiresAt = this.resolveTime(tokenData[this.tokenExpireName]);
         if (Ember.isEmpty(expiresAt)) {
@@ -158,24 +158,13 @@ export default TokenAuthenticator.extend({
                                  otherwise
   */
   authenticate(credentials, headers) {
-
     return new Ember.RSVP.Promise((resolve, reject) => {
       const data = this.getAuthenticateData(credentials);
 
       this.makeRequest(this.serverTokenEndpoint, data, headers).then(response => {
         Ember.run(() => {
-          const token = Ember.get(response, this.tokenPropertyName);
-          const tokenData = this.getTokenData(token);
-          const expiresAt = Ember.get(tokenData, this.tokenExpireName);
-          const tokenExpireData = {};
-
-          this.scheduleAccessTokenRefresh(expiresAt, token);
-
-          tokenExpireData[this.tokenExpireName] = expiresAt;
-
-          response = Ember.merge(response, tokenExpireData);
-
-          resolve(this.getResponseData(response));
+          const sessionData = this.handleAuthResponse(response);
+          resolve(sessionData);
         });
       }, xhr => {
         Ember.run(() => { reject(xhr.responseJSON || xhr.responseText); });
@@ -226,26 +215,14 @@ export default TokenAuthenticator.extend({
     @private
   */
   refreshAccessToken(token, headers) {
-    let data = {
-      [this.tokenPropertyName]: token
-    };
+    const data = this.makeRefreshData(token);
 
     return new Ember.RSVP.Promise((resolve, reject) => {
       this.makeRequest(this.serverTokenRefreshEndpoint, data, headers).then(response => {
         Ember.run(() => {
-          const resToken = Ember.get(response, this.tokenPropertyName);
-          const tokenData = this.getTokenData(resToken);
-          const expiresAt = Ember.get(tokenData, this.tokenExpireName);
-          const tokenExpireData = {};
-
-          tokenExpireData[this.tokenExpireName] = expiresAt;
-
-          data = Ember.merge(response, tokenExpireData);
-
-          this.scheduleAccessTokenRefresh(expiresAt, resToken);
-          this.trigger('sessionDataUpdated', data);
-
-          resolve(response);
+          const sessionData = this.handleAuthResponse(response);
+          this.trigger('sessionDataUpdated', sessionData);
+          resolve(sessionData);
         });
       }, (xhr, status, error) => {
         Ember.Logger.warn(`Access token could not be refreshed - server responded with ${error}.`);
@@ -255,13 +232,37 @@ export default TokenAuthenticator.extend({
   },
 
   /**
+    Returns a nested object with the token property name.
+    Example:  If `tokenPropertyName` is "data.user.token", `makeRefreshData` will return {data: {user: {token: "token goes here"}}}
+
+    @method makeRefreshData
+    @return {object} An object with the nested property name.
+  */
+  makeRefreshData(token) {
+    const data = {};
+    let lastObject = data;
+    const nestings = this.tokenPropertyName.split('.');
+    const tokenPropertyName = nestings.pop();
+
+    nestings.forEach((nesting) => {
+      lastObject[nesting] = {};
+      lastObject = lastObject[nesting];
+    });
+
+    lastObject[tokenPropertyName] = token;
+
+    return data;
+  },
+
+  /**
     Returns the decoded token with accessible returned values.
 
     @method getTokenData
     @return {object} An object with properties for the session.
   */
   getTokenData(token) {
-    const tokenData = atob(token.split('.')[1]);
+    const payload = token.split('.')[1];
+    const tokenData = decodeURIComponent(window.escape(atob(payload)));
 
     try {
       return JSON.parse(tokenData);
@@ -326,5 +327,23 @@ export default TokenAuthenticator.extend({
       return time;
     }
     return new Date(time * this.timeFactor).getTime();
+  },
+
+  /**
+    Handles authentication response from server, and returns session data
+
+    @method handleAuthResponse
+    @private
+   */
+  handleAuthResponse(response) {
+    const token = Ember.get(response, this.tokenPropertyName);
+    const tokenData = this.getTokenData(token);
+    const expiresAt = Ember.get(tokenData, this.tokenExpireName);
+    const tokenExpireData = {};
+    tokenExpireData[this.tokenExpireName] = expiresAt;
+
+    this.scheduleAccessTokenRefresh(expiresAt, token);
+
+    return Ember.merge(this.getResponseData(response), tokenExpireData);
   }
 });

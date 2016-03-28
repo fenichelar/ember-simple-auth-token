@@ -5,10 +5,11 @@ import Token from 'ember-simple-auth-token/authorizers/token';
 import Session from 'ember-simple-auth/internal-session';
 import EphemeralStore from 'ember-simple-auth/session-stores/ephemeral';
 
-var App, data = { token: 'secret token!' };
+var App, data;
 
 module('Token Authenticator', {
   beforeEach: () => {
+    data = { token: 'secret token!' };
     App = startApp();
     App.authorizer = Token.create({
       session: Session.create({
@@ -29,6 +30,20 @@ test('#authorize when authenticated adds token to request', assert => {
   App.authorizer.authorize(data, (headerName, headerValue) => {
     assert.equal(headerName, 'Authorization');
     assert.equal(headerValue, 'Bearer secret token!');
+  });
+});
+
+test('#authorize when authenticated adds token to request, nested tokenPropertyName', assert => {
+  assert.expect(2);
+
+  App.authorizer.set('session.isAuthenticated', true);
+
+  data = {nested: {token: 'secret nested token!'}};
+  App.authorizer.tokenPropertyName = 'nested.token';
+
+  App.authorizer.authorize(data, (headerName, headerValue) => {
+    assert.equal(headerName, 'Authorization');
+    assert.equal(headerValue, 'Bearer secret nested token!');
   });
 });
 

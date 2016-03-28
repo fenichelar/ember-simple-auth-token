@@ -494,6 +494,8 @@ test('#authenticate rejects with invalid credentials', assert => {
 });
 
 test('#authenticate schedules a token refresh when `refreshAccessTokens` is true', assert => {
+  assert.expect(2);
+
   const jwt = JWT.create(),
     expiresAt = new Date().getTime() + 300000;
 
@@ -525,6 +527,8 @@ test('#authenticate schedules a token refresh when `refreshAccessTokens` is true
 });
 
 test('#authenticate does not schedule a token refresh when `refreshAccessTokens` is false', assert => {
+  assert.expect(1);
+
   const jwt = JWT.create(),
     expiresAt = 3;
 
@@ -558,6 +562,8 @@ test('#authenticate does not schedule a token refresh when `refreshAccessTokens`
 });
 
 test('#refreshAccessToken makes an AJAX request to the token endpoint.', assert => {
+  assert.expect(1);
+
   const jwt = JWT.create(),
     expiresAt = 3;
 
@@ -583,7 +589,41 @@ test('#refreshAccessToken makes an AJAX request to the token endpoint.', assert 
   });
 });
 
+test('#refreshAccessToken makes an AJAX request to the token endpoint with nested tokenPropertyName.', assert => {
+  assert.expect(1);
+  const jwt = JWT.create();
+  const expiresAt = 3;
+
+  let token = {};
+  token[jwt.identificationField] = 'test@test.com';
+  token[jwt.tokenExpireName] = expiresAt;
+
+  token = createFakeToken(token);
+
+  let authenticator = App.authenticator;
+  let tokenPropertyNameWas = authenticator.tokenPropertyName;
+
+  authenticator.tokenPropertyName = 'auth.nested.token';
+  authenticator.refreshAccessToken(token);
+
+  Ember.run(() => {
+    var args = Ember.$.ajax.getCall(0).args[0];
+    delete args.beforeSend;
+    assert.deepEqual(args, {
+      url: jwt.serverTokenRefreshEndpoint,
+      method: 'POST',
+      data: JSON.stringify({auth: {nested: {token: token}}}),
+      dataType: 'json',
+      contentType: 'application/json',
+      headers: {}
+    });
+  });
+});
+
 test('#refreshAccessToken triggers the `sessionDataUpdated` event on successful request.', assert => {
+  assert.expect(3);
+  const done = assert.async();
+
   const jwt = JWT.create(),
     expiresAt = 3;
 
@@ -609,10 +649,14 @@ test('#refreshAccessToken triggers the `sessionDataUpdated` event on successful 
     assert.ok(data[jwt.tokenExpireName] > 0, 'Verify is greater than `now`');
     assert.deepEqual(data.token, token);
     App.authenticator.scheduleAccessTokenRefresh.restore();
+
+    done();
   });
 });
 
 test('#getTokenData returns correct data', assert => {
+  assert.expect(2);
+
   const jwt = JWT.create();
 
   const stringTokenData = 'test@test.com';
@@ -625,4 +669,14 @@ test('#getTokenData returns correct data', assert => {
 
   assert.deepEqual(jwt.getTokenData(objectToken), objectTokenData, 'Object data returned');
   assert.equal(jwt.getTokenData(stringToken), stringTokenData, 'String data returned');
+});
+
+test('#getTokenData returns correctly encoded data', assert => {
+  assert.expect(1);
+
+  const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE0NTQxNzM1NzEsImRhdGEiOnsiYXV0aGVudGljYXRlZCI6dHJ1ZSwidXNlciI6eyJpZCI6IjdhMWRkYzJmLWI5MTAtNDY2Yi04MDhhLTUxOTUyOTkwZjUyNyIsIm5hbWUiOiJUaG9yYmrDuHJuIEhlcm1hbnNlbiIsIm1vYmlsZSI6IjQwNDUxMzg5IiwiZW1haWwiOiJ0aEBza2FsYXIubm8iLCJsb2NhbGUiOiJuYiIsInNpZ25faW5fY291bnQiOjI1fX19.se8PT5e1G1_xhPTQf_16BIv0Q9uEjQxLGE3iTJwhAec';
+  const jwt = JWT.create();
+
+  const data = jwt.getTokenData(token);
+  assert.equal(data.data.user.name, 'Thorbjørn Hermansen', 'Correctly decodes JWT data');
 });
