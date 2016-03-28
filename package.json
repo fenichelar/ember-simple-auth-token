@@ -49,7 +49,7 @@
     "ember-qunit": "0.2.0",
     "ember-simple-auth": "1.0.1",
     "ember-sinon": "0.3.0",
-    "ember-try": "~0.0.8",
+    "ember-try": "^0.2.2",
     "express": "^4.12.3",
     "glob": "^4.5.3",
     "jsonwebtoken": "^5.0.0",
@@ -68,6 +68,9 @@
   },
   "ember-addon": {
     "configPath": "tests/dummy/config",
-    "demoURL": "https://jpadilla.github.io/ember-simple-auth-token/"
+    "demoURL": "https://jpadilla.github.io/ember-simple-auth-token/",
+    "versionCompatibility": {
+      "ember": ">1.11.0 <=2.0.0"
+    }
   }
 }
