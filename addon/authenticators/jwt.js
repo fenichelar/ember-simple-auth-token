@@ -2,6 +2,8 @@ import Ember from 'ember';
 import Configuration from '../configuration';
 import TokenAuthenticator from './token';
 
+const assign = Ember.assign || Ember.merge;
+
 /**
   JWT (JSON Web Token) Authenticator that supports automatic token refresh.
 
@@ -344,6 +346,6 @@ export default TokenAuthenticator.extend({
 
     this.scheduleAccessTokenRefresh(expiresAt, token);
 
-    return Ember.merge(this.getResponseData(response), tokenExpireData);
+    return assign(this.getResponseData(response), tokenExpireData);
   }
 });
