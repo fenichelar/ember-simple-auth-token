@@ -31,22 +31,6 @@ test('assigns serverTokenEndpoint from the configuration object', assert => {
   Configuration.load({}, {});
 });
 
-test('assigns identificationField from the configuration object', assert => {
-  Configuration.identificationField = 'identificationField';
-
-  assert.equal(Token.create().identificationField, 'identificationField');
-
-  Configuration.load({}, {});
-});
-
-test('assigns passwordField from the configuration object', assert => {
-  Configuration.passwordField = 'passwordField';
-
-  assert.equal(Token.create().passwordField, 'passwordField');
-
-  Configuration.load({}, {});
-});
-
 test('assigns tokenPropertyName from the configuration object', assert => {
   Configuration.tokenPropertyName = 'tokenPropertyName';
 
@@ -123,34 +107,7 @@ test('#authenticate sends an AJAX request to the sign in endpoint', assert => {
     assert.deepEqual(args, {
       url: '/api/token-auth/',
       method: 'POST',
-      data: '{"password":"password","username":"username"}',
-      dataType: 'json',
-      contentType: 'application/json',
-      headers: {}
-    });
-  });
-});
-
-test('#authenticate sends an AJAX request to the sign in endpoint with custom fields', assert => {
-  const credentials = {
-    identification: 'username',
-    password: 'password'
-  };
-
-  Configuration.identificationField = 'api-user';
-  Configuration.passwordField = 'api-key';
-
-  App.authenticator = Token.create();
-  App.authenticator.authenticate(credentials);
-
-  Ember.run(() => {
-    var args = Ember.$.ajax.getCall(0).args[0];
-    delete args.beforeSend;
-
-    assert.deepEqual(args, {
-      url: '/api/token-auth/',
-      method: 'POST',
-      data: '{"api-key":"password","api-user":"username"}',
+      data: '{"identification":"username","password":"password"}',
       dataType: 'json',
       contentType: 'application/json',
       headers: {}
@@ -198,7 +155,7 @@ test('#authenticate sends an AJAX request with custom headers', assert => {
     assert.deepEqual(args, {
       url: '/api/token-auth/',
       method: 'POST',
-      data: '{"password":"password","username":"username"}',
+      data: '{"identification":"username","password":"password"}',
       dataType: 'json',
       contentType: 'application/json',
       headers: {

@@ -27,32 +27,6 @@ export default Base.extend({
   serverTokenEndpoint: '/api/token-auth/',
 
   /**
-    The attribute-name that is used for the identification field when sending the
-    authentication data to the server.
-
-    This value can be configured via
-    [`SimpleAuth.Configuration.Token#identificationField`](#SimpleAuth-Configuration-Token-identificationField).
-
-    @property identificationField
-    @type String
-    @default 'username'
-  */
-  identificationField: 'username',
-
-  /**
-    The attribute-name that is used for the password field when sending the
-    authentication data to the server.
-
-    This value can be configured via
-    [`SimpleAuth.Configuration.Token#passwordfield`](#SimpleAuth-Configuration-Token-passwordfield).
-
-    @property passwordField
-    @type String
-    @default 'password'
-  */
-  passwordField: 'password',
-
-  /**
     The name of the property in session that contains token used for authorization.
 
     This value can be configured via
@@ -82,8 +56,6 @@ export default Base.extend({
   */
   init() {
     this.serverTokenEndpoint = Configuration.serverTokenEndpoint;
-    this.identificationField = Configuration.identificationField;
-    this.passwordField = Configuration.passwordField;
     this.tokenPropertyName = Configuration.tokenPropertyName;
     this.headers = Configuration.headers;
   },
@@ -125,9 +97,7 @@ export default Base.extend({
   */
   authenticate(credentials, headers) {
     return new Ember.RSVP.Promise((resolve, reject) => {
-      const data = this.getAuthenticateData(credentials);
-
-      this.makeRequest(data, headers).then(response => {
+      this.makeRequest(credentials, headers).then(response => {
         Ember.run(() => {
           resolve(this.getResponseData(response));
         });
@@ -135,21 +105,6 @@ export default Base.extend({
         Ember.run(() => { reject(xhr.responseJSON || xhr.responseText); });
       });
     });
-  },
-
-  /**
-    Returns an object used to be sent for authentication.
-
-    @method getAuthenticateData
-    @return {object} An object with properties for authentication.
-  */
-  getAuthenticateData(credentials) {
-    const authentication = {
-      [this.passwordField]: credentials.password,
-      [this.identificationField]: credentials.identification
-    };
-
-    return authentication;
   },
 
   /**

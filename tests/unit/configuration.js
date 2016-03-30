@@ -18,10 +18,6 @@ test('serverTokenEndpoint', assert => {
   assert.equal(Configuration.serverTokenEndpoint, '/api/token-auth/', 'defaults to "/api/token-auth/"');
 });
 
-test('identificationField', assert => {
-  assert.equal(Configuration.identificationField, 'username', 'defaults to "username"');
-});
-
 test('tokenPropertyName', assert => {
   assert.equal(Configuration.tokenPropertyName, 'token', 'defaults to "token"');
 });
