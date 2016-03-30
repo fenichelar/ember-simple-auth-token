@@ -70,7 +70,7 @@
     "configPath": "tests/dummy/config",
     "demoURL": "https://jpadilla.github.io/ember-simple-auth-token/",
     "versionCompatibility": {
-      "ember": ">1.11.0 <=2.0.0"
+      "ember": ">1.13.0 <=2.5.0"
     }
   }
 }
