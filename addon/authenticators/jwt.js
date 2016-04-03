@@ -238,6 +238,7 @@ export default TokenAuthenticator.extend({
           }
         });
       }, (xhr, status, error) => {
+        this.handleTokenRefreshFail(xhr.status);
         Ember.Logger.warn(`Access token could not be refreshed - server responded with ${error}.`);
         reject();
       });
@@ -364,5 +365,21 @@ export default TokenAuthenticator.extend({
     this.scheduleAccessTokenRefresh(expiresAt, token);
 
     return assign(this.getResponseData(response), tokenExpireData);
+  },
+
+  /**
+    Handles token refresh fail status. If the server response to a token refresh has a
+    status of 401 or 403 then the token in the session will be invalidated and
+    the sessionInvalidated provided by ember-simple-auth will be triggered.
+
+    @method handleTokenRefreshFail
+  */
+
+  handleTokenRefreshFail(refreshStatus) {
+    if(refreshStatus === 401 || refreshStatus === 403) {
+      return this.invalidate().then(() => {
+        this.trigger('sessionDataInvalidated');
+      });
+    }
   }
 });
