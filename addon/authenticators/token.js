@@ -221,6 +221,12 @@ export default Base.extend({
     });
   },
 
+  /**
+    Initializes the service provided by ember-user-activity.
+
+    @method initIdleTracking
+    @private
+  */
   initIdleTracking() {
     this.get('userIdle').init();
   }
