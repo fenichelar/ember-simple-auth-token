@@ -14,6 +14,8 @@ import Configuration from '../configuration';
   @extends Base
 */
 export default Base.extend({
+  userIdle: Ember.inject.service('idle'),
+
   /**
     The endpoint on the server the authenticator acquires the auth token from.
 
@@ -130,6 +132,7 @@ export default Base.extend({
       this.makeRequest(data, headers).then(response => {
         Ember.run(() => {
           resolve(this.getResponseData(response));
+          this.initIdleTracking();
         });
       }, xhr => {
         Ember.run(() => { reject(xhr.responseJSON || xhr.responseText); });
@@ -174,6 +177,22 @@ export default Base.extend({
   },
 
   /**
+    Observes the changes in the state of the 'isIdle' property provided by ember-user-activity.
+    When `invalidateIfIdle` is true and the user is idle for the time specified in
+    `invalidateAfter` the token will be invalidated and the `sessionDataInvalidated`
+    event will be triggered.
+
+    @method invalidateWhenIdle
+  */
+  invalidateWhenIdle: Ember.observer('userIdle.isIdle', function() {
+    if (this.get('userIdle.isIdle') && this.get('invalidateIfIdle')) {
+      this.invalidate().then(() => {
+        this.trigger('sessionDataInvalidated');
+      });
+    }
+  }),
+
+  /**
     @method makeRequest
     @param {Object} data Object that will be sent to server
     @param {Object} headers Additional headers that will be sent to server
@@ -197,5 +216,11 @@ export default Base.extend({
         }
       }
     });
+  },
+
+  initIdleTracking() {
+    if (this.get('invalidateIfIdle')) {
+      this.get('userIdle').init();
+    }
   }
 });

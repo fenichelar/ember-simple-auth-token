@@ -81,6 +81,8 @@ export default TokenAuthenticator.extend({
     this.tokenExpireName = Configuration.tokenExpireName;
     this.timeFactor = Configuration.timeFactor;
     this.headers = Configuration.headers;
+    this.invalidateIfIdle = Configuration.invalidateIfIdle;
+    this.invalidateAfter = Configuration.invalidateAfter;
   },
 
   /**
@@ -170,6 +172,7 @@ export default TokenAuthenticator.extend({
             const sessionData = this.handleAuthResponse(response);
 
             resolve(sessionData);
+            this.initIdleTracking();
           } catch(error) {
             reject(error);
           }
@@ -325,6 +328,13 @@ export default TokenAuthenticator.extend({
     return new Ember.RSVP.resolve();
   },
 
+  /**
+    Returns a numeric representation in milliseconds of the current date.
+
+    @method getCurrentTime
+    @return Integer
+    @private
+  */
   getCurrentTime() {
     return (new Date()).getTime();
   },
@@ -339,6 +349,7 @@ export default TokenAuthenticator.extend({
     if (Ember.isEmpty(time)) {
       return time;
     }
+
     return new Date(time * this.timeFactor).getTime();
   },
 
