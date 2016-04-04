@@ -50,6 +50,7 @@
     "ember-simple-auth": "1.0.1",
     "ember-sinon": "0.3.0",
     "ember-try": "^0.2.2",
+    "ember-user-activity": "0.1.0",
     "express": "^4.12.3",
     "glob": "^4.5.3",
     "jsonwebtoken": "^5.0.0",
