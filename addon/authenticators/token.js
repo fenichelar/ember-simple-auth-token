@@ -132,7 +132,10 @@ export default Base.extend({
       this.makeRequest(data, headers).then(response => {
         Ember.run(() => {
           resolve(this.getResponseData(response));
-          this.initIdleTracking();
+
+          if (this.get('invalidateIfIdle')) {
+            this.initIdleTracking();
+          }
         });
       }, xhr => {
         Ember.run(() => { reject(xhr.responseJSON || xhr.responseText); });
@@ -219,8 +222,6 @@ export default Base.extend({
   },
 
   initIdleTracking() {
-    if (this.get('invalidateIfIdle')) {
-      this.get('userIdle').init();
-    }
+    this.get('userIdle').init();
   }
 });

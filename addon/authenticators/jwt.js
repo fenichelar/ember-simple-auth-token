@@ -172,7 +172,10 @@ export default TokenAuthenticator.extend({
             const sessionData = this.handleAuthResponse(response);
 
             resolve(sessionData);
-            this.initIdleTracking();
+
+            if (this.get('invalidateIfIdle')) {
+              this.initIdleTracking();
+            }
           } catch(error) {
             reject(error);
           }
