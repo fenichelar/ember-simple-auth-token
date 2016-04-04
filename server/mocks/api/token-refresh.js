@@ -8,7 +8,7 @@ module.exports = function(app) {
     jwt.verify(req.body.token, 'secret', function(err, decoded) {
       if (err) {
         res
-          .status(402)
+          .status(401)
           .send({
             error: err
           });
