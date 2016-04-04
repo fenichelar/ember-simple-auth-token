@@ -12,7 +12,9 @@ var defaults = {
   authorizationPrefix: 'Bearer ',
   authorizationHeaderName: 'Authorization',
   timeFactor: 1,
-  headers: {}
+  headers: {},
+  invalidateIfIdle: false,
+  invalidateAfter: 300000
 };
 
 /**
@@ -155,6 +157,28 @@ export default {
     @default {}
   */
   headers: defaults.headers,
+
+  /**
+    Boolean value that indicate wheater the token should be invalidated if the user goes idle.
+
+    @property invalidateIfIdle
+    @readonly
+    @static
+    @type boolean
+    @default false
+  */
+  invalidateIfIdle: defaults.invalidateIfIdle,
+
+  /**
+    Time that has to pass for a user to be considered idle.
+
+    @property invalidateAfter
+    @readonly
+    @static
+    @type integer
+    @default 300000 (milliseconds) => (5 minutes)
+  */
+  invalidateAfter: defaults.invalidateAfter,
 
   /**
     @method load
