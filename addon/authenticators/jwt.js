@@ -324,6 +324,8 @@ export default TokenAuthenticator.extend({
     @return {Ember.RSVP.Promise} A resolving promise
   */
   invalidate() {
+    this.destroyUserIdle(this.get('userIdle.isIdle'), this.get('invalidateIfIdle'));
+
     Ember.run.cancel(this._refreshTokenTimeout);
 
     delete this._refreshTokenTimeout;

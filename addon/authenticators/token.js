@@ -14,6 +14,12 @@ import Configuration from '../configuration';
   @extends Base
 */
 export default Base.extend({
+  /**
+    Injects custom service that extends ember-user-activity user-idle service.
+
+    @method userIdle
+    @private
+  */
   userIdle: Ember.inject.service('idle'),
 
   /**
@@ -176,6 +182,8 @@ export default Base.extend({
     @return {Ember.RSVP.Promise} A resolving promise
   */
   invalidate() {
+    this.destroyUserIdle(this.get('userIdle.isIdle'), this.get('invalidateIfIdle'));
+
     return Ember.RSVP.resolve();
   },
 
@@ -186,12 +194,11 @@ export default Base.extend({
     event will be triggered.
 
     @method invalidateWhenIdle
+    @private
   */
   invalidateWhenIdle: Ember.observer('userIdle.isIdle', function() {
     if (this.get('userIdle.isIdle') && this.get('invalidateIfIdle')) {
-      this.invalidate().then(() => {
-        this.trigger('sessionDataInvalidated');
-      });
+      this.trigger('invalidateIdledSession');
     }
   }),
 
@@ -229,5 +236,18 @@ export default Base.extend({
   */
   initIdleTracking() {
     this.get('userIdle').init();
+  },
+
+  /**
+    If the user is idle and the add-on configuration specifies that the token should be
+    invalidated it will destroy user activity tracker provided by ember-user-activity.
+
+    @method destroyUserIdle
+    @private
+  */
+  destroyUserIdle(isIdle, shouldInvalidate) {
+    if (isIdle && shouldInvalidate) {
+      this.get('userIdle').willDestroy();
+    }
   }
 });
