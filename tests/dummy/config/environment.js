@@ -39,7 +39,9 @@ module.exports = function(environment) {
       serverTokenEndpoint: '/api/token-auth/',
       serverTokenRefreshEndpoint: '/api/token-refresh/',
       timeFactor: 1000,
-      refreshLeeway: 5
+      refreshLeeway: 5,
+      invalidateIfIdle: true,
+      invalidateAfter: 10000
     };
   }
 
