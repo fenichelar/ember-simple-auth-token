@@ -597,6 +597,80 @@ test('#authenticate does not schedule a token refresh when `refreshAccessTokens`
   });
 });
 
+test('#authenticate does not call `initIdleTracking` when `invalidateIfIdle` is false', assert => {
+  assert.expect(1);
+  const done = assert.async();
+
+  const jwt = JWT.create(),
+    expiresAt = 3;
+
+  let token = {};
+  token[jwt.identificationField] = 'test@test.com';
+  token[jwt.tokenExpireName] = expiresAt;
+
+  token = createFakeToken(token);
+
+  const credentials = {
+    identification: 'username',
+    password: 'password'
+  };
+
+  App.server.respondWith('POST', jwt.serverTokenEndpoint, [
+    201, {
+      'Content-Type': 'application/json'
+    },
+    '{ "token": "' + token + '"}'
+  ]);
+
+  App.authenticator.invalidateIfIdle = false;
+
+  const spy = sinon.spy(App.authenticator, 'initIdleTracking');
+
+  Ember.run(() => {
+    App.authenticator.authenticate(credentials).then(() => {
+      assert.equal(spy.calledOnce, false);
+      done();
+    });
+  });
+});
+
+test('#authenticate calls `initIdleTracking` when `invalidateIfIdle` is true', assert => {
+  assert.expect(1);
+  const done = assert.async();
+
+  const jwt = JWT.create(),
+    expiresAt = 3;
+
+  let token = {};
+  token[jwt.identificationField] = 'test@test.com';
+  token[jwt.tokenExpireName] = expiresAt;
+
+  token = createFakeToken(token);
+
+  const credentials = {
+    identification: 'username',
+    password: 'password'
+  };
+
+  App.server.respondWith('POST', jwt.serverTokenEndpoint, [
+    201, {
+      'Content-Type': 'application/json'
+    },
+    '{ "token": "' + token + '"}'
+  ]);
+
+  App.authenticator.invalidateIfIdle = true;
+
+  const spy = sinon.spy(App.authenticator, 'initIdleTracking');
+
+  Ember.run(() => {
+    App.authenticator.authenticate(credentials).then(() => {
+      assert.equal(spy.calledOnce, true);
+      done();
+    });
+  });
+});
+
 test('#refreshAccessToken makes an AJAX request to the token endpoint.', assert => {
   assert.expect(1);
 

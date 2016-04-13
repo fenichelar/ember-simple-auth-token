@@ -230,6 +230,9 @@ test('#authenticate rejects with the correct error', assert => {
 });
 
 test('#invalidate returns a resolving promise', assert => {
+  App.authenticator.invalidateIfIdle = false;
+  App.authenticator.userIdle = {isIdle: false};
+
   App.authenticator.invalidate().then(() => {
     assert.ok(true);
   });

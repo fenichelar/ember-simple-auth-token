@@ -1,3 +1,7 @@
 html, body {
   margin: 20px;
 }
+
+.text-center {
+  text-align: center;
+}

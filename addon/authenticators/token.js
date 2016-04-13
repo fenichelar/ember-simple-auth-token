@@ -15,6 +15,14 @@ import Configuration from '../configuration';
 */
 export default Base.extend({
   /**
+    Injects custom service that extends ember-user-activity user-idle service.
+
+    @method userIdle
+    @private
+  */
+  userIdle: Ember.inject.service('idle'),
+
+  /**
     The endpoint on the server the authenticator acquires the auth token from.
 
     This value can be configured via
@@ -130,6 +138,10 @@ export default Base.extend({
       this.makeRequest(data, headers).then(response => {
         Ember.run(() => {
           resolve(this.getResponseData(response));
+
+          if (this.get('invalidateIfIdle')) {
+            this.initIdleTracking();
+          }
         });
       }, xhr => {
         Ember.run(() => { reject(xhr.responseJSON || xhr.responseText); });
@@ -170,8 +182,25 @@ export default Base.extend({
     @return {Ember.RSVP.Promise} A resolving promise
   */
   invalidate() {
+    this.destroyUserIdle(this.get('userIdle.isIdle'), this.get('invalidateIfIdle'));
+
     return Ember.RSVP.resolve();
   },
+
+  /**
+    Observes the changes in the state of the 'isIdle' property provided by ember-user-activity.
+    When `invalidateIfIdle` is true and the user is idle for the time specified in
+    `invalidateAfter` the token will be invalidated and the `sessionDataInvalidated`
+    event will be triggered.
+
+    @method invalidateWhenIdle
+    @private
+  */
+  invalidateWhenIdle: Ember.observer('userIdle.isIdle', function() {
+    if (this.get('userIdle.isIdle') && this.get('invalidateIfIdle')) {
+      this.trigger('invalidateIdledSession');
+    }
+  }),
 
   /**
     @method makeRequest
@@ -197,5 +226,28 @@ export default Base.extend({
         }
       }
     });
+  },
+
+  /**
+    Initializes the service provided by ember-user-activity.
+
+    @method initIdleTracking
+    @private
+  */
+  initIdleTracking() {
+    this.get('userIdle').init();
+  },
+
+  /**
+    If the user is idle and the add-on configuration specifies that the token should be
+    invalidated it will destroy user activity tracker provided by ember-user-activity.
+
+    @method destroyUserIdle
+    @private
+  */
+  destroyUserIdle(isIdle, shouldInvalidate) {
+    if (isIdle && shouldInvalidate) {
+      this.get('userIdle').willDestroy();
+    }
   }
 });
