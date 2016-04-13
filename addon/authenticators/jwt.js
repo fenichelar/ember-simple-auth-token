@@ -116,7 +116,7 @@ export default TokenAuthenticator.extend({
       if (Ember.isEmpty(expiresAt)) {
         // Fetch the expire time from the token data since `expiresAt`
         // wasn't included in the data object that was passed in.
-        const tokenData = this.getTokenData(Ember.get(token, this.tokenPropertyName));
+        const tokenData = this.getTokenData(token);
 
         expiresAt = this.resolveTime(tokenData[this.tokenExpireName]);
         if (Ember.isEmpty(expiresAt)) {

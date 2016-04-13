@@ -177,6 +177,42 @@ test('#restore rejects when `refreshAccessTokens` is false and token is expired'
   });
 });
 
+test('#restore resolves when `expiresAt` is empty but the data includes a nested tokenPropertyName', assert => {
+  assert.expect(1);
+
+  const jwt = JWT.create(),
+    currentTime = getConvertedTime(10000),
+    expiresAt = null;
+
+  sinon.stub(App.authenticator, 'getCurrentTime', () => { return currentTime; });
+  let authenticator = App.authenticator;
+  authenticator.tokenPropertyName = 'auth.nested.token';
+
+  let token = {};
+  token[jwt.identificationField] = 'test@test.com';
+  token[jwt.tokenExpireName] = expiresAt;
+
+  token = createFakeToken(token);
+
+  const data = {
+    auth: {
+      nested: {
+        token: token
+      }
+    }
+  };
+  data[jwt.tokenExpireName] = expiresAt;
+
+  Ember.run(() => {
+    App.authenticator.restore(data).then(content => {
+    // Check that the resolved data matches the init data.
+      assert.equal(JSON.stringify(content), JSON.stringify(data));
+    }, () => {
+      assert.ok(false);
+    });
+  });
+});
+
 test('#restore rejects when `token` is excluded.', assert => {
   assert.expect(1);
 
