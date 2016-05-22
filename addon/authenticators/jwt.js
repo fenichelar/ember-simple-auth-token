@@ -239,6 +239,11 @@ export default TokenAuthenticator.extend({
         });
       }, (xhr, status, error) => {
         Ember.Logger.warn(`Access token could not be refreshed - server responded with ${error}.`);
+
+        if (xhr.status === 401 || xhr.status === 403) {
+          this.trigger('sessionDataInvalidated');
+        }
+
         reject();
       });
     });
