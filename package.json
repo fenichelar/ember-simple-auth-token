@@ -47,7 +47,7 @@
     "ember-disable-proxy-controllers": "^1.0.1",
     "ember-export-application-global": "^1.0.4",
     "ember-qunit": "0.2.0",
-    "ember-simple-auth": "1.0.1",
+    "ember-simple-auth": "^1.1.0",
     "ember-sinon": "0.3.0",
     "ember-try": "^0.2.2",
     "express": "^4.12.3",
