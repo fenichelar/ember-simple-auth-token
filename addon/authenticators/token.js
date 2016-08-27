@@ -188,7 +188,9 @@ export default Base.extend({
       contentType: 'application/json',
       headers: this.headers,
       beforeSend: (xhr, settings) => {
-        xhr.setRequestHeader('Accept', settings.accepts.json);
+        if (Ember.isEmpty(this.headers['Accept'])) {
+          xhr.setRequestHeader('Accept', settings.accepts.json);
+        }
 
         if (headers) {
           Object.keys(headers).forEach(key => {
