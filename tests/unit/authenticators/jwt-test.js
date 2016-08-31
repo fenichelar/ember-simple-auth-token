@@ -690,6 +690,70 @@ test('#refreshAccessToken triggers the `sessionDataUpdated` event on successful 
   });
 });
 
+test('#refreshAccessToken invalidates session and triggers `sessionDataInvalidated` when the server responds with 401 or 403.', assert => {
+  assert.expect(2);
+
+  const jwt = JWT.create();
+  const expiresAt = 3;
+
+  sinon.stub(App.authenticator, 'scheduleAccessTokenRefresh', () => { return null; });
+
+  let token = {};
+
+  token[jwt.identificationField] = 'test@test.com';
+  token[jwt.tokenExpireName] = expiresAt;
+
+  token = createFakeToken(token);
+
+  App.server.respondWith('POST', jwt.serverTokenRefreshEndpoint, [
+    401, {
+      'Content-Type': 'application/json'
+    },
+    '{ "error": "Unauthorized"}'
+  ]);
+
+  const spy = sinon.spy(App.authenticator, 'invalidate');
+  let dataInvalidated = false;
+
+  App.authenticator.refreshAccessToken(token);
+
+  App.authenticator.one('sessionDataInvalidated', () => {
+    dataInvalidated = true;
+
+    assert.equal(spy.calledOnce, true);
+    assert.equal(dataInvalidated, true);
+  });
+});
+
+test('#refreshAccessToken does not invalidate session when the server responds with 500.', assert => {
+  assert.expect(1);
+
+  const jwt = JWT.create();
+  const expiresAt = 3;
+
+  sinon.stub(App.authenticator, 'scheduleAccessTokenRefresh', () => { return null; });
+
+  let token = {};
+
+  token[jwt.identificationField] = 'test@test.com';
+  token[jwt.tokenExpireName] = expiresAt;
+
+  token = createFakeToken(token);
+
+  App.server.respondWith('POST', jwt.serverTokenRefreshEndpoint, [
+    500, {
+      'Content-Type': 'application/json'
+    },
+    '{ "error": "Internal Server Error"}'
+  ]);
+
+  const spy = sinon.spy(App.authenticator, 'invalidate');
+
+  App.authenticator.refreshAccessToken(token);
+
+  assert.equal(spy.calledOnce, false);
+});
+
 test('#getTokenData returns correct data', assert => {
   assert.expect(2);
 
