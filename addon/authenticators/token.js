@@ -145,8 +145,8 @@ export default Base.extend({
   */
   getAuthenticateData(credentials) {
     const authentication = {
-      [this.passwordField]: credentials.password,
-      [this.identificationField]: credentials.identification
+      [this.passwordField]: credentials[this.passwordField],
+      [this.identificationField]: credentials[this.identificationField]
     };
 
     return authentication;
