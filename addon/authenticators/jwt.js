@@ -201,7 +201,7 @@ export default TokenAuthenticator.extend({
 
       if (!Ember.isEmpty(token) && !Ember.isEmpty(expiresAt) && wait > 0) {
         Ember.run.cancel(this._refreshTokenTimeout);
-        Reflect.deleteProperty(this, '_refreshTokenTimeout');
+        delete this._refreshTokenTimeout;
         this._refreshTokenTimeout = Ember.run.later(this, this.refreshAccessToken, token, wait);
       }
     }
@@ -325,7 +325,7 @@ export default TokenAuthenticator.extend({
   */
   invalidate() {
     Ember.run.cancel(this._refreshTokenTimeout);
-    Reflect.deleteProperty(this, '_refreshTokenTimeout');
+    delete this._refreshTokenTimeout;
     return new Ember.RSVP.resolve();
   },
 
