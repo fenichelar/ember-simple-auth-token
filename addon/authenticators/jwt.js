@@ -305,7 +305,9 @@ export default TokenAuthenticator.extend({
       contentType: 'application/json',
       headers: this.headers,
       beforeSend: (xhr, settings) => {
-        xhr.setRequestHeader('Accept', settings.accepts.json);
+        if(this.headers['Accept'] === null || this.headers['Accept'] === undefined) {
+          xhr.setRequestHeader('Accept', settings.accepts.json);
+        }
 
         if (headers) {
           Object.keys(headers).forEach((key) => {
