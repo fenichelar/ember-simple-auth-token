@@ -104,7 +104,7 @@ export default Ember.Controller.extend({
 ```
 
 Please note, the JWT authenticator will decode a token and look for the
-expiration time found by looking up the token[Config.tokenExpireName]. It then
+expiration time found by looking up the `token[Config.tokenExpireName]``. It then
 calculates the difference between the current time and the token expire time —
 from which the *refreshLeeway* is subtracted — to determine when to make the
 next automatic token refresh request.
@@ -135,7 +135,7 @@ token = {
 *In this case the token expire name is using the default `exp` as set by the
 `Config.tokenExpireName` property.*
 
-An automatic token refresh request would be sent out at token[Config.tokenExpireName] - now(). A good practice with regards to token refreshing is to also set a "leeway", usually no more than a few minutes, to account for clock skew when decoding JSON Web Tokens in the server-side. Some libraries like [PyJWT][pyjwt] and [ruby-jwt][ruby-jwt] already support this.
+An automatic token refresh request would be sent out at `token[Config.tokenExpireName] - now()``. A good practice with regards to token refreshing is to also set a "leeway", usually no more than a few minutes, to account for clock skew when decoding JSON Web Tokens in the server-side. Some libraries like [PyJWT][pyjwt] and [ruby-jwt][ruby-jwt] already support this.
 
 ## The Authorizer
 
