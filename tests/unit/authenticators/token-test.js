@@ -187,7 +187,8 @@ test('#authenticate sends an AJAX request with custom headers', assert => {
 
   Configuration.headers = {
     'X-API-KEY': '123-abc',
-    'X-ANOTHER-HEADER': 0
+    'X-ANOTHER-HEADER': 0,
+    Accept: 'application/vnd.api+json'
   };
   App.authenticator = Token.create();
   App.authenticator.authenticate(credentials);
@@ -203,7 +204,8 @@ test('#authenticate sends an AJAX request with custom headers', assert => {
       contentType: 'application/json',
       headers: {
         'X-API-KEY': '123-abc',
-        'X-ANOTHER-HEADER': 0
+        'X-ANOTHER-HEADER': 0,
+        Accept: 'application/vnd.api+json'
       }
     });
   });

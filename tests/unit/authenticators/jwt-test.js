@@ -597,6 +597,41 @@ test('#authenticate does not schedule a token refresh when `refreshAccessTokens`
   });
 });
 
+test('#authenticate sends an AJAX request with custom headers', assert => {
+  assert.expect(1);
+
+  const credentials = {
+    identification: 'username',
+    password: 'password'
+  };
+
+  Configuration.headers = {
+    'X-API-KEY': '123-abc',
+    'X-ANOTHER-HEADER': 0,
+    Accept: 'application/vnd.api+json'
+  };
+
+  App.authenticator = JWT.create();
+  App.authenticator.authenticate(credentials);
+
+  Ember.run(() => {
+    var args = Ember.$.ajax.getCall(0).args[0];
+    delete args.beforeSend;
+    assert.deepEqual(args, {
+      url: '/api/token-auth/',
+      method: 'POST',
+      data: '{"password":"password","username":"username"}',
+      dataType: 'json',
+      contentType: 'application/json',
+      headers: {
+        'X-API-KEY': '123-abc',
+        'X-ANOTHER-HEADER': 0,
+        Accept: 'application/vnd.api+json'
+      }
+    });
+  });
+});
+
 test('#refreshAccessToken makes an AJAX request to the token endpoint.', assert => {
   assert.expect(1);
 
