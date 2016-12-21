@@ -125,7 +125,7 @@ export default TokenAuthenticator.extend({
       }
 
       if (expiresAt > now) {
-        const wait = expiresAt - now - (this.refreshLeeway * 1000);
+        const wait = (expiresAt - now - this.refreshLeeway) * 1000;
 
         if (wait > 0) {
           if (this.refreshAccessTokens) {
@@ -197,7 +197,7 @@ export default TokenAuthenticator.extend({
       expiresAt = this.resolveTime(expiresAt);
 
       const now = this.getCurrentTime();
-      const wait = expiresAt - now - (this.refreshLeeway * 1000);
+      const wait = (expiresAt - now - this.refreshLeeway) * 1000;
 
       if (!Ember.isEmpty(token) && !Ember.isEmpty(expiresAt) && wait > 0) {
         Ember.run.cancel(this._refreshTokenTimeout);
