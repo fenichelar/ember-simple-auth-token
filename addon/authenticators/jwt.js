@@ -331,8 +331,13 @@ export default TokenAuthenticator.extend({
     return new Ember.RSVP.resolve();
   },
 
+  /**
+    Returns the current time as a timestamp in seconds
+    @method getCurrentTime
+    @return {Integer} timestamp
+  */
   getCurrentTime() {
-    return (new Date()).getTime();
+    return Math.floor((new Date()).getTime() / 1000);
   },
 
   /**
