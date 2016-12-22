@@ -165,7 +165,7 @@ import DS from 'ember-data';
 import DataAdapterMixin from 'ember-simple-auth/mixins/data-adapter-mixin';
 
 export default DS.JSONAPIAdapter.extend(DataAdapterMixin, {
-  authorizer: 'authorizer:application'
+  authorizer: 'authorizer:token' //or authorizer: 'authorizer:jwt'
 });
 ```
 *DataAdapterMixin is supported for Ember 1.13 and above*
