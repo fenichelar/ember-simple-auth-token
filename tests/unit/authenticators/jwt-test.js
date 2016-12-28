@@ -64,14 +64,6 @@ test('assigns tokenExpireName from the configuration object', assert => {
   Configuration.load({}, {});
 });
 
-test('assigns timeFactor from the configuration object', assert => {
-  Configuration.timeFactor = 'timeFactor';
-
-  assert.equal(JWT.create().timeFactor, 'timeFactor');
-
-  Configuration.load({}, {});
-});
-
 test('#restore resolves when the data includes `token` and `expiresAt`', assert => {
   assert.expect(1);
 
