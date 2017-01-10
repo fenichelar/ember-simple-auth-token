@@ -62,9 +62,9 @@ export default TokenAuthenticator.extend({
     Default time unit.
     @property timeFactor
     @type Integer
-    @default 1 (seconds)
+    @default 1000 (milliseconds)
   */
-  timeFactor: 1,
+  timeFactor: 1000,
 
   /**
     @method init

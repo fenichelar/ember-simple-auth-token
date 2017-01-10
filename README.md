@@ -117,7 +117,7 @@ For example, with the following configuration:
   };
   ENV['ember-simple-auth-token'] = {
     refreshAccessTokens: true,
-    timeFactor: 1,
+    timeFactor: 1000,
     refreshLeeway: 300 // Refresh the token 5 minutes (300s) before it expires.
   };
 ```
@@ -194,7 +194,7 @@ For the JWT authenticator (in addition to the Token authenticator fields):
   serverTokenRefreshEndpoint: '/api/token-refresh/',
   tokenExpireName: 'exp',
   refreshLeeway: 0,
-  timeFactor: 1  // example - set to "1000" to convert incoming seconds to milliseconds.
+  timeFactor: 1000  // example - set to "1" to convert incoming seconds to seconds.
 ```
 
 [build-status-image]: https://travis-ci.org/jpadilla/ember-simple-auth-token.svg?branch=master

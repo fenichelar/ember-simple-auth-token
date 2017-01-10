@@ -11,7 +11,7 @@ var defaults = {
   tokenExpireName: 'exp',
   authorizationPrefix: 'Bearer ',
   authorizationHeaderName: 'Authorization',
-  timeFactor: 1,
+  timeFactor: 1000,
   headers: {}
 };
 
@@ -119,9 +119,9 @@ export default {
     Default time unit.
     @property timeFactor
     @type Integer
-    @default 1 (seconds)
+    @default 1 (milliseconds)
   */
-  timeFactor: 1,
+  timeFactor: 1000,
 
   /**
     The prefix used in the value of the Authorization header.
