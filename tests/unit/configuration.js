@@ -49,7 +49,3 @@ test('refreshLeeway', assert => {
 test('tokenExpireName', assert => {
   assert.equal(Configuration.tokenExpireName, 'exp', 'defaults to "exp"');
 });
-
-test('timeFactor', assert => {
-  assert.equal(Configuration.timeFactor, 1, 'defaults to 1');
-});
