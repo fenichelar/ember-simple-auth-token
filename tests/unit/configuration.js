@@ -26,6 +26,10 @@ test('tokenPropertyName', assert => {
   assert.equal(Configuration.tokenPropertyName, 'token', 'defaults to "token"');
 });
 
+test('refreshTokenPropertyName', assert => {
+  assert.equal(Configuration.refreshTokenPropertyName, 'refresh_token', 'defaults to "refresh_token"');
+});
+
 test('authorizationPrefix', assert => {
   assert.equal(Configuration.authorizationPrefix, 'Bearer ', 'defaults to "Bearer "');
 });
