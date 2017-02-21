@@ -180,6 +180,7 @@ ENV['ember-simple-auth-token'] = {
   identificationField: 'username',
   passwordField: 'password',
   tokenPropertyName: 'token',
+  refreshTokenPropertyName: 'refresh_token',
   authorizationPrefix: 'Bearer ',
   authorizationHeaderName: 'Authorization',
   headers: {},
@@ -194,6 +195,14 @@ For the JWT authenticator (in addition to the Token authenticator fields):
   tokenExpireName: 'exp',
   refreshLeeway: 0
 ```
+
+Since version 3.0 we are supporting refresh tokens.
+If your token implementation manages your *access token* and *refresh token* separately you can specify the property names under `tokenPropertyName` and `refreshTokenPropertyName` on your `ember-simple-auth-token` JSON.
+If your token implementation checks the authorization directly against your access token and you need to refresh it you can specify the token name on `refreshTokenPropertyName`.
+
+For more information:
+[Refresh tokens what are they and when to use them]: https://auth0.com/blog/refresh-tokens-what-are-they-and-when-to-use-them/
+
 
 [build-status-image]: https://travis-ci.org/jpadilla/ember-simple-auth-token.svg?branch=master
 [travis]: https://travis-ci.org/jpadilla/ember-simple-auth-token
