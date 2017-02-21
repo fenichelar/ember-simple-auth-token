@@ -201,7 +201,7 @@ If your token implementation manages your *access token* and *refresh token* sep
 If your token implementation checks the authorization directly against your access token and you need to refresh it you can specify the token name on `refreshTokenPropertyName`.
 
 For more information:
-[Refresh tokens what are they and when to use them]: https://auth0.com/blog/refresh-tokens-what-are-they-and-when-to-use-them/
+[Refresh tokens what are they and when to use them](https://auth0.com/blog/refresh-tokens-what-are-they-and-when-to-use-them/)
 
 
 [build-status-image]: https://travis-ci.org/jpadilla/ember-simple-auth-token.svg?branch=master
