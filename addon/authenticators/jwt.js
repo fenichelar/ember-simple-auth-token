@@ -131,7 +131,14 @@ export default TokenAuthenticator.extend({
           reject(new Error('unable to refresh token'));
         }
       } else {
-        reject(new Error('token is expired'));
+        // the refresh token might not be expired,
+        // we can't test this on the client so attempt to refresh the token.
+        // If the server rejects the token the user session will be invalidated
+        if (this.refreshAccessTokens) {
+          resolve(this.refreshAccessToken(refreshToken));
+        } else {
+          reject(new Error('token is expired'));
+        }
       }
     });
   },
