@@ -12,6 +12,10 @@ const createFakeToken = obj => {
   return 'a.' + token + '.b';
 };
 
+const createFakeRefreshToken = () => {
+  return window.btoa('91df47a8-8c7f-4411-98e7-43bfd32df5c4');
+};
+
 const getConvertedTime = time => {
   return time * 1000;
 };
@@ -79,6 +83,8 @@ test('#restore resolves when the data includes `token` and `expiresAt`', assert 
 
   token = createFakeToken(token);
 
+  let refreshToken = createFakeRefreshToken();
+
   const data = {};
   data[jwt.tokenPropertyName] = token;
   data[jwt.tokenExpireName] = expiresAt;
@@ -87,7 +93,7 @@ test('#restore resolves when the data includes `token` and `expiresAt`', assert 
     201, {
       'Content-Type': 'application/json'
     },
-    '{ "token": "' + token + '"}'
+    '{ "token": "' + token + '", "refresh_token": "' + refreshToken + '" }'
   ]);
 
   Ember.run(() => {
@@ -115,6 +121,8 @@ test('#restore resolves when the data includes `token` and excludes `expiresAt`'
 
   token = createFakeToken(token);
 
+  let refreshToken = createFakeRefreshToken();
+
   const data = {};
   data[jwt.tokenPropertyName] = token;
   data[jwt.tokenExpireName] = expiresAt;
@@ -123,7 +131,7 @@ test('#restore resolves when the data includes `token` and excludes `expiresAt`'
     201, {
       'Content-Type': 'application/json'
     },
-    '{ "token": "' + token + '"}'
+    '{ "token": "' + token + '", "refresh_token": "' + refreshToken + '" }'
   ]);
 
   Ember.run(() => {
@@ -146,6 +154,8 @@ test('#restore rejects when `refreshAccessTokens` is false and token is expired'
 
   token = createFakeToken(token);
 
+  let refreshToken = createFakeRefreshToken();
+
   const data = {};
   data[jwt.tokenPropertyName] = token;
   data[jwt.tokenExpireName] = expiresAt;
@@ -156,7 +166,7 @@ test('#restore rejects when `refreshAccessTokens` is false and token is expired'
     201, {
       'Content-Type': 'application/json'
     },
-    '{ "token": "' + token + '"}'
+    '{ "token": "' + token + '", "refresh_token": "' + refreshToken + '" }'
   ]);
 
   Ember.run(() => {
@@ -217,6 +227,8 @@ test('#restore rejects when `token` is excluded.', assert => {
 
   token = createFakeToken(token);
 
+  let refreshToken = createFakeRefreshToken();
+
   const data = {};
   data[jwt.tokenExpireName] = expiresAt;
 
@@ -224,7 +236,7 @@ test('#restore rejects when `token` is excluded.', assert => {
     201, {
       'Content-Type': 'application/json'
     },
-    '{ "token": "' + token + '"}'
+    '{ "token": "' + token + '", "refresh_token": "' + refreshToken + '" }'
   ]);
 
   Ember.run(() => {
@@ -252,6 +264,8 @@ test('#restore resolves when `expiresAt` is greater than `now`', assert => {
 
   token = createFakeToken(token);
 
+  let refreshToken = createFakeRefreshToken();
+
   const data = {};
   data[jwt.tokenPropertyName] = token;
   data[jwt.tokenExpireName] = expiresAt;
@@ -262,7 +276,7 @@ test('#restore resolves when `expiresAt` is greater than `now`', assert => {
     201, {
       'Content-Type': 'application/json'
     },
-    '{ "token": "' + token + '"}'
+    '{ "token": "' + token + '", "refresh_token": "' + refreshToken + '" }'
   ]);
 
   Ember.run(() => {
@@ -291,8 +305,11 @@ test('#restore schedules a token refresh when `refreshAccessTokens` is true.', a
 
   token = createFakeToken(token);
 
+  let refreshToken = createFakeRefreshToken();
+
   const data = {};
   data[jwt.tokenPropertyName] = token;
+  data[jwt.refreshTokenPropertyName] = refreshToken;
   data[jwt.tokenExpireName] = expiresAt;
 
   const refreshedToken = {};
@@ -305,7 +322,7 @@ test('#restore schedules a token refresh when `refreshAccessTokens` is true.', a
     201, {
       'Content-Type': 'application/json'
     },
-    '{ "token": "' + token + '" }'
+    '{ "token": "' + token + '", "refresh_token": "' + refreshToken + '" }'
   ]);
 
   Ember.run(() => {
@@ -313,7 +330,7 @@ test('#restore schedules a token refresh when `refreshAccessTokens` is true.', a
       // Check that Ember.run.later ran.
       var spyCall = Ember.run.later.getCall(0);
       assert.deepEqual(spyCall.args[1], App.authenticator.refreshAccessToken);
-      assert.deepEqual(spyCall.args[2], token);
+      assert.deepEqual(spyCall.args[2], refreshToken);
 
       App.authenticator.refreshAccessToken.restore();
     });
@@ -432,8 +449,11 @@ test('#restore schedule access token refresh and refreshes it when time is appro
 
   token = createFakeToken(token);
 
+  let refreshToken = createFakeRefreshToken();
+
   const data = {};
   data[jwt.tokenPropertyName] = token;
+  data[jwt.refreshTokenPropertyName] = refreshToken;
   data[jwt.tokenExpireName] = expiresAt;
 
   // Set the refreshLeeway to > expiresAt.
@@ -460,12 +480,12 @@ test('#restore schedule access token refresh and refreshes it when time is appro
     201, {
       'Content-Type': 'application/json'
     },
-    '{ "token": "' + token + '" }'
+    '{ "token": "' + token + '", "refresh_token": "' + refreshToken + '" }'
   ]);
 
   Ember.run(() => {
     refreshAccessToken.call(refreshAccessTokenTarget, refreshAccessTokenArgs).then(response => {
-      assert.deepEqual(response, { exp: expiresAt, token: token });
+      assert.deepEqual(response, { exp: expiresAt, token: token, 'refresh_token': refreshToken });
     });
   });
 });
@@ -533,6 +553,8 @@ test('#authenticate schedules a token refresh when `refreshAccessTokens` is true
 
   token = createFakeToken(token);
 
+  let refreshToken = createFakeRefreshToken();
+
   const credentials = {
     identification: 'username',
     password: 'password'
@@ -542,14 +564,14 @@ test('#authenticate schedules a token refresh when `refreshAccessTokens` is true
     201, {
       'Content-Type': 'application/json'
     },
-    '{ "token": "' + token + '"}'
+    '{ "token": "' + token + '", "refresh_token": "' + refreshToken + '" }'
   ]);
 
   Ember.run(() => {
     App.authenticator.authenticate(credentials).then(() => {
       var spyCall = Ember.run.later.getCall(0);
       assert.deepEqual(spyCall.args[1], App.authenticator.refreshAccessToken);
-      assert.deepEqual(spyCall.args[2], token);
+      assert.deepEqual(spyCall.args[2], refreshToken);
     });
   });
 });
@@ -566,6 +588,8 @@ test('#authenticate does not schedule a token refresh when `refreshAccessTokens`
 
   token = createFakeToken(token);
 
+  let refreshToken = createFakeRefreshToken();
+
   const credentials = {
     identification: 'username',
     password: 'password'
@@ -575,7 +599,7 @@ test('#authenticate does not schedule a token refresh when `refreshAccessTokens`
     201, {
       'Content-Type': 'application/json'
     },
-    '{ "token": "' + token + '"}'
+    '{ "token": "' + token + '", "refresh_token": "' + refreshToken + '" }'
   ]);
 
   App.authenticator.refreshAccessTokens = false;
@@ -630,11 +654,7 @@ test('#refreshAccessToken makes an AJAX request to the token endpoint.', assert 
   const jwt = JWT.create(),
     expiresAt = 3;
 
-  let token = {};
-  token[jwt.identificationField] = 'test@test.com';
-  token[jwt.tokenExpireName] = expiresAt;
-
-  token = createFakeToken(token);
+  let token = createFakeRefreshToken();
 
   App.authenticator.refreshAccessToken(token);
 
@@ -644,7 +664,7 @@ test('#refreshAccessToken makes an AJAX request to the token endpoint.', assert 
     assert.deepEqual(args, {
       url: jwt.serverTokenRefreshEndpoint,
       method: 'POST',
-      data: JSON.stringify({ token: token }),
+      data: JSON.stringify({ refresh_token: token }),
       dataType: 'json',
       contentType: 'application/json',
       headers: {}
@@ -652,22 +672,17 @@ test('#refreshAccessToken makes an AJAX request to the token endpoint.', assert 
   });
 });
 
-test('#refreshAccessToken makes an AJAX request to the token endpoint with nested tokenPropertyName.', assert => {
+test('#refreshAccessToken makes an AJAX request to the token endpoint with nested refreshTokenPropertyName.', assert => {
   assert.expect(1);
   const jwt = JWT.create();
   const expiresAt = 3;
 
-  let token = {};
-  token[jwt.identificationField] = 'test@test.com';
-  token[jwt.tokenExpireName] = expiresAt;
+  let token = createFakeRefreshToken();
 
-  token = createFakeToken(token);
+  let refreshTokenPropertyNameWas = App.authenticator.refreshTokenPropertyName;
 
-  let authenticator = App.authenticator;
-  let tokenPropertyNameWas = authenticator.tokenPropertyName;
-
-  authenticator.tokenPropertyName = 'auth.nested.token';
-  authenticator.refreshAccessToken(token);
+  App.authenticator.refreshTokenPropertyName = 'auth.nested.token';
+  App.authenticator.refreshAccessToken(token);
 
   Ember.run(() => {
     var args = Ember.$.ajax.getCall(0).args[0];
@@ -698,11 +713,13 @@ test('#refreshAccessToken triggers the `sessionDataUpdated` event on successful 
 
   token = createFakeToken(token);
 
+  let refreshToken = createFakeRefreshToken();
+
   App.server.respondWith('POST', jwt.serverTokenRefreshEndpoint, [
     201, {
       'Content-Type': 'application/json'
     },
-    '{ "token": "' + token + '"}'
+    '{ "token": "' + token + '", "refresh_token": "' + refreshToken + '" }'
   ]);
 
   App.authenticator.refreshAccessToken(token);

@@ -6,6 +6,7 @@ var defaults = {
   identificationField: 'username',
   passwordField: 'password',
   tokenPropertyName: 'token',
+  refreshTokenPropertyName: 'refresh_token',
   refreshAccessTokens: true,
   refreshLeeway: 0,
   tokenExpireName: 'exp',
@@ -88,6 +89,18 @@ export default {
     @default 'token'
   */
   tokenPropertyName: defaults.tokenPropertyName,
+
+  /**
+    The name of the property in session that contains token
+    used for refresh.
+
+    @property refreshTokenPropertyName
+    @readOnly
+    @static
+    @type String
+    @default 'refresh_token'
+  */
+  refreshTokenPropertyName: defaults.refreshTokenPropertyName,
 
   /**
     Sets whether the authenticator automatically refreshes access tokens.
