@@ -173,8 +173,10 @@ test('#restore rejects when `refreshAccessTokens` is false and token is expired'
     App.authenticator.restore(data).then(() => {
       assert.ok(false);
     }, () => {
-      // Check that Ember.run.later was not called.
-      assert.deepEqual(Ember.run.later.getCall(0), null);
+      // Check that refreshAccessToken was not scheduled
+      assert.equal(Ember.run.later.getCalls().some((call) => {
+        return call.args[1] === App.authenticator.refreshAccessToken;
+      }), false);
     });
   });
 });
@@ -329,8 +331,7 @@ test('#restore schedules a token refresh when `refreshAccessTokens` is true.', a
 
   Ember.run(() => {
     App.authenticator.restore(data).then(() => {
-      // Check that Ember.run.later ran.
-      var spyCall = Ember.run.later.getCall(0);
+      // Check that refreshAccessToken was scheduled
       assert.equal(Ember.run.later.getCalls().some((call) => {
         return call.args[1] === App.authenticator.refreshAccessToken &&
           call.args[2] === refreshToken;
@@ -606,7 +607,7 @@ test('#authenticate rejects with invalid credentials', assert => {
 });
 
 test('#authenticate schedules a token refresh when `refreshAccessTokens` is true', assert => {
-  assert.expect(2);
+  assert.expect(1);
 
   const jwt = JWT.create(),
     expiresAt = new Date().getTime() + 300000;
@@ -633,9 +634,11 @@ test('#authenticate schedules a token refresh when `refreshAccessTokens` is true
 
   Ember.run(() => {
     App.authenticator.authenticate(credentials).then(() => {
-      var spyCall = Ember.run.later.getCall(0);
-      assert.deepEqual(spyCall.args[1], App.authenticator.refreshAccessToken);
-      assert.deepEqual(spyCall.args[2], refreshToken);
+      // Check that refreshAccessToken was scheduled
+      assert.equal(Ember.run.later.getCalls().some((call) => {
+        return call.args[1] === App.authenticator.refreshAccessToken &&
+          call.args[2] === refreshToken;
+      }), true);
     });
   });
 });
@@ -670,9 +673,46 @@ test('#authenticate does not schedule a token refresh when `refreshAccessTokens`
 
   Ember.run(() => {
     App.authenticator.authenticate(credentials).then(() => {
-      // Check that Ember.run.later ran.
-      var spyCall = Ember.run.later.getCall(0);
-      assert.deepEqual(spyCall, null);
+      // Check that refreshAccessToken was not scheduled
+      assert.equal(Ember.run.later.getCalls().some((call) => {
+        return call.args[1] === App.authenticator.refreshAccessToken;
+      }), false);
+    });
+  });
+});
+
+test('#authenticate schedules a token expiration', assert => {
+  assert.expect(1);
+
+  const jwt = JWT.create(),
+    expiresAt = new Date().getTime() + 300000;
+
+  let token = {};
+  token[jwt.identificationField] = 'test@test.com';
+  token[jwt.tokenExpireName] = expiresAt;
+
+  token = createFakeToken(token);
+
+  let refreshToken = createFakeRefreshToken();
+
+  const credentials = {
+    identification: 'username',
+    password: 'password'
+  };
+
+  App.server.respondWith('POST', jwt.serverTokenEndpoint, [
+    201, {
+      'Content-Type': 'application/json'
+    },
+    '{ "token": "' + token + '", "refresh_token": "' + refreshToken + '" }'
+  ]);
+
+  Ember.run(() => {
+    App.authenticator.authenticate(credentials).then(() => {
+      // Check that expireAccessToken was scheduled
+      assert.equal(Ember.run.later.getCalls().some((call) => {
+        return call.args[1] === App.authenticator.handleAccessTokenExpiration;
+      }), true);
     });
   });
 });
