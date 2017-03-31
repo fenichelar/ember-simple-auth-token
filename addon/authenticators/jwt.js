@@ -120,6 +120,8 @@ export default TokenAuthenticator.extend({
       if (expiresAt > now) {
         const wait = (expiresAt - now - this.refreshLeeway) * 1000;
 
+        this.scheduleAccessTokenExpiration(expiresAt);
+
         if (wait > 0) {
           if (this.refreshAccessTokens) {
             this.scheduleAccessTokenRefresh(dataObject.get(this.tokenExpireName), refreshToken);
@@ -319,6 +321,23 @@ export default TokenAuthenticator.extend({
   },
 
   /**
+    Schedules session invalidation at the time token expires.
+
+    @method scheduleAccessTokenExpiration
+    @private
+  */
+  scheduleAccessTokenExpiration(expiresAt) {
+    const now = this.getCurrentTime();
+    const wait = Math.max((expiresAt - now) * 1000, 0);
+
+    if (!Ember.isEmpty(expiresAt)) {
+      Ember.run.cancel(this._tokenExpirationTimeout);
+      delete this._tokenExpirationTimeout;
+      this._tokenExpirationTimeout = Ember.run.later(this, this.handleAccessTokenExpiration, wait);
+    }
+  },
+
+  /**
     Cancels any outstanding automatic token refreshes and returns a resolving
     promise.
     @method invalidate
@@ -328,6 +347,8 @@ export default TokenAuthenticator.extend({
   invalidate() {
     Ember.run.cancel(this._refreshTokenTimeout);
     delete this._refreshTokenTimeout;
+    Ember.run.cancel(this._tokenExpirationTimeout);
+    delete this._tokenExpirationTimeout;
     return new Ember.RSVP.resolve();
   },
 
@@ -386,5 +407,15 @@ export default TokenAuthenticator.extend({
         this.trigger('sessionDataInvalidated');
       });
     }
+  },
+
+  /**
+    Handles access token expiration
+
+    @method handleAccessTokenExpiration
+    @private
+  */
+  handleAccessTokenExpiration() {
+    this.invalidate();
   }
 });
