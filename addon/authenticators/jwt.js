@@ -388,6 +388,7 @@ export default TokenAuthenticator.extend({
       }
 
       this.scheduleAccessTokenRefresh(expiresAt, refreshToken);
+      this.scheduleAccessTokenExpiration(expiresAt);
     }
 
     return assign(this.getResponseData(response), tokenExpireData);
