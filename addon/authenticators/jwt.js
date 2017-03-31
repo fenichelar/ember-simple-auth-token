@@ -379,6 +379,7 @@ export default TokenAuthenticator.extend({
     const tokenExpireData = {};
 
     tokenExpireData[this.tokenExpireName] = expiresAt;
+    this.scheduleAccessTokenExpiration(expiresAt);
 
     if (this.refreshAccessTokens) {
       const refreshToken = Ember.get(response, this.refreshTokenPropertyName);
@@ -388,7 +389,6 @@ export default TokenAuthenticator.extend({
       }
 
       this.scheduleAccessTokenRefresh(expiresAt, refreshToken);
-      this.scheduleAccessTokenExpiration(expiresAt);
     }
 
     return assign(this.getResponseData(response), tokenExpireData);
@@ -411,12 +411,16 @@ export default TokenAuthenticator.extend({
   },
 
   /**
-    Handles access token expiration
+    Handles access token expiration. After token expiration the session will
+    be invalidated and the sessionInvalidated provided by ember-simple-auth
+    will be triggered.
 
     @method handleAccessTokenExpiration
     @private
   */
   handleAccessTokenExpiration() {
-    this.invalidate();
+    return this.invalidate().then(() => {
+        this.trigger('sessionDataInvalidated');
+    });
   }
 });
