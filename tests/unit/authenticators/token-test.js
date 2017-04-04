@@ -47,6 +47,14 @@ test('assigns passwordField from the configuration object', assert => {
   Configuration.load({}, {});
 });
 
+test('assigns otpField from the configuration object', assert => {
+  Configuration.otpField = 'otpField';
+
+  assert.equal(Token.create().otpField, 'otpField');
+
+  Configuration.load({}, {});
+});
+
 test('assigns tokenPropertyName from the configuration object', assert => {
   Configuration.tokenPropertyName = 'tokenPropertyName';
 
@@ -131,6 +139,29 @@ test('#authenticate sends an AJAX request to the sign in endpoint', assert => {
   });
 });
 
+test('#authenticate sends an AJAX request to the sign in endpoint with otp', assert => {
+  const credentials = {
+    identification: 'username',
+    password: 'password',
+    otp: 'otp'
+  };
+
+  App.authenticator.authenticate(credentials);
+
+  Ember.run(() => {
+    var args = Ember.$.ajax.getCall(0).args[0];
+    delete args.beforeSend;
+    assert.deepEqual(args, {
+      url: '/api/token-auth/',
+      method: 'POST',
+      data: '{"password":"password","otp":"otp","username":"username"}',
+      dataType: 'json',
+      contentType: 'application/json',
+      headers: {}
+    });
+  });
+});
+
 test('#authenticate sends an AJAX request to the sign in endpoint with custom fields', assert => {
   const credentials = {
     identification: 'username',
@@ -151,6 +182,35 @@ test('#authenticate sends an AJAX request to the sign in endpoint with custom fi
       url: '/api/token-auth/',
       method: 'POST',
       data: '{"api-key":"password","api-user":"username"}',
+      dataType: 'json',
+      contentType: 'application/json',
+      headers: {}
+    });
+  });
+});
+
+test('#authenticate sends an AJAX request to the sign in endpoint with otp and custom fields', assert => {
+  const credentials = {
+    identification: 'username',
+    password: 'password',
+    otp: 'otp'
+  };
+
+  Configuration.identificationField = 'api-user';
+  Configuration.passwordField = 'api-key';
+  Configuration.otpField = 'api-otp';
+
+  App.authenticator = Token.create();
+  App.authenticator.authenticate(credentials);
+
+  Ember.run(() => {
+    var args = Ember.$.ajax.getCall(0).args[0];
+    delete args.beforeSend;
+
+    assert.deepEqual(args, {
+      url: '/api/token-auth/',
+      method: 'POST',
+      data: '{"api-key":"password","api-otp":"otp","api-user":"username"}',
       dataType: 'json',
       contentType: 'application/json',
       headers: {}

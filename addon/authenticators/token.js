@@ -53,6 +53,19 @@ export default Base.extend({
   passwordField: 'password',
 
   /**
+    The attribute-name that is used for the one time password field when sending the
+    authentication data to the server.
+
+    This value can be configured via
+    [`SimpleAuth.Configuration.Token#otpfield`](#SimpleAuth-Configuration-Token-otpfield).
+
+    @property passwordField
+    @type String
+    @default 'password'
+  */
+  otpField: 'otp',
+
+  /**
     The name of the property in session that contains token used for authorization.
 
     This value can be configured via
@@ -84,6 +97,7 @@ export default Base.extend({
     this.serverTokenEndpoint = Configuration.serverTokenEndpoint;
     this.identificationField = Configuration.identificationField;
     this.passwordField = Configuration.passwordField;
+    this.otpField = Configuration.otpField;
     this.tokenPropertyName = Configuration.tokenPropertyName;
     this.headers = Configuration.headers;
   },
@@ -146,6 +160,7 @@ export default Base.extend({
   getAuthenticateData(credentials) {
     const authentication = {
       [this.passwordField]: credentials.password,
+      [this.otpField]: credentials.otp,
       [this.identificationField]: credentials.identification
     };
 

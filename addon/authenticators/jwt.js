@@ -67,6 +67,7 @@ export default TokenAuthenticator.extend({
     this.serverTokenRefreshEndpoint = Configuration.serverTokenRefreshEndpoint;
     this.identificationField = Configuration.identificationField;
     this.passwordField = Configuration.passwordField;
+    this.otpField = Configuration.otpField;
     this.tokenPropertyName = Configuration.tokenPropertyName;
     this.refreshTokenPropertyName = Configuration.refreshTokenPropertyName;
     this.refreshAccessTokens = Configuration.refreshAccessTokens;
