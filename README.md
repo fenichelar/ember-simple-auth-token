@@ -27,7 +27,7 @@ ember install ember-simple-auth
 To install simply run:
 
 ```
-ember install ember-simple-auth-token
+ember install ember-cli-simple-auth-token
 ```
 
 ## The Authenticators
