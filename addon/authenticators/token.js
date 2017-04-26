@@ -59,9 +59,9 @@ export default Base.extend({
     This value can be configured via
     [`SimpleAuth.Configuration.Token#otpfield`](#SimpleAuth-Configuration-Token-otpfield).
 
-    @property passwordField
+    @property otpField
     @type String
-    @default 'password'
+    @default 'otp'
   */
   otpField: 'otp',
 
