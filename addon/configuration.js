@@ -5,6 +5,7 @@ var defaults = {
   serverTokenRefreshEndpoint: '/api/token-refresh/',
   identificationField: 'username',
   passwordField: 'password',
+  otpField: 'otp',
   tokenPropertyName: 'token',
   refreshTokenPropertyName: 'refresh_token',
   refreshAccessTokens: true,
@@ -77,6 +78,18 @@ export default {
     @default 'password'
   */
   passwordField: defaults.passwordField,
+
+  /**
+    The attribute-name that is used for the one time password field when sending
+    the authentication data to the server.
+
+    @property otpField
+    @readOnly
+    @static
+    @type String
+    @default 'otp'
+  */
+  otpField: defaults.otpField,
 
   /**
     The name of the property in session that contains token

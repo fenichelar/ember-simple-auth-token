@@ -42,7 +42,7 @@ Router.map(function() {
 ```
 
 This route displays the login form with fields for `identification`,
-`password`:
+`password`, and optionally `otp`:
 
 ```html
 {{! app/templates/login.hbs }}
@@ -179,6 +179,7 @@ ENV['ember-simple-auth-token'] = {
   serverTokenEndpoint: '/api/token-auth/',
   identificationField: 'username',
   passwordField: 'password',
+  otpField: 'otp',
   tokenPropertyName: 'token',
   refreshTokenPropertyName: 'refresh_token',
   authorizationPrefix: 'Bearer ',
