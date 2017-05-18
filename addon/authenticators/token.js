@@ -1,4 +1,5 @@
 import Ember from 'ember';
+import fetch from 'fetch';
 import Base from 'ember-simple-auth/authenticators/base';
 import Configuration from '../configuration';
 
@@ -180,24 +181,14 @@ export default Base.extend({
     @private
   */
   makeRequest(data, headers) {
-    return Ember.$.ajax({
-      url: this.serverTokenEndpoint,
-      method: 'POST',
-      data: JSON.stringify(data),
-      dataType: 'json',
-      contentType: 'application/json',
-      headers: this.headers,
-      beforeSend: (xhr, settings) => {
-        if(this.headers['Accept'] === null || this.headers['Accept'] === undefined) {
-          xhr.setRequestHeader('Accept', settings.accepts.json);
-        }
+    let modifiedHeaders = Ember.merge({
+      'Content-Type': 'application/json'
+    }, headers);
 
-        if (headers) {
-          Object.keys(headers).forEach(key => {
-            xhr.setRequestHeader(key, headers[key]);
-          });
-        }
-      }
-    });
+    return fetch(this.serverTokenEndpoint, {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: modifiedHeaders
+    }).then((response) => response.json());
   }
 });
