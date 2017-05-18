@@ -46,6 +46,7 @@
     "ember-disable-prototype-extensions": "^1.0.0",
     "ember-disable-proxy-controllers": "^1.0.1",
     "ember-export-application-global": "^1.0.4",
+    "ember-fetch": "1.5.0",
     "ember-qunit": "0.2.0",
     "ember-simple-auth": "1.0.1",
     "ember-sinon": "0.3.0",
