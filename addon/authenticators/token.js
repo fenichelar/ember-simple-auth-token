@@ -181,7 +181,7 @@ export default Base.extend({
     @private
   */
   makeRequest(data, headers) {
-    let modifiedHeaders = Ember.copy({
+    let modifiedHeaders = Ember.merge({
       'Content-Type': 'application/json'
     }, headers);
 
