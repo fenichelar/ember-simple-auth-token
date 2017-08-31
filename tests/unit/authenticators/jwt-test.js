@@ -527,9 +527,12 @@ test('#autenticate resolves with the token and its contents', assert => {
     password: 'password'
   };
 
+  const expiresAt = getConvertedTime(10000);
+
   let token = {};
   token[jwt.identificationField] = 'test@test.com';
   token['custom-field'] = 'custom-value';
+  token[jwt.tokenExpireName] = expiresAt;
 
   token = createFakeToken(token);
 
@@ -540,6 +543,7 @@ test('#autenticate resolves with the token and its contents', assert => {
   data['custom-field'] = 'custom-value';
   data[jwt.identificationField] = 'test@test.com';
   data[jwt.refreshTokenPropertyName] = refreshToken;
+  data[jwt.tokenExpireName] = expiresAt;
 
   App.server.respondWith('POST', jwt.serverTokenEndpoint, [
     201, {
