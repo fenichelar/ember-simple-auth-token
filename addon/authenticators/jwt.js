@@ -369,7 +369,7 @@ export default TokenAuthenticator.extend({
       this.scheduleAccessTokenRefresh(expiresAt, refreshToken);
     }
 
-    return assign(this.getResponseData(response), tokenExpireData);
+    return assign(this.getResponseData(response), tokenData, tokenExpireData);
   },
 
   /**

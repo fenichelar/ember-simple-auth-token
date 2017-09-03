@@ -455,6 +455,7 @@ test('#restore schedule access token refresh and refreshes it when time is appro
   data[jwt.tokenPropertyName] = token;
   data[jwt.refreshTokenPropertyName] = refreshToken;
   data[jwt.tokenExpireName] = expiresAt;
+  data[jwt.identificationField] = 'test@test.com';
 
   // Set the refreshLeeway to > expiresAt.
   App.authenticator.refreshLeeway = 120;
@@ -485,7 +486,7 @@ test('#restore schedule access token refresh and refreshes it when time is appro
 
   Ember.run(() => {
     refreshAccessToken.call(refreshAccessTokenTarget, refreshAccessTokenArgs).then(response => {
-      assert.deepEqual(response, { exp: expiresAt, token: token, 'refresh_token': refreshToken });
+      assert.deepEqual(response, data);
     });
   });
 });
@@ -512,6 +513,48 @@ test('#authenticate sends an ajax request to the token endpoint', assert => {
       dataType: 'json',
       contentType: 'application/json',
       headers: {}
+    });
+  });
+});
+
+test('#autenticate resolves with the token and its contents', assert => {
+  assert.expect(1);
+
+  const jwt = JWT.create();
+
+  const credentials = {
+    identification: 'username',
+    password: 'password'
+  };
+
+  const expiresAt = getConvertedTime(10000);
+
+  let token = {};
+  token[jwt.identificationField] = 'test@test.com';
+  token['custom-field'] = 'custom-value';
+  token[jwt.tokenExpireName] = expiresAt;
+
+  token = createFakeToken(token);
+
+  let refreshToken = createFakeRefreshToken();
+
+  const data = {};
+  data[jwt.tokenPropertyName] = token;
+  data['custom-field'] = 'custom-value';
+  data[jwt.identificationField] = 'test@test.com';
+  data[jwt.refreshTokenPropertyName] = refreshToken;
+  data[jwt.tokenExpireName] = expiresAt;
+
+  App.server.respondWith('POST', jwt.serverTokenEndpoint, [
+    201, {
+      'Content-Type': 'application/json'
+    },
+    '{ "token": "' + token + '", "refresh_token": "' + refreshToken + '" }'
+  ]);
+
+  Ember.run(() => {
+    App.authenticator.authenticate(credentials).then((response) => {
+      assert.deepEqual(response, data);
     });
   });
 });
