@@ -1,7 +1,7 @@
 ---
 language: node_js
 node_js:
-  - "0.12"
+  - "8.4.0"
 
 sudo: false
 
@@ -31,4 +31,4 @@ install:
   - bower install
 
 script:
-  - ember try:each
+  - ember try:one $EMBER_TRY_SCENARIO
