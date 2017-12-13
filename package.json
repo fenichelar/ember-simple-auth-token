@@ -42,7 +42,10 @@
     "ember-cli-shims": "^1.2.0",
     "ember-cli-sri": "^2.1.0",
     "ember-cli-uglify": "^2.0.0",
+<<<<<<< HEAD
     "ember-data": "^2.17.0",
+=======
+>>>>>>> Upgrade ember-{cli,source} to 2.17
     "ember-disable-prototype-extensions": "^1.1.2",
     "ember-disable-proxy-controllers": "^1.0.1",
     "ember-export-application-global": "^2.0.0",
