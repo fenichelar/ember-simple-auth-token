@@ -1,3 +1,4 @@
+import { module } from 'qunit';
 import { test } from 'ember-qunit';
 import sinon from 'sinon';
 import startApp from '../../helpers/start-app';
@@ -212,6 +213,8 @@ test('#authenticate sends an AJAX request with custom headers', assert => {
 });
 
 test('#authenticate rejects with the correct error', assert => {
+  const done = assert.async();
+
   const credentials = {
     email: 'email@address.com',
     password: 'password'
@@ -224,10 +227,9 @@ test('#authenticate rejects with the correct error', assert => {
     '{ "error": "invalid_grant" }'
   ]);
 
-  Ember.run(() => {
-    App.authenticator.authenticate(credentials).then(null, error => {
-      assert.deepEqual(error, { error: 'invalid_grant' });
-    });
+  App.authenticator.authenticate(credentials).then(null, error => {
+    assert.deepEqual(error, { error: 'invalid_grant' });
+    done();
   });
 });
 
