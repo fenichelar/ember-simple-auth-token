@@ -1,15 +1,20 @@
-/* jshint node: true */
+/* eslint-env node */
+'use strict';
 
 module.exports = function(environment) {
-  var ENV = {
+  let ENV = {
     modulePrefix: 'dummy',
-    environment: environment,
-    baseURL: '/',
-    locationType: 'hash',
+    environment,
+    rootURL: '/',
+    locationType: 'auto',
     EmberENV: {
       FEATURES: {
         // Here you can enable experimental features on an ember canary build
         // e.g. 'with-controller': true
+      },
+      EXTEND_PROTOTYPES: {
+        // Prevent Ember Data from overriding Date.parse.
+        Date: false
       }
     },
 
@@ -32,7 +37,7 @@ module.exports = function(environment) {
   if (environment === 'development') {
     ENV['ember-simple-auth'] = {
       authorizer: 'authorizer:token',
-      applicationRootUrl: ENV.baseURL
+      applicationRootUrl: ENV.rootURL
     };
 
     ENV['ember-simple-auth-token'] = {
@@ -45,7 +50,7 @@ module.exports = function(environment) {
 
   if (environment === 'test') {
     // Testem prefers this...
-    ENV.baseURL = '/';
+    ENV.rootURL = '/';
     ENV.locationType = 'none';
 
     // keep test console output quieter
@@ -56,12 +61,12 @@ module.exports = function(environment) {
   }
 
   if (environment === 'production') {
-    ENV.baseURL = '/ember-simple-auth-token';
+    ENV.rootURL = '/ember-simple-auth-token';
     ENV.API_URL = 'https://simple-auth-token-server.herokuapp.com';
 
     ENV['ember-simple-auth'] = {
       authorizer: 'authorizer:token',
-      applicationRootUrl: ENV.baseURL,
+      applicationRootUrl: ENV.rootURL,
       crossOriginWhitelist: [ENV.API_URL]
     };
 
