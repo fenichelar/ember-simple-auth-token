@@ -4,7 +4,7 @@ import ENV from '../config/environment';
 
 export default Ember.Route.extend(AuthenticatedRouteMixin, {
   model: function () {
-    const adapter = this.container.lookup('adapter:application');
+    const adapter = Ember.getOwner(this).lookup('adapter:application');
 
     return adapter.ajax((ENV['API_URL'] || '') + '/api/users/', 'GET');
   },

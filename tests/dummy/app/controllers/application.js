@@ -8,7 +8,7 @@ export default Ember.Controller.extend({
   }),
 
   tokenData: Ember.computed('session.session.content.authenticated', function() {
-    var authenticator = this.container.lookup('authenticator:jwt'),
+    var authenticator = Ember.getOwner(this).lookup('authenticator:jwt'),
         session = this.get('session.session.content.authenticated'),
         tokenData = {};
 
