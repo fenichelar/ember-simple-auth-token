@@ -46,7 +46,6 @@
     "ember-disable-prototype-extensions": "^1.1.2",
     "ember-disable-proxy-controllers": "^1.0.1",
     "ember-export-application-global": "^2.0.0",
-    "ember-getowner-polyfill": "^2.2.0",
     "ember-load-initializers": "^1.0.0",
     "ember-resolver": "^4.0.0",
     "ember-simple-auth": "^1.4.0",
