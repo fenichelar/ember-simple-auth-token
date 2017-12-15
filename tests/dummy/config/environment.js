@@ -66,11 +66,11 @@ module.exports = function(environment) {
 
     ENV['ember-simple-auth'] = {
       authorizer: 'authorizer:token',
-      applicationRootUrl: ENV.rootURL,
-      crossOriginWhitelist: [ENV.API_URL]
+      applicationRootUrl: ENV.rootURL
     };
 
     ENV['ember-simple-auth-token'] = {
+      refreshTokenPropertyName: 'token',
       serverTokenEndpoint: ENV.API_URL + '/api/token-auth/',
       serverTokenRefreshEndpoint: ENV.API_URL + '/api/token-refresh/',
       refreshLeeway: 5
