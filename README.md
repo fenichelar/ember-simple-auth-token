@@ -2,6 +2,7 @@
 
 [![build-status-image]][travis]
 [![ember-observer-score-image]][ember-observer]
+[![npm](https://img.shields.io/npm/v/ember-simple-auth-token.svg)]()
 
 This is an extension to the Ember Simple Auth library that provides a default token authenticator, an enhanced authenticator with automatic refresh capability, and an authorizer that are compatible with APIs with token-based authentication.
 
@@ -206,11 +207,11 @@ For more information:
 
 [build-status-image]: https://travis-ci.org/jpadilla/ember-simple-auth-token.svg?branch=master
 [travis]: https://travis-ci.org/jpadilla/ember-simple-auth-token
-[ember-observer-score-image]: http://emberobserver.com/badges/ember-simple-auth-token.svg
-[ember-observer]: http://emberobserver.com/addons/ember-simple-auth-token
+[ember-observer-score-image]: https://emberobserver.com/badges/ember-simple-auth-token.svg
+[ember-observer]: https://emberobserver.com/addons/ember-simple-auth-token
 
 [demo]: https://jpadilla.github.io/ember-simple-auth-token/
-[ember-cli]: http://ember-cli.com/
+[ember-cli]: https://ember-cli.com/
 [ember-simple-auth]: https://github.com/simplabs/ember-simple-auth
 [pyjwt]: https://github.com/jpadilla/pyjwt
 [ruby-jwt]: https://github.com/jwt/ruby-jwt
