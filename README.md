@@ -188,6 +188,8 @@ ENV['ember-simple-auth-token'] = {
 };
 ```
 
+If you need to completeley remove authorization prefix ('Bearer: '), set it to null.
+
 For the JWT authenticator (in addition to the Token authenticator fields):
 
 ```
