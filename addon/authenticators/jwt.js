@@ -165,7 +165,7 @@ export default TokenAuthenticator.extend({
       const data = this.getAuthenticateData(credentials);
 
       this.makeRequest(this.serverTokenEndpoint, data, headers)
-        .then((response) => {
+        .done((response) => {
           Ember.run(() => {
             try {
               const sessionData = this.handleAuthResponse(response);
@@ -175,7 +175,7 @@ export default TokenAuthenticator.extend({
               reject(error);
             }
           });
-        }, (xhr) => {
+        }).fail((xhr) => {
           Ember.run(() => { reject(xhr.responseJSON || xhr.responseText); });
         });
     });
