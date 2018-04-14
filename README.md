@@ -170,6 +170,18 @@ export default DS.JSONAPIAdapter.extend(DataAdapterMixin, {
 ```
 *DataAdapterMixin is supported for Ember 1.13 and above*
 
+### Deprecation in ember-simple-auth 2.0
+
+Ember Simple Auth has deprecated the use of Authorizers. The alternative is to use the `TokenAuthorizerMixin`.
+
+```js
+// app/adapters/application.js
+import DS from 'ember-data';
+import TokenAuthorizerMixin from 'ember-simple-auth-token/mixins/token-authorizer';
+
+export default DS.JSONAPIAdapter.extend(TokenAuthorizerMixin);
+```
+
 ## Available Customization Options
 
 For the Token authenticator:
