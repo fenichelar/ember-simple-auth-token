@@ -1,6 +1,7 @@
 import Ember from 'ember';
 import Base from 'ember-simple-auth/authenticators/base';
 import Configuration from '../configuration';
+import { deprecate } from '@ember/application/deprecations';
 
 /**
   Authenticator that works with token-based authentication like JWT.
@@ -125,7 +126,11 @@ export default Base.extend({
   */
   authenticate(credentials, headers) {
     return new Ember.RSVP.Promise((resolve, reject) => {
-      const data = this.getAuthenticateData(credentials);
+      let data = credentials;
+
+      if (this.checkCredentialGetAuthData(credentials)) {
+        data = this.getAuthenticateData(credentials)
+      }
 
       this.makeRequest(data, headers).then(response => {
         Ember.run(() => {
@@ -137,6 +142,19 @@ export default Base.extend({
     });
   },
 
+
+  /**
+    Returns a true false value to check if `getAuthenticateData` should be run for legacy
+
+    @param {object} credentials
+    @return {boolean} A
+  */
+  checkCredentialGetAuthData(credentials) {
+    return Object.keys(credentials) > 2
+      || this.passwordField !== 'password'
+      || this.identificationField !== 'identification';
+  },
+
   /**
     Returns an object used to be sent for authentication.
 
@@ -144,6 +162,8 @@ export default Base.extend({
     @return {object} An object with properties for authentication.
   */
   getAuthenticateData(credentials) {
+    deprecate('Ember Simple Auth Token: "getAuthenticateData" is deprecated in favor of passing in all required credentials directly.');
+
     const authentication = {
       [this.passwordField]: credentials[this.passwordField],
       [this.identificationField]: credentials[this.identificationField]
