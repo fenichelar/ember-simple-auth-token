@@ -237,7 +237,7 @@ export default TokenAuthenticator.extend({
   */
   getTokenData(token) {
     const payload = token.split('.')[1];
-    const tokenData = decodeURIComponent(window.atob(payload.replace (/-/g, '+').replace(/_/g, '/')));
+    const tokenData = decodeURIComponent(window.escape(atob(payload.replace (/-/g, '+').replace(/_/g, '/'))));
 
     try {
       return JSON.parse(tokenData);
