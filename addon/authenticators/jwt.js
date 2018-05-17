@@ -158,10 +158,14 @@ export default TokenAuthenticator.extend({
       const now = this.getCurrentTime();
       const wait = (expiresAt - now - this.refreshLeeway) * 1000;
 
-      if (!isEmpty(refreshToken) && !isEmpty(expiresAt) && wait > 0) {
-        cancel(this._refreshTokenTimeout);
-        delete this._refreshTokenTimeout;
-        this._refreshTokenTimeout = later(this, this.refreshAccessToken, refreshToken, wait);
+      if (!isEmpty(refreshToken) && !isEmpty(expiresAt)) {
+        if (wait > 0) {
+          cancel(this._refreshTokenTimeout);
+          delete this._refreshTokenTimeout;
+          this._refreshTokenTimeout = later(this, this.refreshAccessToken, refreshToken, wait);
+        } else {
+          throw new Error('refreshLeeway is too large which is preventing token refresh');
+        }
       }
     }
   },
