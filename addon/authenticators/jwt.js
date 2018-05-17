@@ -1,5 +1,4 @@
 import EmberObject from '@ember/object';
-import $ from 'jquery';
 import { assign } from '@ember/polyfills';
 import { Promise, resolve } from 'rsvp';
 import { isEmpty } from '@ember/utils';
@@ -247,34 +246,6 @@ export default TokenAuthenticator.extend({
   },
 
   /**
-    Accepts a `url` and `data` to be used in an ajax server request.
-
-    @method makeRequest
-    @private
-  */
-  makeRequest(url, data, headers) {
-    return $.ajax({
-      url: url,
-      method: 'POST',
-      data: JSON.stringify(data),
-      dataType: 'json',
-      contentType: 'application/json',
-      headers: this.headers,
-      beforeSend: (xhr, settings) => {
-        if(this.headers['Accept'] === null || this.headers['Accept'] === undefined) {
-          xhr.setRequestHeader('Accept', settings.accepts.json);
-        }
-
-        if (headers) {
-          Object.keys(headers).forEach((key) => {
-            xhr.setRequestHeader(key, headers[key]);
-          });
-        }
-      }
-    });
-  },
-
-  /**
     Cancels any outstanding automatic token refreshes and returns a resolving
     promise.
     @method invalidate
@@ -356,6 +327,7 @@ export default TokenAuthenticator.extend({
   scheduleAccessTokenExpiration(expiresAt) {
     const now = this.getCurrentTime();
     const wait = Math.max((expiresAt - now) * 1000, 0);
+
     if (!isEmpty(expiresAt)) {
       cancel(this._tokenExpirationTimeout);
       delete this._tokenExpirationTimeout;

@@ -68,7 +68,7 @@ export default Base.extend({
   */
   authenticate(credentials, headers) {
     return new Promise((resolve, reject) => {
-      this.makeRequest(credentials, headers).then(response => {
+      this.makeRequest(this.serverTokenEndpoint, credentials, headers).then(response => {
         run(() => {
           resolve(this.getResponseData(response));
         });
@@ -101,13 +101,14 @@ export default Base.extend({
 
   /**
     @method makeRequest
+    @param {Object} url Server endpoint
     @param {Object} data Object that will be sent to server
     @param {Object} headers Additional headers that will be sent to server
     @private
   */
-  makeRequest(data, headers) {
+  makeRequest(url, data, headers) {
     return $.ajax({
-      url: this.serverTokenEndpoint,
+      url: url,
       method: 'POST',
       data: JSON.stringify(data),
       dataType: 'json',
