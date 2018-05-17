@@ -11,7 +11,7 @@ export default Controller.extend({
       var credentials = this.getProperties('username', 'password'),
           authenticator = 'authenticator:jwt';
 
-      this.get('session').authenticate(authenticator, credentials)
+      this.get('session').authenticate(authenticator, credentials);
     }
   }
 });

@@ -70,7 +70,6 @@ export default TokenAuthenticator.extend({
         // Fetch the expire time from the token data since `expiresAt`
         // wasn't included in the data object that was passed in.
         const tokenData = this.getTokenData(token);
-
         expiresAt = tokenData[this.tokenExpireName];
         if (isEmpty(expiresAt)) {
           return resolve(data);
@@ -129,14 +128,15 @@ export default TokenAuthenticator.extend({
           run(() => {
             try {
               const sessionData = this.handleAuthResponse(response);
-
               resolve(sessionData);
             } catch (error) {
               reject(error);
             }
           });
         }, (xhr) => {
-          run(() => { reject(xhr.responseJSON || xhr.responseText); });
+          run(() => {
+            reject(xhr.responseJSON || xhr.responseText);
+          });
         });
     });
   },
@@ -193,7 +193,6 @@ export default TokenAuthenticator.extend({
           run(() => {
             try {
               const sessionData = this.handleAuthResponse(response);
-
               this.trigger('sessionDataUpdated', sessionData);
               resolve(sessionData);
             } catch (error) {
@@ -202,7 +201,6 @@ export default TokenAuthenticator.extend({
           });
         }, xhr => {
           this.handleTokenRefreshFail(xhr.status);
-
           reject();
         });
     });
@@ -217,7 +215,6 @@ export default TokenAuthenticator.extend({
   */
   makeRefreshData(refreshToken) {
     const data = {};
-
     let lastObject = data;
     const nestings = this.refreshTokenPropertyName.split('.');
     const refreshTokenPropertyName = nestings.pop();

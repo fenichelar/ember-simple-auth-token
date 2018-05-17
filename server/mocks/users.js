@@ -10,7 +10,6 @@ module.exports = function(app) {
     if (!token) {
       return res.send({}, 200);
     }
-
     var user = jwt.verify(token, 'secret');
 
     return res.send({username: user.username});
