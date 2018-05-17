@@ -1,8 +1,13 @@
-import Ember from 'ember';
-import Configuration from '../configuration';
+import EmberObject from '@ember/object';
+import $ from 'jquery';
+import { assign } from '@ember/polyfills';
+import { Promise, resolve } from 'rsvp';
+import { isEmpty } from '@ember/utils';
+import { run } from '@ember/runloop';
+import { cancel, later } from '@ember/runloop';
+import { get } from '@ember/object';
 import TokenAuthenticator from './token';
-
-const assign = Ember.assign || Ember.merge;
+import config from 'ember-get-config';
 
 /**
   JWT (JSON Web Token) Authenticator that supports automatic token refresh.
@@ -19,60 +24,16 @@ const assign = Ember.assign || Ember.merge;
 */
 export default TokenAuthenticator.extend({
   /**
-    The endpoint on the server for refreshing a token.
-    @property serverTokenRefreshEndpoint
-    @type String
-    @default '/api/token-refresh/'
-  */
-  serverTokenRefreshEndpoint: '/api/token-refresh/',
-
-  /**
-    Sets whether the authenticator automatically refreshes access tokens.
-    @property refreshAccessTokens
-    @type Boolean
-    @default true
-  */
-  refreshAccessTokens: true,
-
-  /**
-    The number of seconds to subtract from the token's time of expiration when
-    scheduling the automatic token refresh call.
-    @property refreshLeeway
-    @type Integer
-    @default 0 (seconds)
-  */
-  refreshLeeway: 0,
-
-  /**
-    The amount of time to wait before refreshing the token - set automatically.
-    @property refreshTokenTimeout
-    @private
-  */
-  refreshTokenTimeout: null,
-
-  /**
-    The name for which decoded token field represents the token expire time.
-    @property tokenExpireName
-    @type String
-    @default 'exp'
-  */
-  tokenExpireName: 'exp',
-
-  /**
     @method init
     @private
   */
   init() {
-    this.serverTokenEndpoint = Configuration.serverTokenEndpoint;
-    this.serverTokenRefreshEndpoint = Configuration.serverTokenRefreshEndpoint;
-    this.identificationField = Configuration.identificationField;
-    this.passwordField = Configuration.passwordField;
-    this.tokenPropertyName = Configuration.tokenPropertyName;
-    this.refreshTokenPropertyName = Configuration.refreshTokenPropertyName;
-    this.refreshAccessTokens = Configuration.refreshAccessTokens;
-    this.refreshLeeway = Configuration.refreshLeeway;
-    this.tokenExpireName = Configuration.tokenExpireName;
-    this.headers = Configuration.headers;
+    this._super(...arguments);
+    const conf = config['ember-simple-auth-token'] || {};
+    this.refreshAccessTokens = conf.refreshAccessTokens === false ? false : conf.refreshAccessTokens || true;
+    this.serverTokenRefreshEndpoint = conf.serverTokenRefreshEndpoint || '/api/token-refresh/';
+    this.tokenExpireName = conf.tokenExpireName || 'exp';
+    this.refreshLeeway = conf.refreshLeeway || 0;
   },
 
   /**
@@ -90,29 +51,29 @@ export default TokenAuthenticator.extend({
 
     @method restore
     @param {Object} data The data to restore the session from
-    @return {Ember.RSVP.Promise} A promise that when it resolves results
+    @return {Promise} A promise that when it resolves results
                                  in the session being authenticated
   */
   restore(data) {
-    const dataObject = Ember.Object.create(data);
+    const dataObject = EmberObject.create(data);
 
-    return new Ember.RSVP.Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       const now = this.getCurrentTime();
       const token = dataObject.get(this.tokenPropertyName);
       const refreshToken = dataObject.get(this.refreshTokenPropertyName);
       let expiresAt = dataObject.get(this.tokenExpireName);
 
-      if (Ember.isEmpty(token)) {
+      if (isEmpty(token)) {
         return reject(new Error('empty token'));
       }
 
-      if (Ember.isEmpty(expiresAt)) {
+      if (isEmpty(expiresAt)) {
         // Fetch the expire time from the token data since `expiresAt`
         // wasn't included in the data object that was passed in.
         const tokenData = this.getTokenData(token);
 
         expiresAt = tokenData[this.tokenExpireName];
-        if (Ember.isEmpty(expiresAt)) {
+        if (isEmpty(expiresAt)) {
           return resolve(data);
         }
       }
@@ -158,17 +119,15 @@ export default TokenAuthenticator.extend({
     @method authenticate
     @param {Object} credentials The credentials to authenticate the session with
     @param {Object} headers Additional headers to be sent to server
-    @return {Ember.RSVP.Promise} A promise that resolves when an auth token is
+    @return {Promise} A promise that resolves when an auth token is
                                  successfully acquired from the server and rejects
                                  otherwise
   */
   authenticate(credentials, headers) {
-    return new Ember.RSVP.Promise((resolve, reject) => {
-      const data = this.getAuthenticateData(credentials);
-
-      this.makeRequest(this.serverTokenEndpoint, data, headers)
+    return new Promise((resolve, reject) => {
+      this.makeRequest(this.serverTokenEndpoint, credentials, headers)
         .then((response) => {
-          Ember.run(() => {
+          run(() => {
             try {
               const sessionData = this.handleAuthResponse(response);
 
@@ -178,7 +137,7 @@ export default TokenAuthenticator.extend({
             }
           });
         }, (xhr) => {
-          Ember.run(() => { reject(xhr.responseJSON || xhr.responseText); });
+          run(() => { reject(xhr.responseJSON || xhr.responseText); });
         });
     });
   },
@@ -189,7 +148,7 @@ export default TokenAuthenticator.extend({
 
     If both `token` and `expiresAt` are non-empty, and `expiresAt` minus the optional
     refres leeway is greater than the calculated `now`, the token refresh will be scheduled
-    through Ember.run.later.
+    through later.
 
     @method scheduleAccessTokenRefresh
     @private
@@ -200,10 +159,10 @@ export default TokenAuthenticator.extend({
       const now = this.getCurrentTime();
       const wait = (expiresAt - now - this.refreshLeeway) * 1000;
 
-      if (!Ember.isEmpty(refreshToken) && !Ember.isEmpty(expiresAt) && wait > 0) {
-        Ember.run.cancel(this._refreshTokenTimeout);
+      if (!isEmpty(refreshToken) && !isEmpty(expiresAt) && wait > 0) {
+        cancel(this._refreshTokenTimeout);
         delete this._refreshTokenTimeout;
-        this._refreshTokenTimeout = Ember.run.later(this, this.refreshAccessToken, refreshToken, wait);
+        this._refreshTokenTimeout = later(this, this.refreshAccessToken, refreshToken, wait);
       }
     }
   },
@@ -225,10 +184,10 @@ export default TokenAuthenticator.extend({
   refreshAccessToken(token, headers) {
     const data = this.makeRefreshData(token);
 
-    return new Ember.RSVP.Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       this.makeRequest(this.serverTokenRefreshEndpoint, data, headers)
         .then((response) => {
-          Ember.run(() => {
+          run(() => {
             try {
               const sessionData = this.handleAuthResponse(response);
 
@@ -238,12 +197,7 @@ export default TokenAuthenticator.extend({
               reject(error);
             }
           });
-        }, (xhr, status, error) => {
-          Ember.Logger.warn(
-            'Access token could not be refreshed - ' +
-            `server responded with ${error}.`
-          );
-
+        }, xhr => {
           this.handleTokenRefreshFail(xhr.status);
 
           reject();
@@ -299,7 +253,7 @@ export default TokenAuthenticator.extend({
     @private
   */
   makeRequest(url, data, headers) {
-    return Ember.$.ajax({
+    return $.ajax({
       url: url,
       method: 'POST',
       data: JSON.stringify(data),
@@ -321,35 +275,18 @@ export default TokenAuthenticator.extend({
   },
 
   /**
-    Schedules session invalidation at the time token expires.
-
-    @method scheduleAccessTokenExpiration
-    @private
-  */
-  scheduleAccessTokenExpiration(expiresAt) {
-    const now = this.getCurrentTime();
-    const wait = Math.max((expiresAt - now) * 1000, 0);
-
-    if (!Ember.isEmpty(expiresAt)) {
-      Ember.run.cancel(this._tokenExpirationTimeout);
-      delete this._tokenExpirationTimeout;
-      this._tokenExpirationTimeout = Ember.run.later(this, this.handleAccessTokenExpiration, wait);
-    }
-  },
-
-  /**
     Cancels any outstanding automatic token refreshes and returns a resolving
     promise.
     @method invalidate
     @param {Object} data The data of the session to be invalidated
-    @return {Ember.RSVP.Promise} A resolving promise
+    @return {Promise} A resolving promise
   */
   invalidate() {
-    Ember.run.cancel(this._refreshTokenTimeout);
+    cancel(this._refreshTokenTimeout);
     delete this._refreshTokenTimeout;
-    Ember.run.cancel(this._tokenExpirationTimeout);
+    cancel(this._tokenExpirationTimeout);
     delete this._tokenExpirationTimeout;
-    return new Ember.RSVP.resolve();
+    return new resolve();
   },
 
   /**
@@ -368,23 +305,23 @@ export default TokenAuthenticator.extend({
     @private
    */
   handleAuthResponse(response) {
-    const token = Ember.get(response, this.tokenPropertyName);
+    const token = get(response, this.tokenPropertyName);
 
-    if (Ember.isEmpty(token)) {
+    if (isEmpty(token)) {
       throw new Error('Token is empty. Please check your backend response.');
     }
 
     const tokenData = this.getTokenData(token);
-    const expiresAt = Ember.get(tokenData, this.tokenExpireName);
+    const expiresAt = get(tokenData, this.tokenExpireName);
     const tokenExpireData = {};
 
     tokenExpireData[this.tokenExpireName] = expiresAt;
     this.scheduleAccessTokenExpiration(expiresAt);
 
     if (this.refreshAccessTokens) {
-      const refreshToken = Ember.get(response, this.refreshTokenPropertyName);
+      const refreshToken = get(response, this.refreshTokenPropertyName);
 
-      if (Ember.isEmpty(refreshToken)) {
+      if (isEmpty(refreshToken)) {
         throw new Error('Refresh token is empty. Please check your backend response.');
       }
 
@@ -411,16 +348,30 @@ export default TokenAuthenticator.extend({
   },
 
   /**
-    Handles access token expiration. After token expiration the session will
-    be invalidated and the sessionInvalidated provided by ember-simple-auth
-    will be triggered.
+    Schedules session invalidation at the time token expires.
+
+    @method scheduleAccessTokenExpiration
+    @private
+  */
+  scheduleAccessTokenExpiration(expiresAt) {
+    const now = this.getCurrentTime();
+    const wait = Math.max((expiresAt - now) * 1000, 0);
+    if (!isEmpty(expiresAt)) {
+      cancel(this._tokenExpirationTimeout);
+      delete this._tokenExpirationTimeout;
+      this._tokenExpirationTimeout = later(this, this.handleAccessTokenExpiration, wait);
+    }
+  },
+
+  /**
+    Handles access token expiration
 
     @method handleAccessTokenExpiration
     @private
   */
   handleAccessTokenExpiration() {
     return this.invalidate().then(() => {
-        this.trigger('sessionDataInvalidated');
+      this.trigger('sessionDataInvalidated');
     });
   }
 });

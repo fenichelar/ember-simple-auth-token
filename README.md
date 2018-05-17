@@ -4,7 +4,7 @@
 [![ember-observer-score-image]][ember-observer]
 [![npm](https://img.shields.io/npm/v/ember-simple-auth-token.svg)]()
 
-This is an extension to the Ember Simple Auth library that provides a default token authenticator, an enhanced authenticator with automatic refresh capability, and an authorizer that are compatible with APIs with token-based authentication.
+This is an extension to the Ember Simple Auth library that provides a default token authenticator, an enhanced authenticator with automatic refresh capability, and an authorizer mixin that are compatible with APIs with token-based authentication.
 
 If you're thinking about using this addon in combination with JSON Web Tokens, you can find more about why they're so awesome in [this article][medium-jwt].
 
@@ -42,14 +42,14 @@ Router.map(function() {
 });
 ```
 
-This route displays the login form with fields for `identification`,
+This route displays the login form with fields for `username`,
 `password`:
 
 ```html
 {{! app/templates/login.hbs }}
 <form {{action 'authenticate' on='submit'}}>
-  <label for="identification">Login</label>
-  {{input id='identification' placeholder='Enter Login' value=identification}}
+  <label for="username">Login</label>
+  {{input id='username' placeholder='Enter Login' value=username}}
   <label for="password">Password</label>
   {{input id='password' placeholder='Enter Password' type='password' value=password}}
   <button type="submit">Login</button>
@@ -73,7 +73,7 @@ export default Ember.Controller.extend({
 
   actions: {
     authenticate: function() {
-      var credentials = this.getProperties('identification', 'password'),
+      var credentials = this.getProperties('username', 'password'),
         authenticator = 'authenticator:token';
 
       this.get('session').authenticate(authenticator, credentials);
@@ -95,7 +95,7 @@ export default Ember.Controller.extend({
 
   actions: {
     authenticate: function() {
-      var credentials = this.getProperties('identification', 'password'),
+      var credentials = this.getProperties('username', 'password'),
         authenticator = 'authenticator:jwt';
 
       this.get('session').authenticate(authenticator, credentials);
@@ -113,9 +113,6 @@ next automatic token refresh request.
 For example, with the following configuration:
 
 ```
-  ENV['ember-simple-auth'] = {
-    authorizer: 'authorizer:token'
-  };
   ENV['ember-simple-auth-token'] = {
     refreshAccessTokens: true,
     refreshLeeway: 300 // Refresh the token 5 minutes (300s) before it expires.
@@ -137,42 +134,15 @@ token = {
 
 An automatic token refresh request would be sent out at `token[Config.tokenExpireName] - now()`. A good practice with regards to token refreshing is to also set a "leeway", usually no more than a few minutes, to account for clock skew when decoding JSON Web Tokens in the server-side. Some libraries like [PyJWT][pyjwt] and [ruby-jwt][ruby-jwt] already support this.
 
-## The Authorizer
+## The Token Authorizer Mixin
 
-The authorizer authorizes requests by adding `token` property from the session in the `Authorization` header:
+The token authorizer mixin authorizes requests by adding `token` property from the session in the `Authorization` header:
 
 ```
 Authorization: Bearer <token>
 ```
 
-To use the authorizer, configure it in the global environment object:
-
-```js
-// config/environment.js
-ENV['ember-simple-auth'] = {
-  authorizer: 'authorizer:token'
-};
-```
-
-## Sending token on API requests
-
-If you need your token to be present on every request to your API you will need to inject the `DataAdapterMixin` from `ember-simple-auth` on your application `adapter`.
-
-Example from the `ember-simple-auth` [documentation](http://ember-simple-auth.com/api/classes/DataAdapterMixin.html):
-```js
-// app/adapters/application.js
-import DS from 'ember-data';
-import DataAdapterMixin from 'ember-simple-auth/mixins/data-adapter-mixin';
-
-export default DS.JSONAPIAdapter.extend(DataAdapterMixin, {
-  authorizer: 'authorizer:token'
-});
-```
-*DataAdapterMixin is supported for Ember 1.13 and above*
-
-### Deprecation in ember-simple-auth 2.0
-
-Ember Simple Auth has deprecated the use of Authorizers. The alternative is to use the `TokenAuthorizerMixin`.
+To use the authorizer, configure your application `adapter`:
 
 ```js
 // app/adapters/application.js
@@ -190,8 +160,6 @@ For the Token authenticator:
 // config/environment.js
 ENV['ember-simple-auth-token'] = {
   serverTokenEndpoint: '/api/token-auth/',
-  identificationField: 'username',
-  passwordField: 'password',
   tokenPropertyName: 'token',
   refreshTokenPropertyName: 'refresh_token',
   authorizationPrefix: 'Bearer ',

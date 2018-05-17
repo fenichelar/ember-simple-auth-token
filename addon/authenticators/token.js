@@ -1,6 +1,10 @@
-import Ember from 'ember';
+import EmberObject from '@ember/object';
+import $ from 'jquery';
+import { Promise, resolve } from 'rsvp';
+import { isEmpty } from '@ember/utils';
+import { run } from '@ember/runloop';
 import Base from 'ember-simple-auth/authenticators/base';
-import Configuration from '../configuration';
+import config from 'ember-get-config';
 
 /**
   Authenticator that works with token-based authentication like JWT.
@@ -15,77 +19,16 @@ import Configuration from '../configuration';
 */
 export default Base.extend({
   /**
-    The endpoint on the server the authenticator acquires the auth token from.
-
-    This value can be configured via
-    [`SimpleAuth.Configuration.Token#serverTokenEndpoint`](#SimpleAuth-Configuration-Token-serverTokenEndpoint).
-
-    @property serverTokenEndpoint
-    @type String
-    @default '/api/token-auth/'
-  */
-  serverTokenEndpoint: '/api/token-auth/',
-
-  /**
-    The attribute-name that is used for the identification field when sending the
-    authentication data to the server.
-
-    This value can be configured via
-    [`SimpleAuth.Configuration.Token#identificationField`](#SimpleAuth-Configuration-Token-identificationField).
-
-    @property identificationField
-    @type String
-    @default 'username'
-  */
-  identificationField: 'username',
-
-  /**
-    The attribute-name that is used for the password field when sending the
-    authentication data to the server.
-
-    This value can be configured via
-    [`SimpleAuth.Configuration.Token#passwordfield`](#SimpleAuth-Configuration-Token-passwordfield).
-
-    @property passwordField
-    @type String
-    @default 'password'
-  */
-  passwordField: 'password',
-
-  /**
-    The name of the property in session that contains token used for authorization.
-
-    This value can be configured via
-    [`SimpleAuth.Configuration.Token#tokenPropertyName`](#SimpleAuth-Configuration-Token-tokenPropertyName).
-
-    @property tokenPropertyName
-    @type String
-    @default 'token'
-  */
-  tokenPropertyName: 'token',
-
-  /**
-    The property that stores custom headers that will be sent on every request.
-
-    This value can be configured via
-    [`SimpleAuth.Configuration.Token#headers`](#SimpleAuth-Configuration-Token-headers).
-
-    @property headers
-    @type Object
-    @default {}
-  */
-  headers: {},
-
-  /**
     @method init
     @private
   */
   init() {
-    this.serverTokenEndpoint = Configuration.serverTokenEndpoint;
-    this.identificationField = Configuration.identificationField;
-    this.passwordField = Configuration.passwordField;
-    this.tokenPropertyName = Configuration.tokenPropertyName;
-    this.headers = Configuration.headers;
+    this._super(...arguments);
+    const conf = config['ember-simple-auth-token'] || {};
+    this.serverTokenEndpoint = conf.serverTokenEndpoint || '/api/token-auth/';
+    this.tokenPropertyName = conf.tokenPropertyName || 'token';
+    this.refreshTokenPropertyName = conf.refreshTokenPropertyName || 'refresh_token';
+    this.headers = conf.headers || {};
   },
 
   /**
@@ -95,13 +38,13 @@ export default Base.extend({
 
     @method restore
     @param {Object} properties The properties to restore the session from
-    @return {Ember.RSVP.Promise} A promise that when it resolves results in the session being authenticated
+    @return {Promise} A promise that when it resolves results in the session being authenticated
   */
   restore(properties) {
-    const propertiesObject = Ember.Object.create(properties);
+    const propertiesObject = EmberObject.create(properties);
 
-    return new Ember.RSVP.Promise((resolve, reject) => {
-      if (!Ember.isEmpty(propertiesObject.get(this.tokenPropertyName))) {
+    return new Promise((resolve, reject) => {
+      if (!isEmpty(propertiesObject.get(this.tokenPropertyName))) {
         resolve(properties);
       } else {
         reject();
@@ -121,35 +64,18 @@ export default Base.extend({
     @method authenticate
     @param {Object} credentials The credentials to authenticate the session with
     @param {Object} headers Additional headers to pass with request
-    @return {Ember.RSVP.Promise} A promise that resolves when an auth token is successfully acquired from the server and rejects otherwise
+    @return {Promise} A promise that resolves when an auth token is successfully acquired from the server and rejects otherwise
   */
   authenticate(credentials, headers) {
-    return new Ember.RSVP.Promise((resolve, reject) => {
-      const data = this.getAuthenticateData(credentials);
-
-      this.makeRequest(data, headers).then(response => {
-        Ember.run(() => {
+    return new Promise((resolve, reject) => {
+      this.makeRequest(credentials, headers).then(response => {
+        run(() => {
           resolve(this.getResponseData(response));
         });
       }, xhr => {
-        Ember.run(() => { reject(xhr.responseJSON || xhr.responseText); });
+        run(() => { reject(xhr.responseJSON || xhr.responseText); });
       });
     });
-  },
-
-  /**
-    Returns an object used to be sent for authentication.
-
-    @method getAuthenticateData
-    @return {object} An object with properties for authentication.
-  */
-  getAuthenticateData(credentials) {
-    const authentication = {
-      [this.passwordField]: credentials[this.passwordField],
-      [this.identificationField]: credentials[this.identificationField]
-    };
-
-    return authentication;
   },
 
   /**
@@ -167,10 +93,10 @@ export default Base.extend({
     Does nothing
 
     @method invalidate
-    @return {Ember.RSVP.Promise} A resolving promise
+    @return {Promise} A resolving promise
   */
   invalidate() {
-    return Ember.RSVP.resolve();
+    return resolve();
   },
 
   /**
@@ -180,7 +106,7 @@ export default Base.extend({
     @private
   */
   makeRequest(data, headers) {
-    return Ember.$.ajax({
+    return $.ajax({
       url: this.serverTokenEndpoint,
       method: 'POST',
       data: JSON.stringify(data),

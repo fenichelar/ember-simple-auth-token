@@ -1,14 +1,17 @@
-import Ember from 'ember';
+import Controller from '@ember/controller';
+import { inject } from '@ember/service';
+import { computed } from '@ember/object';
+import { getOwner } from '@ember/application';
 
-export default Ember.Controller.extend({
-  session: Ember.inject.service('session'),
+export default Controller.extend({
+  session: inject('session'),
 
-  sessionData: Ember.computed('session.session.content.authenticated', function() {
+  sessionData: computed('session.session.content.authenticated', function() {
     return JSON.stringify(this.get('session.session.content.authenticated'), null, '\t');
   }),
 
-  tokenData: Ember.computed('session.session.content.authenticated', function() {
-    var authenticator = Ember.getOwner(this).lookup('authenticator:jwt'),
+  tokenData: computed('session.session.content.authenticated', function() {
+    var authenticator = getOwner(this).lookup('authenticator:jwt'),
         session = this.get('session.session.content.authenticated'),
         tokenData = {};
 

@@ -1,17 +1,17 @@
-import Ember from 'ember';
+import Controller from '@ember/controller';
+import { inject } from '@ember/service';
 
-export default Ember.Controller.extend({
-  identification: 'admin',
+export default Controller.extend({
+  session: inject('session'),
+  username: 'admin',
   password: 'abc123',
-
-  session: Ember.inject.service('session'),
 
   actions: {
     authenticate: function() {
-      var credentials = this.getProperties('identification', 'password'),
+      var credentials = this.getProperties('username', 'password'),
           authenticator = 'authenticator:jwt';
 
-      this.get('session').authenticate(authenticator, credentials);
+      this.get('session').authenticate(authenticator, credentials)
     }
   }
 });

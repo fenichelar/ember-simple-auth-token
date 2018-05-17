@@ -2,9 +2,9 @@ import { module } from 'qunit';
 import { test } from 'ember-qunit';
 import sinon from 'sinon';
 import startApp from '../../helpers/start-app';
-import Ember from 'ember';
+import $ from 'jquery';
+import { run } from '@ember/runloop';
 import Token from 'ember-simple-auth-token/authenticators/token';
-import Configuration from 'ember-simple-auth-token/configuration';
 
 var App;
 
@@ -15,53 +15,13 @@ module('Token Authenticator', {
     App.server = sinon.fakeServer.create();
     App.server.autoRespond = true;
     App.authenticator = Token.create();
-    sinon.spy(Ember.$, 'ajax');
+    sinon.spy($, 'ajax');
   },
   afterEach: () => {
-    Ember.$.ajax.restore();
+    run(App, App.destroy);
     App.xhr.restore();
-    Ember.run(App, App.destroy);
+    $.ajax.restore();
   }
-});
-
-test('assigns serverTokenEndpoint from the configuration object', assert => {
-  Configuration.serverTokenEndpoint = 'serverTokenEndpoint';
-
-  assert.equal(Token.create().serverTokenEndpoint, 'serverTokenEndpoint');
-
-  Configuration.load({}, {});
-});
-
-test('assigns identificationField from the configuration object', assert => {
-  Configuration.identificationField = 'identificationField';
-
-  assert.equal(Token.create().identificationField, 'identificationField');
-
-  Configuration.load({}, {});
-});
-
-test('assigns passwordField from the configuration object', assert => {
-  Configuration.passwordField = 'passwordField';
-
-  assert.equal(Token.create().passwordField, 'passwordField');
-
-  Configuration.load({}, {});
-});
-
-test('assigns tokenPropertyName from the configuration object', assert => {
-  Configuration.tokenPropertyName = 'tokenPropertyName';
-
-  assert.equal(Token.create().tokenPropertyName, 'tokenPropertyName');
-
-  Configuration.load({}, {});
-});
-
-test('assigns custom headers from the configuration object', assert => {
-  Configuration.headers = 'headers';
-
-  assert.equal(Token.create().headers, 'headers');
-
-  Configuration.load({}, {});
 });
 
 test('#restore resolves with the correct data', assert => {
@@ -76,34 +36,7 @@ test('#restore resolves with the correct data', assert => {
     '{ "token": "secret token!" }'
   ]);
 
-  Ember.run(() => {
-    App.authenticator.restore(properties).then(content => {
-      assert.deepEqual(content, properties);
-    });
-  });
-});
-
-test('#restore resolves custom token with the correct data', assert => {
-  Configuration.tokenPropertyName = 'user.data.token';
-
-  App.authenticator = Token.create();
-
-  const properties = {
-    user: {
-      data: {
-        token: 'secret token!'
-      }
-    }
-  };
-
-  App.server.respondWith('POST', '/api/token-auth/', [
-    201, {
-      'Content-Type': 'application/json'
-    },
-    '{ "token": "secret token!" }'
-  ]);
-
-  Ember.run(() => {
+  run(() => {
     App.authenticator.restore(properties).then(content => {
       assert.deepEqual(content, properties);
     });
@@ -112,46 +45,19 @@ test('#restore resolves custom token with the correct data', assert => {
 
 test('#authenticate sends an AJAX request to the sign in endpoint', assert => {
   const credentials = {
-    identification: 'username',
+    username: 'test@test.com',
     password: 'password'
   };
 
   App.authenticator.authenticate(credentials);
 
-  Ember.run(() => {
-    var args = Ember.$.ajax.getCall(0).args[0];
+  run(() => {
+    var args = $.ajax.getCall(0).args[0];
     delete args.beforeSend;
     assert.deepEqual(args, {
       url: '/api/token-auth/',
       method: 'POST',
-      data: '{"password":"password","username":"username"}',
-      dataType: 'json',
-      contentType: 'application/json',
-      headers: {}
-    });
-  });
-});
-
-test('#authenticate sends an AJAX request to the sign in endpoint with custom fields', assert => {
-  const credentials = {
-    identification: 'username',
-    password: 'password'
-  };
-
-  Configuration.identificationField = 'api-user';
-  Configuration.passwordField = 'api-key';
-
-  App.authenticator = Token.create();
-  App.authenticator.authenticate(credentials);
-
-  Ember.run(() => {
-    var args = Ember.$.ajax.getCall(0).args[0];
-    delete args.beforeSend;
-
-    assert.deepEqual(args, {
-      url: '/api/token-auth/',
-      method: 'POST',
-      data: '{"api-key":"password","api-user":"username"}',
+      data: '{"username":"test@test.com","password":"password"}',
       dataType: 'json',
       contentType: 'application/json',
       headers: {}
@@ -161,7 +67,7 @@ test('#authenticate sends an AJAX request to the sign in endpoint with custom fi
 
 test('#authenticate successfully resolves with the correct data', assert => {
   const credentials = {
-    email: 'email@address.com',
+    username: 'test@test.com',
     password: 'password'
   };
 
@@ -182,25 +88,27 @@ test('#authenticate successfully resolves with the correct data', assert => {
 
 test('#authenticate sends an AJAX request with custom headers', assert => {
   const credentials = {
-    identification: 'username',
+    username: 'test@test.com',
     password: 'password'
   };
 
-  Configuration.headers = {
+  App.authenticator = Token.create();
+
+  App.authenticator.headers = {
     'X-API-KEY': '123-abc',
     'X-ANOTHER-HEADER': 0,
     Accept: 'application/vnd.api+json'
   };
-  App.authenticator = Token.create();
+
   App.authenticator.authenticate(credentials);
 
-  Ember.run(() => {
-    var args = Ember.$.ajax.getCall(0).args[0];
+  run(() => {
+    var args = $.ajax.getCall(0).args[0];
     delete args.beforeSend;
     assert.deepEqual(args, {
       url: '/api/token-auth/',
       method: 'POST',
-      data: '{"password":"password","username":"username"}',
+      data: '{"username":"test@test.com","password":"password"}',
       dataType: 'json',
       contentType: 'application/json',
       headers: {
@@ -216,7 +124,7 @@ test('#authenticate rejects with the correct error', assert => {
   const done = assert.async();
 
   const credentials = {
-    email: 'email@address.com',
+    username: 'test@test.com',
     password: 'password'
   };
 

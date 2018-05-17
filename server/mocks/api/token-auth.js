@@ -5,8 +5,8 @@ module.exports = function(app) {
   var apiTokenAuthRouter = express.Router();
 
   apiTokenAuthRouter.post('/', function(req, res) {
-    jwt.sign(req.body, 'secret', { expiresIn: 10 }, function(token) {
-      res.send({
+    jwt.sign(req.body, 'secret', { expiresIn: 10 }, function(err, token) {
+      return res.send({
         token: token
       });
     });

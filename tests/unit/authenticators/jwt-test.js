@@ -2,9 +2,9 @@ import { module } from 'qunit';
 import { test } from 'ember-qunit';
 import sinon from 'sinon';
 import startApp from '../../helpers/start-app';
-import Ember from 'ember';
+import $ from 'jquery';
+import { run } from '@ember/runloop';
 import JWT from 'ember-simple-auth-token/authenticators/jwt';
-import Configuration from 'ember-simple-auth-token/configuration';
 
 var App;
 
@@ -28,45 +28,19 @@ module('JWT Authenticator', {
     App.server = sinon.fakeServer.create();
     App.server.autoRespond = true;
     App.authenticator = JWT.create();
-    sinon.spy(Ember.run, 'cancel');
-    sinon.stub(Ember.run, 'later').callsFake((scope, callback, args) => {
+    sinon.spy($, 'ajax');
+    sinon.spy(run, 'cancel');
+    sinon.stub(run, 'later').callsFake((scope, callback, args) => {
       callback.call(scope, args);
     });
-    sinon.spy(Ember.$, 'ajax');
-
   },
   afterEach() {
-    Ember.run(App, App.destroy);
-    Ember.$.ajax.restore();
-
+    run(App, App.destroy);
     App.xhr.restore();
-    Ember.run.cancel.restore();
-    Ember.run.later.restore();
+    $.ajax.restore();
+    run.cancel.restore();
+    run.later.restore();
   }
-});
-
-test('assigns serverTokenRefreshEndpoint from the configuration object', assert => {
-  Configuration.serverTokenRefreshEndpoint = 'serverTokenRefreshEndpoint';
-
-  assert.equal(JWT.create().serverTokenRefreshEndpoint, 'serverTokenRefreshEndpoint');
-
-  Configuration.load({}, {});
-});
-
-test('assigns refreshAccessTokens from the configuration object', assert => {
-  Configuration.refreshAccessTokens = 'refreshAccessTokens';
-
-  assert.equal(JWT.create().refreshAccessTokens, 'refreshAccessTokens');
-
-  Configuration.load({}, {});
-});
-
-test('assigns tokenExpireName from the configuration object', assert => {
-  Configuration.tokenExpireName = 'tokenExpireName';
-
-  assert.equal(JWT.create().tokenExpireName, 'tokenExpireName');
-
-  Configuration.load({}, {});
 });
 
 test('#restore resolves when the data includes `token` and `expiresAt`', assert => {
@@ -76,10 +50,12 @@ test('#restore resolves when the data includes `token` and `expiresAt`', assert 
     currentTime = getConvertedTime(10000),
     expiresAt = currentTime + getConvertedTime(3000);
 
-  sinon.stub(App.authenticator, 'getCurrentTime').callsFake(() => { return currentTime; });
+  sinon.stub(App.authenticator, 'getCurrentTime').callsFake(() => {
+    return currentTime;
+  });
 
   let token = {};
-  token[jwt.identificationField] = 'test@test.com';
+  token.username = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
   token = createFakeToken(token);
@@ -97,7 +73,7 @@ test('#restore resolves when the data includes `token` and `expiresAt`', assert 
     '{ "token": "' + token + '", "refresh_token": "' + refreshToken + '" }'
   ]);
 
-  Ember.run(() => {
+  run(() => {
     App.authenticator.restore(data).then(content => {
       // Check that the resolved data matches the init data.
       assert.equal(JSON.stringify(content), JSON.stringify(data));
@@ -114,10 +90,12 @@ test('#restore resolves when the data includes `token` and excludes `expiresAt`'
     currentTime = getConvertedTime(10000),
     expiresAt = currentTime + getConvertedTime(3000);
 
-  sinon.stub(App.authenticator, 'getCurrentTime').callsFake(() => { return currentTime; });
+  sinon.stub(App.authenticator, 'getCurrentTime').callsFake(() => {
+    return currentTime;
+  });
 
   let token = {};
-  token[jwt.identificationField] = 'test@test.com';
+  token.username = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
   token = createFakeToken(token);
@@ -135,7 +113,7 @@ test('#restore resolves when the data includes `token` and excludes `expiresAt`'
     '{ "token": "' + token + '", "refresh_token": "' + refreshToken + '" }'
   ]);
 
-  Ember.run(() => {
+  run(() => {
     App.authenticator.restore(data).then(content => {
       assert.equal(JSON.stringify(content), JSON.stringify(data), 'Check that the resolved data matches the init data');
     }).catch(() => {
@@ -150,7 +128,7 @@ test('#restore rejects when `refreshAccessTokens` is false and token is expired'
     expiresAt = 0;
 
   let token = {};
-  token[jwt.identificationField] = 'test@test.com';
+  token.username = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
   token = createFakeToken(token);
@@ -170,14 +148,12 @@ test('#restore rejects when `refreshAccessTokens` is false and token is expired'
     '{ "token": "' + token + '", "refresh_token": "' + refreshToken + '" }'
   ]);
 
-  Ember.run(() => {
+  run(() => {
     App.authenticator.restore(data).then(() => {
       assert.ok(false);
     }, () => {
-      // Check that refreshAccessToken was not scheduled
-      assert.equal(Ember.run.later.getCalls().some((call) => {
-        return call.args[1] === App.authenticator.refreshAccessToken;
-      }), false);
+      // Check that run.later was not called.
+      assert.deepEqual(run.later.getCall(0), null);
     });
   });
 });
@@ -189,12 +165,14 @@ test('#restore resolves when `expiresAt` is empty but the data includes a nested
     currentTime = getConvertedTime(10000),
     expiresAt = null;
 
-  sinon.stub(App.authenticator, 'getCurrentTime').callsFake(() => { return currentTime; });
+  sinon.stub(App.authenticator, 'getCurrentTime').callsFake(() => {
+    return currentTime;
+  });
   let authenticator = App.authenticator;
   authenticator.tokenPropertyName = 'auth.nested.token';
 
   let token = {};
-  token[jwt.identificationField] = 'test@test.com';
+  token.username = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
   token = createFakeToken(token);
@@ -208,7 +186,7 @@ test('#restore resolves when `expiresAt` is empty but the data includes a nested
   };
   data[jwt.tokenExpireName] = expiresAt;
 
-  Ember.run(() => {
+  run(() => {
     App.authenticator.restore(data).then(content => {
     // Check that the resolved data matches the init data.
       assert.equal(JSON.stringify(content), JSON.stringify(data));
@@ -225,7 +203,7 @@ test('#restore rejects when `token` is excluded.', assert => {
     expiresAt = 3;
 
   let token = {};
-  token[jwt.identificationField] = 'test@test.com';
+  token.username = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
   token = createFakeToken(token);
@@ -242,12 +220,12 @@ test('#restore rejects when `token` is excluded.', assert => {
     '{ "token": "' + token + '", "refresh_token": "' + refreshToken + '" }'
   ]);
 
-  Ember.run(() => {
+  run(() => {
     App.authenticator.restore(data).then(() => {
       assert.ok(false);
     }, () => {
-      // Check that Ember.run.later was not called.
-      assert.deepEqual(Ember.run.later.getCall(0), null);
+      // Check that run.later was not called.
+      assert.deepEqual(run.later.getCall(0), null);
     });
   });
 });
@@ -259,10 +237,12 @@ test('#restore resolves when `expiresAt` is greater than `now`', assert => {
     currentTime = getConvertedTime(10000),
     expiresAt = currentTime + getConvertedTime(3000);
 
-  sinon.stub(App.authenticator, 'getCurrentTime').callsFake(() => { return currentTime; });
+  sinon.stub(App.authenticator, 'getCurrentTime').callsFake(() => {
+    return currentTime;
+  });
 
   let token = {};
-  token[jwt.identificationField] = 'test@test.com';
+  token.username = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
   token = createFakeToken(token);
@@ -282,10 +262,10 @@ test('#restore resolves when `expiresAt` is greater than `now`', assert => {
     '{ "token": "' + token + '", "refresh_token": "' + refreshToken + '" }'
   ]);
 
-  Ember.run(() => {
+  run(() => {
     App.authenticator.restore(data).then(() => {
       // Check that refreshAccessToken was not scheduled
-      assert.equal(Ember.run.later.getCalls().some((call) => {
+      assert.equal(run.later.getCalls().some((call) => {
         return call.args[1] === App.authenticator.refreshAccessToken;
       }), false);
     }).catch(() => {
@@ -301,11 +281,15 @@ test('#restore schedules a token refresh when `refreshAccessTokens` is true.', a
     currentTime = getConvertedTime(10000),
     expiresAt = currentTime + getConvertedTime(3000);
 
-  sinon.stub(App.authenticator, 'getCurrentTime').callsFake(() => { return currentTime; });
-  sinon.stub(App.authenticator, 'refreshAccessToken').callsFake(() => { return null; });
+  sinon.stub(App.authenticator, 'getCurrentTime').callsFake(() => {
+    return currentTime;
+  });
+  sinon.stub(App.authenticator, 'refreshAccessToken').callsFake(() => {
+    return null;
+  });
 
   let token = {};
-  token[jwt.identificationField] = 'test@test.com';
+  token.username = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
   token = createFakeToken(token);
@@ -318,7 +302,7 @@ test('#restore schedules a token refresh when `refreshAccessTokens` is true.', a
   data[jwt.tokenExpireName] = expiresAt;
 
   const refreshedToken = {};
-  refreshedToken[jwt.identificationField] = 'test@test.com';
+  refreshedToken.username = 'test@test.com';
   refreshedToken[jwt.tokenExpireName] = expiresAt;
 
   token = createFakeToken(refreshedToken);
@@ -330,10 +314,10 @@ test('#restore schedules a token refresh when `refreshAccessTokens` is true.', a
     '{ "token": "' + token + '", "refresh_token": "' + refreshToken + '" }'
   ]);
 
-  Ember.run(() => {
+  run(() => {
     App.authenticator.restore(data).then(() => {
       // Check that refreshAccessToken was scheduled
-      assert.equal(Ember.run.later.getCalls().some((call) => {
+      assert.equal(run.later.getCalls().some((call) => {
         return call.args[1] === App.authenticator.refreshAccessToken &&
           call.args[2] === refreshToken;
       }), true);
@@ -351,10 +335,12 @@ test('#restore does not schedule a token refresh when `refreshAccessTokens` is f
     currentTime = getConvertedTime(10000),
     expiresAt = currentTime + getConvertedTime(3000);
 
-  sinon.stub(App.authenticator, 'getCurrentTime').callsFake(() => { return currentTime; });
+  sinon.stub(App.authenticator, 'getCurrentTime').callsFake(() => {
+    return currentTime;
+  });
 
   let token = {};
-  token[jwt.identificationField] = 'test@test.com';
+  token.username = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
   token = createFakeToken(token);
@@ -365,10 +351,10 @@ test('#restore does not schedule a token refresh when `refreshAccessTokens` is f
 
   App.authenticator.refreshAccessTokens = false;
 
-  Ember.run(() => {
+  run(() => {
     App.authenticator.restore(data).then(() => {
       // Check that refreshAccessToken was not scheduled
-      assert.equal(Ember.run.later.getCalls().some((call) => {
+      assert.equal(run.later.getCalls().some((call) => {
         return call.args[1] === App.authenticator.refreshAccessToken;
       }), false);
     });
@@ -384,7 +370,7 @@ test('#restore does not schedule a token refresh when `expiresAt` <= `now`.', as
     expiresAt = -1;
 
   let token = {};
-  token[jwt.identificationField] = 'test@test.com';
+  token.username = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
   token = createFakeToken(token);
@@ -393,10 +379,10 @@ test('#restore does not schedule a token refresh when `expiresAt` <= `now`.', as
   data[jwt.tokenPropertyName] = token;
   data[jwt.tokenExpireName] = expiresAt;
 
-  Ember.run(() => {
+  run(() => {
     App.authenticator.restore(data).catch(() => {
-      // Check that Ember.run.later was not called.
-      assert.deepEqual(Ember.run.later.getCall(0), null);
+      // Check that run.later was not called.
+      assert.deepEqual(run.later.getCall(0), null);
       done();
     });
   });
@@ -410,7 +396,7 @@ test('#restore does not schedule a token refresh when `expiresAt` - `refreshLeew
     expiresAt = getConvertedTime(6000);
 
   let token = {};
-  token[jwt.identificationField] = 'test@test.com';
+  token.username = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
   token = createFakeToken(token);
@@ -422,10 +408,10 @@ test('#restore does not schedule a token refresh when `expiresAt` - `refreshLeew
   // Set the refreshLeeway to > expiresAt.
   App.authenticator.refreshLeeway = 120;
 
-  Ember.run(() => {
+  run(() => {
     App.authenticator.restore(data).catch(() => {
-      // Check that Ember.run.later was not called.
-      assert.deepEqual(Ember.run.later.getCall(0), null);
+      // Check that run.later was not called.
+      assert.deepEqual(run.later.getCall(0), null);
       done();
     });
   });
@@ -444,9 +430,9 @@ test('#restore schedule access token refresh and refreshes it when time is appro
   let refreshAccessTokenTarget;
   let refreshAccessTokenArgs;
 
-  Ember.run.later.restore();
+  run.later.restore();
 
-  sinon.stub(Ember.run, 'later').callsFake((target, method, args) => {
+  sinon.stub(run, 'later').callsFake((target, method, args) => {
     refreshAccessToken = method;
     refreshAccessTokenTarget = target;
     refreshAccessTokenArgs = args;
@@ -454,10 +440,12 @@ test('#restore schedule access token refresh and refreshes it when time is appro
     return Math.random();
   });
 
-  sinon.stub(App.authenticator, 'getCurrentTime').callsFake(() => { return currentTime; });
+  sinon.stub(App.authenticator, 'getCurrentTime').callsFake(() => {
+    return currentTime;
+  });
 
   let token = {};
-  token[jwt.identificationField] = 'test@test.com';
+  token.username = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
   token = createFakeToken(token);
@@ -472,19 +460,21 @@ test('#restore schedule access token refresh and refreshes it when time is appro
   // Set the refreshLeeway to > expiresAt.
   App.authenticator.refreshLeeway = 120;
 
-  Ember.run(() => {
+  run(() => {
     App.authenticator.restore(data).catch(() => {
-      // Check that Ember.run.cancel was called.
-      assert.deepEqual(Ember.run.cancel.getCall(1), true);
+      // Check that run.cancel was called.
+      assert.deepEqual(run.cancel.getCall(1), true);
     });
   });
 
   currentTime = getConvertedTime(1250);
   App.authenticator.getCurrentTime.restore();
-  sinon.stub(App.authenticator, 'getCurrentTime').callsFake(() => { return currentTime; });
+  sinon.stub(App.authenticator, 'getCurrentTime').callsFake(() => {
+    return currentTime;
+  });
 
   const refreshedToken = {};
-  refreshedToken[jwt.identificationField] = 'test@test.com';
+  refreshedToken.username = 'test@test.com';
   refreshedToken[jwt.tokenExpireName] = expiresAt;
 
   token = createFakeToken(refreshedToken);
@@ -496,69 +486,12 @@ test('#restore schedule access token refresh and refreshes it when time is appro
     '{ "token": "' + token + '", "refresh_token": "' + refreshToken + '" }'
   ]);
 
-  assert.ok(!!refreshAccessToken, "should schedule refreshAccessToken method");
-
-  Ember.run(() => {
+  run(() => {
     refreshAccessToken.call(refreshAccessTokenTarget, refreshAccessTokenArgs).then(response => {
       assert.deepEqual(response, { exp: expiresAt, token: token, 'refresh_token': refreshToken });
       done();
     });
   });
-});
-
-test('#restore schedule access token expiration and invalidates session when time is appropriate', assert => {
-  assert.expect(3);
-
-  const jwt = JWT.create();
-
-  let currentTime = getConvertedTime(10000);
-  const expiresAt = currentTime + getConvertedTime(3000);
-
-  let invalidateSession;
-  let invalidateSessionTarget;
-  let invalidateSessionArgs;
-
-  Ember.run.later.restore();
-
-  sinon.stub(Ember.run, 'later', (target, method, wait) => {
-    assert.equal(target, App.authenticator);
-    assert.equal(method, App.authenticator.handleAccessTokenExpiration);
-    assert.equal(wait, 3000000000);
-
-    return Math.random();
-  });
-
-  sinon.stub(App.authenticator, 'getCurrentTime', () => { return currentTime; });
-
-  let token = {};
-  token[jwt.identificationField] = 'test@test.com';
-  token[jwt.tokenExpireName] = expiresAt;
-
-  token = createFakeToken(token);
-
-  const data = {};
-  data[jwt.tokenPropertyName] = token;
-  data[jwt.tokenExpireName] = expiresAt;
-
-  App.authenticator.refreshAccessTokens = false;
-
-  Ember.run(() => {
-    App.authenticator.restore(data).catch(() => {
-      // Check that Ember.run.cancel was called.
-      assert.deepEqual(Ember.run.cancel.getCall(1), true);
-    });
-  });
-
-  currentTime = getConvertedTime(1250);
-  App.authenticator.getCurrentTime.restore();
-  sinon.stub(App.authenticator, 'getCurrentTime', () => { return currentTime; });
-
-  // Ember.run(() => {
-  //   invalidateSession.call(invalidateSessionTarget, invalidateSessionArgs).then(response => {
-  //     console.log(response);
-  //     assert.true();
-  //   });
-  // });
 });
 
 test('#authenticate sends an ajax request to the token endpoint', assert => {
@@ -567,19 +500,19 @@ test('#authenticate sends an ajax request to the token endpoint', assert => {
   const jwt = JWT.create();
 
   const credentials = {
-    identification: 'username',
+    username: 'test@test.com',
     password: 'password'
   };
 
   App.authenticator.authenticate(credentials);
 
-  Ember.run(() => {
-    var args = Ember.$.ajax.getCall(0).args[0];
+  run(() => {
+    var args = $.ajax.getCall(0).args[0];
     delete args.beforeSend;
     assert.deepEqual(args, {
       url: jwt.serverTokenEndpoint,
       method: 'POST',
-      data: '{"password":"password","username":"username"}',
+      data: '{"username":"test@test.com","password":"password"}',
       dataType: 'json',
       contentType: 'application/json',
       headers: {}
@@ -594,7 +527,7 @@ test('#authenticate rejects with invalid credentials', assert => {
   const jwt = JWT.create();
 
   const credentials = {
-    identification: 'username',
+    username: 'test@test.com',
     password: 'password'
   };
 
@@ -605,10 +538,10 @@ test('#authenticate rejects with invalid credentials', assert => {
     '{"message":["Unable to login with provided credentials."]}'
   ]);
 
-  Ember.run(() => {
+  run(() => {
     App.authenticator.authenticate(credentials).then(null, () => {
-      // Check that Ember.run.later was not called.
-      assert.deepEqual(Ember.run.later.getCall(0), null);
+      // Check that run.later was not called.
+      assert.deepEqual(run.later.getCall(0), null);
       done();
     });
   });
@@ -616,12 +549,13 @@ test('#authenticate rejects with invalid credentials', assert => {
 
 test('#authenticate schedules a token refresh when `refreshAccessTokens` is true', assert => {
   assert.expect(1);
+  const done = assert.async();
 
   const jwt = JWT.create(),
     expiresAt = new Date().getTime() + 300000;
 
   let token = {};
-  token[jwt.identificationField] = 'test@test.com';
+  token.username = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
   token = createFakeToken(token);
@@ -629,7 +563,7 @@ test('#authenticate schedules a token refresh when `refreshAccessTokens` is true
   let refreshToken = createFakeRefreshToken();
 
   const credentials = {
-    identification: 'username',
+    username: 'test@test.com',
     password: 'password'
   };
 
@@ -640,13 +574,15 @@ test('#authenticate schedules a token refresh when `refreshAccessTokens` is true
     '{ "token": "' + token + '", "refresh_token": "' + refreshToken + '" }'
   ]);
 
-  Ember.run(() => {
+  run(() => {
     App.authenticator.authenticate(credentials).then(() => {
       // Check that refreshAccessToken was scheduled
-      assert.equal(Ember.run.later.getCalls().some((call) => {
+      var spyCall = run.later.getCalls().some(call => {
         return call.args[1] === App.authenticator.refreshAccessToken &&
           call.args[2] === refreshToken;
-      }), true);
+      });
+      assert.deepEqual(spyCall, true);
+      done();
     });
   });
 });
@@ -659,7 +595,7 @@ test('#authenticate does not schedule a token refresh when `refreshAccessTokens`
     expiresAt = 3;
 
   let token = {};
-  token[jwt.identificationField] = 'test@test.com';
+  token.username = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
   token = createFakeToken(token);
@@ -667,7 +603,7 @@ test('#authenticate does not schedule a token refresh when `refreshAccessTokens`
   let refreshToken = createFakeRefreshToken();
 
   const credentials = {
-    identification: 'username',
+    username: 'test@test.com',
     password: 'password'
   };
 
@@ -680,48 +616,14 @@ test('#authenticate does not schedule a token refresh when `refreshAccessTokens`
 
   App.authenticator.refreshAccessTokens = false;
 
-  Ember.run(() => {
+  run(() => {
     App.authenticator.authenticate(credentials).then(() => {
       // Check that refreshAccessToken was not scheduled
-      assert.equal(Ember.run.later.getCalls().some((call) => {
+      var spyCall = run.later.getCalls().some(call => {
         return call.args[1] === App.authenticator.refreshAccessToken;
-      }), false);
-    });
-  });
-});
-
-test('#authenticate schedules a token expiration', assert => {
-  assert.expect(1);
-
-  const jwt = JWT.create(),
-    expiresAt = new Date().getTime() + 300000;
-
-  let token = {};
-  token[jwt.identificationField] = 'test@test.com';
-  token[jwt.tokenExpireName] = expiresAt;
-
-  token = createFakeToken(token);
-
-  let refreshToken = createFakeRefreshToken();
-
-  const credentials = {
-    identification: 'username',
-    password: 'password'
-  };
-
-  App.server.respondWith('POST', jwt.serverTokenEndpoint, [
-    201, {
-      'Content-Type': 'application/json'
-    },
-    '{ "token": "' + token + '", "refresh_token": "' + refreshToken + '" }'
-  ]);
-
-  Ember.run(() => {
-    App.authenticator.authenticate(credentials).then(() => {
-      // Check that expireAccessToken was scheduled
-      assert.equal(Ember.run.later.getCalls().some((call) => {
-        return call.args[1] === App.authenticator.handleAccessTokenExpiration;
-      }), true);
+      });
+      assert.deepEqual(spyCall, false);
+      done();
     });
   });
 });
@@ -730,26 +632,27 @@ test('#authenticate sends an AJAX request with custom headers', assert => {
   assert.expect(1);
 
   const credentials = {
-    identification: 'username',
+    username: 'test@test.com',
     password: 'password'
   };
 
-  Configuration.headers = {
+  App.authenticator = JWT.create();
+
+  App.authenticator.headers = {
     'X-API-KEY': '123-abc',
     'X-ANOTHER-HEADER': 0,
     Accept: 'application/vnd.api+json'
   };
 
-  App.authenticator = JWT.create();
   App.authenticator.authenticate(credentials);
 
-  Ember.run(() => {
-    var args = Ember.$.ajax.getCall(0).args[0];
+  run(() => {
+    var args = $.ajax.getCall(0).args[0];
     delete args.beforeSend;
     assert.deepEqual(args, {
       url: '/api/token-auth/',
       method: 'POST',
-      data: '{"password":"password","username":"username"}',
+      data: '{"username":"test@test.com","password":"password"}',
       dataType: 'json',
       contentType: 'application/json',
       headers: {
@@ -770,8 +673,8 @@ test('#refreshAccessToken makes an AJAX request to the token endpoint.', assert 
 
   App.authenticator.refreshAccessToken(token);
 
-  Ember.run(() => {
-    var args = Ember.$.ajax.getCall(0).args[0];
+  run(() => {
+    var args = $.ajax.getCall(0).args[0];
     delete args.beforeSend;
     assert.deepEqual(args, {
       url: jwt.serverTokenRefreshEndpoint,
@@ -793,8 +696,8 @@ test('#refreshAccessToken makes an AJAX request to the token endpoint with neste
   App.authenticator.refreshTokenPropertyName = 'auth.nested.token';
   App.authenticator.refreshAccessToken(token);
 
-  Ember.run(() => {
-    var args = Ember.$.ajax.getCall(0).args[0];
+  run(() => {
+    var args = $.ajax.getCall(0).args[0];
     delete args.beforeSend;
     assert.deepEqual(args, {
       url: jwt.serverTokenRefreshEndpoint,
@@ -814,10 +717,12 @@ test('#refreshAccessToken triggers the `sessionDataUpdated` event on successful 
   const jwt = JWT.create(),
     expiresAt = 3;
 
-  sinon.stub(App.authenticator, 'scheduleAccessTokenRefresh').callsFake(() => { return null; });
+  sinon.stub(App.authenticator, 'scheduleAccessTokenRefresh').callsFake(() => {
+    return null;
+  });
 
   let token = {};
-  token[jwt.identificationField] = 'test@test.com';
+  token.username = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
   token = createFakeToken(token);
@@ -850,11 +755,13 @@ test('#refreshAccessToken invalidates session and triggers `sessionDataInvalidat
   const jwt = JWT.create();
   const expiresAt = 3;
 
-  sinon.stub(App.authenticator, 'scheduleAccessTokenRefresh').callsFake(() => { return null; });
+  sinon.stub(App.authenticator, 'scheduleAccessTokenRefresh').callsFake(() => {
+    return null;
+  });
 
   let token = {};
 
-  token[jwt.identificationField] = 'test@test.com';
+  token.username = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
   token = createFakeToken(token);
@@ -886,11 +793,13 @@ test('#refreshAccessToken does not invalidate session when the server responds w
   const jwt = JWT.create();
   const expiresAt = 3;
 
-  sinon.stub(App.authenticator, 'scheduleAccessTokenRefresh').callsFake(() => { return null; });
+  sinon.stub(App.authenticator, 'scheduleAccessTokenRefresh').callsFake(() => {
+    return null;
+  });
 
   let token = {};
 
-  token[jwt.identificationField] = 'test@test.com';
+  token.username = 'test@test.com';
   token[jwt.tokenExpireName] = expiresAt;
 
   token = createFakeToken(token);
@@ -917,7 +826,7 @@ test('#getTokenData returns correct data', assert => {
   const stringTokenData = 'test@test.com';
   const objectTokenData = {};
 
-  objectTokenData[jwt.identificationField] = stringTokenData;
+  objectTokenData.username = stringTokenData;
 
   const objectToken = createFakeToken(objectTokenData);
   const stringToken = createFakeToken(stringTokenData);

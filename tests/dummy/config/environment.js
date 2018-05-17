@@ -1,4 +1,3 @@
-/* eslint-env node */
 'use strict';
 
 module.exports = function(environment) {
@@ -35,10 +34,11 @@ module.exports = function(environment) {
   };
 
   if (environment === 'development') {
-    ENV['ember-simple-auth'] = {
-      authorizer: 'authorizer:token',
-      applicationRootUrl: ENV.rootURL
-    };
+    // ENV.APP.LOG_RESOLVER = true;
+    // ENV.APP.LOG_ACTIVE_GENERATION = true;
+    // ENV.APP.LOG_TRANSITIONS = true;
+    // ENV.APP.LOG_TRANSITIONS_INTERNAL = true;
+    // ENV.APP.LOG_VIEW_LOOKUPS = true;
 
     ENV['ember-simple-auth-token'] = {
       refreshTokenPropertyName: 'token',
@@ -50,7 +50,6 @@ module.exports = function(environment) {
 
   if (environment === 'test') {
     // Testem prefers this...
-    ENV.rootURL = '/';
     ENV.locationType = 'none';
 
     // keep test console output quieter
@@ -58,25 +57,25 @@ module.exports = function(environment) {
     ENV.APP.LOG_VIEW_LOOKUPS = false;
 
     ENV.APP.rootElement = '#ember-testing';
+    ENV.APP.autoboot = false;
   }
 
   if (environment === 'production') {
+    // here you can enable a production-specific feature
     ENV.rootURL = '/ember-simple-auth-token';
     ENV.API_URL = 'https://simple-auth-token-server.herokuapp.com';
 
-    ENV['ember-simple-auth'] = {
-      authorizer: 'authorizer:token',
-      applicationRootUrl: ENV.rootURL,
-      crossOriginWhitelist: [ENV.API_URL]
-    };
-
     ENV['ember-simple-auth-token'] = {
       refreshTokenPropertyName: 'token',
-      serverTokenEndpoint: ENV.API_URL + '/api/token-auth/',
-      serverTokenRefreshEndpoint: ENV.API_URL + '/api/token-refresh/',
+      serverTokenEndpoint: '/api/token-auth/',
+      serverTokenRefreshEndpoint: '/api/token-refresh/',
       refreshLeeway: 5
     };
   }
+
+  ENV['ember-simple-auth'] = {
+    applicationRootUrl: ENV.rootURL
+  };
 
   return ENV;
 };

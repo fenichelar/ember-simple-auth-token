@@ -1,6 +1,9 @@
-import Ember from 'ember';
+import Mixin from '@ember/object/mixin';
+import { inject } from '@ember/service';
+import { get } from '@ember/object';
+import { isEmpty } from '@ember/utils';
 import DataAdapterMixin from 'ember-simple-auth/mixins/data-adapter-mixin';
-import Configuration from '../configuration';
+import config from 'ember-get-config';
 
 /**
   Authorizer Mixin that works with token-based authentication like JWT
@@ -10,44 +13,8 @@ import Configuration from '../configuration';
   @module ember-simple-auth-token/mixins/token-authorizer
   @extends Ember.Mixin
 */
-export default Ember.Mixin.create(DataAdapterMixin, {
-  session: Ember.inject.service('session'),
-
-  /**
-    The prefix used in the value of the Authorization header.
-
-    This value can be configured via
-    [`SimpleAuth.Configuration.Token#authorizationPrefix`](#SimpleAuth-Configuration-Token-authorizationPrefix).
-
-    @property authorizationPrefix
-    @type String
-    @default 'Bearer '
-  */
-  authorizationPrefix: 'Bearer ',
-
-  /**
-    The name of the property in session that contains token used for authorization.
-
-    This value can be configured via
-    [`SimpleAuth.Configuration.Token#tokenPropertyName`](#SimpleAuth-Configuration-Token-tokenPropertyName).
-
-    @property tokenPropertyName
-    @type String
-    @default 'token'
-  */
-  tokenPropertyName: 'token',
-
-  /**
-    The name of the HTTP Header used to send token.
-
-    This value can be configured via
-    [`SimpleAuth.Configuration.Token#authorizationHeaderName`](#SimpleAuth-Configuration-Token-authorizationHeaderName).
-
-    @property authorizationHeaderName
-    @type String
-    @default 'Authorization'
-  */
-  authorizationHeaderName: 'Authorization',
+export default Mixin.create(DataAdapterMixin, {
+  session: inject('session'),
 
   /**
     @method init
@@ -55,12 +22,10 @@ export default Ember.Mixin.create(DataAdapterMixin, {
   */
   init() {
     this._super(...arguments);
-    this.tokenPropertyName = Configuration.tokenPropertyName;
-    this.authorizationHeaderName = Configuration.authorizationHeaderName;
-
-    if (Configuration.authorizationPrefix || Configuration.authorizationPrefix === null) {
-      this.authorizationPrefix = Configuration.authorizationPrefix;
-    }
+    const conf = config['ember-simple-auth-token'] || {};
+    this.tokenPropertyName = conf.tokenPropertyName || 'token';
+    this.authorizationHeaderName = conf.authorizationHeaderName || 'Authorization';
+    this.authorizationPrefix = conf.authorizationPrefix === '' ? '' : conf.authorizationPrefix || 'Bearer ';
   },
 
   /**
@@ -75,12 +40,13 @@ export default Ember.Mixin.create(DataAdapterMixin, {
     @param {XMLHttpRequest} xhr
   */
   authorize(xhr) {
-    const data = Ember.get(this, 'session.data.authenticated');
-    const token = Ember.get(data, this.tokenPropertyName);
-    const prefix = this.authorizationPrefix ? this.authorizationPrefix : '';
+    const data = get(this, 'session.data.authenticated');
+    const token = get(data, this.get('tokenPropertyName'));
+    const prefix = this.get('authorizationPrefix')
+    const header = this.get('authorizationHeaderName')
 
-    if (this.get('session.isAuthenticated') && !Ember.isEmpty(token)) {
-      xhr.setRequestHeader(this.authorizationHeaderName, prefix + token);
+    if (this.get('session.isAuthenticated') && !isEmpty(token)) {
+      xhr.setRequestHeader(header, prefix + token);
     }
   }
 });

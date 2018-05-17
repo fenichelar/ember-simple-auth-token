@@ -5,15 +5,15 @@ module.exports = function(app) {
 
   usersRouter.get('/', function(req, res) {
     var authorizationHeader = req.headers.authorization || '';
-
     var token = authorizationHeader.split('Bearer ')[1];
 
     if (!token) {
-      res.send({}, 200);
-      return;
+      return res.send({}, 200);
     }
 
-    res.send(jwt.verify(token, 'secret'));
+    var user = jwt.verify(token, 'secret');
+
+    return res.send({username: user.username});
   });
 
   app.use('/api/users', usersRouter);
