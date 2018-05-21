@@ -27,7 +27,6 @@ export default Base.extend({
     const conf = config['ember-simple-auth-token'] || {};
     this.serverTokenEndpoint = conf.serverTokenEndpoint || '/api/token-auth/';
     this.tokenPropertyName = conf.tokenPropertyName || 'token';
-    this.refreshTokenPropertyName = conf.refreshTokenPropertyName || 'refresh_token';
     this.headers = conf.headers || {};
   },
 
