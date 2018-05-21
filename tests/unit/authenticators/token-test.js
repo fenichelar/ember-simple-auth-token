@@ -6,7 +6,7 @@ import $ from 'jquery';
 import { run } from '@ember/runloop';
 import Token from 'ember-simple-auth-token/authenticators/token';
 
-var App;
+let App;
 
 module('Token Authenticator', {
   beforeEach: () => {
@@ -52,7 +52,7 @@ test('#authenticate sends an AJAX request to the sign in endpoint', assert => {
   App.authenticator.authenticate(credentials);
 
   run(() => {
-    var args = $.ajax.getCall(0).args[0];
+    let args = $.ajax.getCall(0).args[0];
     delete args.beforeSend;
     assert.deepEqual(args, {
       url: '/api/token-auth/',
@@ -103,7 +103,7 @@ test('#authenticate sends an AJAX request with custom headers', assert => {
   App.authenticator.authenticate(credentials);
 
   run(() => {
-    var args = $.ajax.getCall(0).args[0];
+    let args = $.ajax.getCall(0).args[0];
     delete args.beforeSend;
     assert.deepEqual(args, {
       url: '/api/token-auth/',

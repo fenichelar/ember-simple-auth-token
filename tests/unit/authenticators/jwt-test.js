@@ -6,10 +6,10 @@ import $ from 'jquery';
 import { run } from '@ember/runloop';
 import JWT from 'ember-simple-auth-token/authenticators/jwt';
 
-var App;
+let App;
 
 const createFakeToken = obj => {
-  var token = window.btoa(JSON.stringify(obj));
+  const token = window.btoa(JSON.stringify(obj));
   return 'a.' + token + '.b';
 };
 
@@ -507,7 +507,7 @@ test('#authenticate sends an ajax request to the token endpoint', assert => {
   App.authenticator.authenticate(credentials);
 
   run(() => {
-    var args = $.ajax.getCall(0).args[0];
+    let args = $.ajax.getCall(0).args[0];
     delete args.beforeSend;
     assert.deepEqual(args, {
       url: jwt.serverTokenEndpoint,
@@ -577,7 +577,7 @@ test('#authenticate schedules a token refresh when `refreshAccessTokens` is true
   run(() => {
     App.authenticator.authenticate(credentials).then(() => {
       // Check that refreshAccessToken was scheduled
-      var spyCall = run.later.getCalls().some(call => {
+      const spyCall = run.later.getCalls().some(call => {
         return call.args[1] === App.authenticator.refreshAccessToken &&
           call.args[2] === refreshToken;
       });
@@ -619,7 +619,7 @@ test('#authenticate does not schedule a token refresh when `refreshAccessTokens`
   run(() => {
     App.authenticator.authenticate(credentials).then(() => {
       // Check that refreshAccessToken was not scheduled
-      var spyCall = run.later.getCalls().some(call => {
+      const spyCall = run.later.getCalls().some(call => {
         return call.args[1] === App.authenticator.refreshAccessToken;
       });
       assert.deepEqual(spyCall, false);
@@ -647,7 +647,7 @@ test('#authenticate sends an AJAX request with custom headers', assert => {
   App.authenticator.authenticate(credentials);
 
   run(() => {
-    var args = $.ajax.getCall(0).args[0];
+    let args = $.ajax.getCall(0).args[0];
     delete args.beforeSend;
     assert.deepEqual(args, {
       url: '/api/token-auth/',
@@ -674,7 +674,7 @@ test('#refreshAccessToken makes an AJAX request to the token endpoint.', assert 
   App.authenticator.refreshAccessToken(token);
 
   run(() => {
-    var args = $.ajax.getCall(0).args[0];
+    let args = $.ajax.getCall(0).args[0];
     delete args.beforeSend;
     assert.deepEqual(args, {
       url: jwt.serverTokenRefreshEndpoint,
@@ -697,7 +697,7 @@ test('#refreshAccessToken makes an AJAX request to the token endpoint with neste
   App.authenticator.refreshAccessToken(token);
 
   run(() => {
-    var args = $.ajax.getCall(0).args[0];
+    let args = $.ajax.getCall(0).args[0];
     delete args.beforeSend;
     assert.deepEqual(args, {
       url: jwt.serverTokenRefreshEndpoint,
