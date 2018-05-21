@@ -8,8 +8,8 @@ export default Controller.extend({
 
   actions: {
     authenticate: function() {
-      var credentials = this.getProperties('username', 'password'),
-          authenticator = 'authenticator:jwt';
+      const credentials = this.getProperties('username', 'password');
+      const authenticator = 'authenticator:jwt';
 
       this.get('session').authenticate(authenticator, credentials);
     }

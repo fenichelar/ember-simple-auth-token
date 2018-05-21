@@ -11,9 +11,9 @@ export default Controller.extend({
   }),
 
   tokenData: computed('session.session.content.authenticated', function() {
-    var authenticator = getOwner(this).lookup('authenticator:jwt'),
-        session = this.get('session.session.content.authenticated'),
-        tokenData = {};
+    const authenticator = getOwner(this).lookup('authenticator:jwt');
+    const session = this.get('session.session.content.authenticated');
+    let tokenData = {};
 
     if(session && Object.keys(session).length > 0) {
       tokenData = authenticator.getTokenData(session.token);
