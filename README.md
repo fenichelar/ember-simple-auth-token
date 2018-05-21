@@ -129,7 +129,7 @@ ENV['ember-simple-auth-token'] = {
 };
 ```
 
-### JSON Web Token Authenticator
+#### JSON Web Token Authenticator
 
 In addition to all the customization options available to the token authenticator:
 
