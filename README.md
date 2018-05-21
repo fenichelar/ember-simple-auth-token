@@ -1,39 +1,32 @@
 # Ember Simple Auth Token
 
-[![build-status-image]][travis]
-[![ember-observer-score-image]][ember-observer]
-[![npm](https://img.shields.io/npm/v/ember-simple-auth-token.svg)]()
+[![travis-image]][travis]
+[![ember-observer-image]][ember-observer]
+[![npm-image]][npm]
 
-This is an extension to the Ember Simple Auth library that provides a default token authenticator, an enhanced authenticator with automatic refresh capability, and an authorizer mixin that are compatible with APIs with token-based authentication.
+This is Ember addon is an extension to the Ember Simple Auth library that provides a basic token authenticator, a JSON Web Tokens token authenticator with automatic refresh capability, and an authorizer mixin. You can find more about why JSON Web Tokens are so awesome in [this article][medium-jwt].
 
-If you're thinking about using this addon in combination with JSON Web Tokens, you can find more about why they're so awesome in [this article][medium-jwt].
+**Because user's credentials and tokens are exchanged between the
+Ember.js app and the server, you must use HTTPS for this connection!**
 
-**As your user's credentials as well as the token are exchanged between the
-Ember.js app and the server you have to make sure that this connection uses HTTPS!**
+## Demo
 
-## Live Demo
-
-View a live demo here: [https://jpadilla.github.io/ember-simple-auth-token/][demo]
+A demo is available [here][demo].
 
 ## Installation
 
-To install Ember Simple Auth Token in an Ember.js application that uses [Ember CLI][ember-cli]:
-
-Make sure you have [ember-simple-auth][ember-simple-auth] installed:
+Before installing the Ember Simple Auth Token addon, [ember-simple-auth][ember-simple-auth] must be installed. Both addons can be installed with [Ember CLI][ember-cli] by running:
 
 ```
 ember install ember-simple-auth
-```
-
-To install simply run:
-
-```
 ember install ember-simple-auth-token
 ```
 
-## The Authenticators
+## Setup
 
-In order to use the Token authenticator or the JWT authenticator, the application needs to have a login route:
+### Authenticator
+
+In order to use the token authenticator or the JSON Web Token authenticator, the application should have a route for login. In most cases, the login route will display a form with a `username` and `password` field. On form submit, the `authenticate` action will be called on the `session`:
 
 ```js
 // app/router.js
@@ -41,9 +34,6 @@ Router.map(function() {
   this.route('login');
 });
 ```
-
-This route displays the login form with fields for `username`,
-`password`:
 
 ```html
 {{! app/templates/login.hbs }}
@@ -56,25 +46,18 @@ This route displays the login form with fields for `username`,
 </form>
 ```
 
-To handle the `authenticate` action that is triggered by submitting the form you can do the following in the respective controller:
-
-Note: This was previously handled using Simple Auth's now deprecated `LoginControllerMixin`.
-
-**Token Authenticator**
-
-Default base implementation for token authentication.
-
 ```js
 // app/controllers/login.js
-import Ember from 'ember';
+import Controller from '@ember/controller';
+import { inject } from '@ember/service';
 
-export default Ember.Controller.extend({
-  session: Ember.inject.service(),
+export default Controller.extend({
+  session: inject('session'),
 
   actions: {
     authenticate: function() {
-      var credentials = this.getProperties('username', 'password'),
-        authenticator = 'authenticator:token';
+      var credentials = this.getProperties('username', 'password');
+      const authenticator = 'authenticator:token'; // or 'authenticator:jwt'
 
       this.get('session').authenticate(authenticator, credentials);
     }
@@ -82,67 +65,42 @@ export default Ember.Controller.extend({
 });
 ```
 
-**JWT Authenticator**
+#### JSON Web Token Authenticator
 
-Extends the Token Authenticator and adds automatic token refresh functionality.
+The JSON Web Token authenticator will decode the token and look for the
+expiration time found. The difference in the current time and the token expiration time is calculated. The `refreshLeeway` is subtracted from this value to determine when the automatic token refresh request should be made.
 
 ```js
-// app/controllers/login.js
-import Ember from 'ember';
-
-export default Ember.Controller.extend({
-  session: Ember.inject.service(),
-
-  actions: {
-    authenticate: function() {
-      var credentials = this.getProperties('username', 'password'),
-        authenticator = 'authenticator:jwt';
-
-      this.get('session').authenticate(authenticator, credentials);
-    }
-  }
-});
+// config/environment.js
+ENV['ember-simple-auth-token'] = {
+  refreshAccessTokens: true,
+  refreshLeeway: 300 // refresh 5 minutes (300 seconds) before expiration
+};
 ```
 
-Please note, the JWT authenticator will decode a token and look for the
-expiration time found by looking up the `token[Config.tokenExpireName]`. It then
-calculates the difference between the current time and the token expire time —
-from which the *refreshLeeway* is subtracted — to determine when to make the
-next automatic token refresh request.
+The `refreshLeeway` can be specified to send the requests before the token expires to account for clock skew. Some libraries like [PyJWT][pyjwt], [ruby-jwt][ruby-jwt], and [node-jsonwebtoken][node-jsonwebtoken] also support specifying a clock tolerance when verifying the token.
 
-For example, with the following configuration:
+Sample JSON Web Token:
 
-```
-  ENV['ember-simple-auth-token'] = {
-    refreshAccessTokens: true,
-    refreshLeeway: 300 // Refresh the token 5 minutes (300s) before it expires.
-  };
-```
-
-Your decoded token might look like this:
-
-```
-token = {
-  'user': 'george',
-  'email': 'george@castanza.com'
-  'exp': '98343234' // <ISO-8601> UTC seconds from e.g. python backend.
-}
+```js
+const encodedToken = eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG4iLCJleHAiOjk4MzQzMjM0fQ.FKuPdB7vmkRfR2fqaWEyltlgOt57lYQ2vC_vFXtlMMJfpCMMq0BEoXEC6rLC5ygORcKHprupi06Zmx0D8nChPQ;
+const decodedHeader = {
+  'alg': 'HS512',
+  'typ': 'JWT'
+};
+const decodedPayload = {
+  'username': 'john',
+  'exp': 98343234 // <ISO-8601> UTC seconds
+};
 ```
 
-*In this case the token expire name is using the default `exp` as set by the
-`Config.tokenExpireName` property.*
+To debug JSON Web Token issues, see [jwt][jwt].
 
-An automatic token refresh request would be sent out at `token[Config.tokenExpireName] - now()`. A good practice with regards to token refreshing is to also set a "leeway", usually no more than a few minutes, to account for clock skew when decoding JSON Web Tokens in the server-side. Some libraries like [PyJWT][pyjwt] and [ruby-jwt][ruby-jwt] already support this.
+The JSON Web Token authenticator supports both separate access tokens and refresh tokens. By specifying the `tokenPropertyName` and the `refreshTokenPropertyName` to the same value, the same token will be used for both access and refresh requests. For more information about refresh tokens, see [this blog](blog-refresh-token).
 
-## The Token Authorizer Mixin
+### Authorizer Mixin
 
-The token authorizer mixin authorizes requests by adding `token` property from the session in the `Authorization` header:
-
-```
-Authorization: Bearer <token>
-```
-
-To use the authorizer, configure your application `adapter`:
+In order to send the token with all API requests made to the server, the token authorizer mixin should be used:
 
 ```js
 // app/adapters/application.js
@@ -152,47 +110,71 @@ import TokenAuthorizerMixin from 'ember-simple-auth-token/mixins/token-authorize
 export default DS.JSONAPIAdapter.extend(TokenAuthorizerMixin);
 ```
 
-## Available Customization Options
+The mixin will add the header to each API request:
 
-For the Token authenticator:
+```
+Authorization: Bearer <token>
+```
+
+### Customization Options
+
+#### Token Authenticator
 
 ```js
 // config/environment.js
 ENV['ember-simple-auth-token'] = {
-  serverTokenEndpoint: '/api/token-auth/',
-  tokenPropertyName: 'token',
-  refreshTokenPropertyName: 'refresh_token',
-  authorizationPrefix: 'Bearer ',
-  authorizationHeaderName: 'Authorization',
-  headers: {},
+  serverTokenEndpoint: '/api/token-auth/', // Server endpoint to send authenticate request
+  tokenPropertyName: 'token', // Key in server response that contains the access token
+  headers: {} // Headers to add to the
 };
 ```
 
-For the JWT authenticator (in addition to the Token authenticator fields):
+### JSON Web Token Authenticator
 
+In addition to all the customization options available to the token authenticator:
+
+```js
+// config/environment.js
+ENV['ember-simple-auth-token'] = {
+  refreshAccessTokens: true, // Enables access token refreshing
+  serverTokenRefreshEndpoint: '/api/token-refresh/', // Server endpoint to send refresh request
+  refreshTokenPropertyName: 'refresh_token', // Key in server response that contains the refresh token
+  tokenExpireName: 'exp', // Field containing token expiration
+  refreshLeeway: 0 // Amount of time to send refresh request before token expiration
+};
 ```
-  refreshAccessTokens: true,
-  serverTokenRefreshEndpoint: '/api/token-refresh/',
-  tokenExpireName: 'exp',
-  refreshLeeway: 0
+
+#### Token Authenticator
+
+In addition to `tokenPropertyName` from the authenticator:
+
+```js
+// config/environment.js
+ENV['ember-simple-auth-token'] = {
+  authorizationHeaderName: 'Authorization', // Header name added to each API request
+  authorizationPrefix: 'Bearer ', // Prefix added to each API request
+};
 ```
 
-Since version 3.0 we are supporting refresh tokens.
-If your token implementation manages your *access token* and *refresh token* separately you can specify the property names under `tokenPropertyName` and `refreshTokenPropertyName` on your `ember-simple-auth-token` JSON.
-If your token implementation checks the authorization directly against your access token and you need to refresh it you can specify the token name on `refreshTokenPropertyName`.
+## Upgrade Notes
 
-For more information:
-[Refresh tokens what are they and when to use them](https://auth0.com/blog/refresh-tokens-what-are-they-and-when-to-use-them/)
+- `getAuthenticateData`, `identificationField`, and `passwordField` have been removed since version 4.0.0
+- `timeFactor` has been removed since version 2.1.0
 
 
-[build-status-image]: https://travis-ci.org/jpadilla/ember-simple-auth-token.svg?branch=master
+[travis-image]: https://travis-ci.org/jpadilla/ember-simple-auth-token.svg?branch=master
 [travis]: https://travis-ci.org/jpadilla/ember-simple-auth-token
-[ember-observer-score-image]: https://emberobserver.com/badges/ember-simple-auth-token.svg
+[ember-observer-image]: https://emberobserver.com/badges/ember-simple-auth-token.svg
 [ember-observer]: https://emberobserver.com/addons/ember-simple-auth-token
+[npm-image]: https://img.shields.io/npm/v/ember-simple-auth-token.svg
+[npm]: https://www.npmjs.com/package/ember-simple-auth-token
 
-[demo]: https://jpadilla.github.io/ember-simple-auth-token/
-[ember-cli]: https://ember-cli.com/
+[demo]: https://jpadilla.github.io/ember-simple-auth-token
+[ember-cli]: https://ember-cli.com
 [ember-simple-auth]: https://github.com/simplabs/ember-simple-auth
 [pyjwt]: https://github.com/jpadilla/pyjwt
 [ruby-jwt]: https://github.com/jwt/ruby-jwt
+[node-jsonwebtoken]: https://github.com/auth0/node-jsonwebtoken
+[jwt]: https://jwt.io
 [medium-jwt]: https://medium.com/@leo/why-json-web-tokens-are-truly-awesome-23fb80b7fc20
+[blog-refresh-token]: https://auth0.com/blog/refresh-tokens-what-are-they-and-when-to-use-them
