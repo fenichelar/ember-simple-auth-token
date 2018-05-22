@@ -2,11 +2,19 @@ import { module } from 'qunit';
 import { test } from 'ember-qunit';
 import sinon from 'sinon';
 import startApp from '../../helpers/start-app';
-import $ from 'jquery';
+import * as fetchWrapper from 'fetch';
 import { run } from '@ember/runloop';
+import { merge } from '@ember/polyfills';
 import Token from 'ember-simple-auth-token/authenticators/token';
 
 let App;
+
+const createFakeCredentials = () => {
+  return {
+    username: 'test@test.com',
+    password: 'password'
+  };
+};
 
 module('Token Authenticator', {
   beforeEach: () => {
@@ -15,134 +23,166 @@ module('Token Authenticator', {
     App.server = sinon.fakeServer.create();
     App.server.autoRespond = true;
     App.authenticator = Token.create();
-    sinon.spy($, 'ajax');
+    sinon.spy(fetchWrapper, 'default');
   },
   afterEach: () => {
     run(App, App.destroy);
     App.xhr.restore();
-    $.ajax.restore();
+    fetchWrapper.default.restore();
   }
 });
 
 test('#restore resolves with the correct data', assert => {
-  const properties = {
-    token: 'secret token!'
+  const response = {
+    [App.authenticator.tokenPropertyName]: 'secret token!'
   };
 
-  App.server.respondWith('POST', '/api/token-auth/', [
-    201, {
+  App.server.respondWith('POST', App.authenticator.serverTokenEndpoint, [
+    201,
+    {
       'Content-Type': 'application/json'
     },
-    '{ "token": "secret token!" }'
+    JSON.stringify(response)
   ]);
 
-  run(() => {
-    App.authenticator.restore(properties).then(content => {
-      assert.deepEqual(content, properties);
-    });
+  return App.authenticator.restore(response).then(content => {
+    assert.deepEqual(content, response);
   });
 });
 
-test('#authenticate sends an AJAX request to the sign in endpoint', assert => {
-  const credentials = {
-    username: 'test@test.com',
-    password: 'password'
+test('#authenticate sends a fetch request to the token endpoint', assert => {
+  assert.expect(2);
+
+  const response = {
+    [App.authenticator.tokenPropertyName]: 'secret token!'
   };
+  const credentials = createFakeCredentials();
 
-  App.authenticator.authenticate(credentials);
-
-  run(() => {
-    let args = $.ajax.getCall(0).args[0];
-    delete args.beforeSend;
-    assert.deepEqual(args, {
-      url: '/api/token-auth/',
-      method: 'POST',
-      data: '{"username":"test@test.com","password":"password"}',
-      dataType: 'json',
-      contentType: 'application/json',
-      headers: {}
-    });
-  });
-});
-
-test('#authenticate successfully resolves with the correct data', assert => {
-  const credentials = {
-    username: 'test@test.com',
-    password: 'password'
-  };
-
-  App.server.respondWith('POST', '/api/token-auth/', [
-    201, {
+  App.server.respondWith('POST', App.authenticator.serverTokenEndpoint, [
+    201,
+    {
       'Content-Type': 'application/json'
     },
-    '{ "access_token": "secret token!" }'
+    JSON.stringify(response)
   ]);
 
-  return App.authenticator
-    .authenticate(credentials)
-    .then(data => {
-      assert.deepEqual(data, { access_token: 'secret token!' });
-    }
-  );
-});
-
-test('#authenticate sends an AJAX request with custom headers', assert => {
-  const credentials = {
-    username: 'test@test.com',
-    password: 'password'
-  };
-
-  App.authenticator = Token.create();
-
-  App.authenticator.headers = {
-    'X-API-KEY': '123-abc',
-    'X-ANOTHER-HEADER': 0,
-    Accept: 'application/vnd.api+json'
-  };
-
-  App.authenticator.authenticate(credentials);
-
-  run(() => {
-    let args = $.ajax.getCall(0).args[0];
-    delete args.beforeSend;
-    assert.deepEqual(args, {
-      url: '/api/token-auth/',
+  return App.authenticator.authenticate(credentials).then(() => {
+    const args = fetchWrapper.default.getCall(0).args;
+    assert.equal(args[0], App.authenticator.serverTokenEndpoint);
+    assert.deepEqual(args[1], {
       method: 'POST',
-      data: '{"username":"test@test.com","password":"password"}',
-      dataType: 'json',
-      contentType: 'application/json',
+      body: JSON.stringify(credentials),
       headers: {
-        'X-API-KEY': '123-abc',
-        'X-ANOTHER-HEADER': 0,
-        Accept: 'application/vnd.api+json'
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
       }
     });
   });
 });
 
-test('#authenticate rejects with the correct error', assert => {
-  const done = assert.async();
-
-  const credentials = {
-    username: 'test@test.com',
-    password: 'password'
+test('#authenticate successfully resolves with the correct data', assert => {
+  const response = {
+    [App.authenticator.tokenPropertyName]: 'secret token!'
   };
+  const credentials = createFakeCredentials();
 
-  App.server.respondWith('POST', '/api/token-auth/', [
-    400, {
+  App.server.respondWith('POST', App.authenticator.serverTokenEndpoint, [
+    201,
+    {
       'Content-Type': 'application/json'
     },
-    '{ "error": "invalid_grant" }'
+    JSON.stringify(response)
   ]);
 
-  App.authenticator.authenticate(credentials).then(null, error => {
-    assert.deepEqual(error, { error: 'invalid_grant' });
-    done();
+  return App.authenticator.authenticate(credentials).then(data => {
+    assert.deepEqual(data, response);
+  });
+});
+
+test('#authenticate sends a fetch request to the token endpoint when `tokenPropertyName` is a nested object', assert => {
+  assert.expect(2);
+
+  App.authenticator.tokenPropertyName = 'auth.nested.token';
+
+  const response = {
+    [App.authenticator.tokenPropertyName]: 'secret token!'
+  };
+  const credentials = createFakeCredentials();
+
+  App.server.respondWith('POST', App.authenticator.serverTokenEndpoint, [
+    201,
+    {
+      'Content-Type': 'application/json'
+    },
+    JSON.stringify(response)
+  ]);
+
+  return App.authenticator.authenticate(credentials).then(() => {
+    const args = fetchWrapper.default.getCall(0).args;
+    assert.equal(args[0], App.authenticator.serverTokenEndpoint);
+    assert.deepEqual(args[1], {
+      method: 'POST',
+      body: JSON.stringify(credentials),
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    });
+  });
+});
+
+test('#authenticate sends an fetch request with custom headers', assert => {
+  const response = {
+    [App.authenticator.tokenPropertyName]: 'secret token!'
+  };
+  const credentials = createFakeCredentials();
+
+  App.authenticator.headers = {
+    'X-API-KEY': '123-abc',
+    'X-ANOTHER-HEADER': 0,
+    'Accept': 'application/vnd.api+json'
+  };
+
+  App.server.respondWith('POST', App.authenticator.serverTokenEndpoint, [
+    201,
+    {
+      'Content-Type': 'application/json'
+    },
+    JSON.stringify(response)
+  ]);
+
+  return App.authenticator.authenticate(credentials).then(() => {
+    const args = fetchWrapper.default.getCall(0).args;
+    assert.equal(args[0], App.authenticator.serverTokenEndpoint);
+    assert.deepEqual(args[1], {
+      method: 'POST',
+      body: JSON.stringify(credentials),
+      headers: merge({
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }, App.authenticator.headers)
+    });
+  });
+});
+
+test('#authenticate rejects with the correct error', assert => {
+  const credentials = createFakeCredentials();
+
+  App.server.respondWith('POST', App.authenticator.serverTokenEndpoint, [
+    400,
+    {
+      'Content-Type': 'application/json'
+    },
+    JSON.stringify({})
+  ]);
+
+  return App.authenticator.authenticate(credentials).catch(error => {
+    assert.equal(error.status, 400);
   });
 });
 
 test('#invalidate returns a resolving promise', assert => {
-  App.authenticator.invalidate().then(() => {
+  return App.authenticator.invalidate().then(() => {
     assert.ok(true);
   });
 });

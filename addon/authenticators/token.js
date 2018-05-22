@@ -1,8 +1,8 @@
 import EmberObject from '@ember/object';
-import $ from 'jquery';
+import fetch from 'fetch';
+import { merge } from '@ember/polyfills';
 import { Promise, resolve } from 'rsvp';
 import { isEmpty } from '@ember/utils';
-import { run } from '@ember/runloop';
 import Base from 'ember-simple-auth/authenticators/base';
 import config from 'ember-get-config';
 
@@ -44,9 +44,9 @@ export default Base.extend({
 
     return new Promise((resolve, reject) => {
       if (!isEmpty(propertiesObject.get(this.tokenPropertyName))) {
-        resolve(properties);
+        return resolve(properties);
       } else {
-        reject();
+        return reject();
       }
     });
   },
@@ -62,30 +62,16 @@ export default Base.extend({
 
     @method authenticate
     @param {Object} credentials The credentials to authenticate the session with
-    @param {Object} headers Additional headers to pass with request
     @return {Promise} A promise that resolves when an auth token is successfully acquired from the server and rejects otherwise
   */
-  authenticate(credentials, headers) {
+  authenticate(credentials) {
     return new Promise((resolve, reject) => {
-      this.makeRequest(this.serverTokenEndpoint, credentials, headers).then(response => {
-        run(() => {
-          resolve(this.getResponseData(response));
-        });
-      }, xhr => {
-        run(() => { reject(xhr.responseJSON || xhr.responseText); });
+      this.makeRequest(this.serverTokenEndpoint, credentials, this.headers).then(response => {
+        return resolve(response);
+      }).catch(error => {
+        return reject(error);
       });
     });
-  },
-
-  /**
-    Returns an object with properties the `authenticate` promise will resolve,
-    be saved in and accessible via the session.
-
-    @method getResponseData
-    @return {object} An object with properties for the session.
-  */
-  getResponseData(response) {
-    return response;
   },
 
   /**
@@ -95,7 +81,7 @@ export default Base.extend({
     @return {Promise} A resolving promise
   */
   invalidate() {
-    return resolve();
+    return new resolve();
   },
 
   /**
@@ -106,24 +92,29 @@ export default Base.extend({
     @private
   */
   makeRequest(url, data, headers) {
-    return $.ajax({
-      url: url,
-      method: 'POST',
-      data: JSON.stringify(data),
-      dataType: 'json',
-      contentType: 'application/json',
-      headers: this.headers,
-      beforeSend: (xhr, settings) => {
-        if(this.headers['Accept'] === null || this.headers['Accept'] === undefined) {
-          xhr.setRequestHeader('Accept', settings.accepts.json);
+    return new Promise((resolve, reject) => {
+      return fetch(url, {
+        method: 'POST',
+        headers: merge({
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }, headers),
+        body: JSON.stringify(data)
+      }).then(response => {
+        if (response.status >= 200 && response.status < 300) {
+          return response
+        } else {
+          let error = new Error(response.statusText);
+          error.status = response.status;
+          return reject(error);
         }
-
-        if (headers) {
-          Object.keys(headers).forEach(key => {
-            xhr.setRequestHeader(key, headers[key]);
-          });
-        }
-      }
+      }).then(response => {
+        return response.json()
+      }).then(response => {
+        return resolve(response);
+      }).catch(error => {
+        return reject(error);
+      });
     });
   }
 });

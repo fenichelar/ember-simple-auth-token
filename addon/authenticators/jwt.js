@@ -2,7 +2,6 @@ import EmberObject from '@ember/object';
 import { assign } from '@ember/polyfills';
 import { Promise, resolve } from 'rsvp';
 import { isEmpty } from '@ember/utils';
-import { run } from '@ember/runloop';
 import { cancel, later } from '@ember/runloop';
 import { get } from '@ember/object';
 import TokenAuthenticator from './token';
@@ -29,7 +28,7 @@ export default TokenAuthenticator.extend({
   init() {
     this._super(...arguments);
     const conf = config['ember-simple-auth-token'] || {};
-    this.refreshAccessTokens = conf.refreshAccessTokens === false ? false : conf.refreshAccessTokens || true;
+    this.refreshAccessTokens = conf.refreshAccessTokens === false ? false : true;
     this.serverTokenRefreshEndpoint = conf.serverTokenRefreshEndpoint || '/api/token-refresh/';
     this.refreshTokenPropertyName = conf.refreshTokenPropertyName || 'refresh_token';
     this.tokenExpireName = conf.tokenExpireName || 'exp';
@@ -84,22 +83,32 @@ export default TokenAuthenticator.extend({
 
         if (wait > 0) {
           if (this.refreshAccessTokens) {
-            this.scheduleAccessTokenRefresh(dataObject.get(this.tokenExpireName), refreshToken);
+            try {
+              this.scheduleAccessTokenRefresh(dataObject.get(this.tokenExpireName), refreshToken);
+              return resolve(data);
+            } catch (error) {
+              return reject(error);
+            }
+          } else {
+            return resolve(data);
           }
-          resolve(data);
         } else if (this.refreshAccessTokens) {
-          resolve(this.refreshAccessToken(refreshToken));
+          return resolve(this.refreshAccessToken(refreshToken));
         } else {
-          reject(new Error('unable to refresh token'));
+          return reject(new Error('unable to refresh token'));
         }
       } else {
         // the refresh token might not be expired,
         // we can't test this on the client so attempt to refresh the token.
         // If the server rejects the token the user session will be invalidated
         if (this.refreshAccessTokens) {
-          resolve(this.refreshAccessToken(refreshToken));
+          try {
+            return resolve(this.refreshAccessToken(refreshToken));
+          } catch (error) {
+            return reject(error);
+          }
         } else {
-          reject(new Error('token is expired'));
+          return reject(new Error('token is expired'));
         }
       }
     });
@@ -117,27 +126,21 @@ export default TokenAuthenticator.extend({
 
     @method authenticate
     @param {Object} credentials The credentials to authenticate the session with
-    @param {Object} headers Additional headers to be sent to server
     @return {Promise} A promise that resolves when an auth token is
                                  successfully acquired from the server and rejects
                                  otherwise
   */
-  authenticate(credentials, headers) {
+  authenticate(credentials) {
     return new Promise((resolve, reject) => {
-      this.makeRequest(this.serverTokenEndpoint, credentials, headers)
-        .then((response) => {
-          run(() => {
-            try {
-              const sessionData = this.handleAuthResponse(response);
-              resolve(sessionData);
-            } catch (error) {
-              reject(error);
-            }
-          });
-        }, (xhr) => {
-          run(() => {
-            reject(xhr.responseJSON || xhr.responseText);
-          });
+      this.makeRequest(this.serverTokenEndpoint, credentials, this.headers).then(response => {
+          try {
+            const sessionData = this.handleAuthResponse(response);
+            return resolve(sessionData);
+          } catch (error) {
+            return reject(error);
+          }
+        }).catch(error => {
+          return reject(error);
         });
     });
   },
@@ -164,7 +167,7 @@ export default TokenAuthenticator.extend({
           cancel(this._refreshTokenTimeout);
           delete this._refreshTokenTimeout;
           this._refreshTokenTimeout = later(this, this.refreshAccessToken, refreshToken, wait);
-        } else {
+        } else if (expiresAt > now) {
           throw new Error('refreshLeeway is too large which is preventing token refresh');
         }
       }
@@ -185,24 +188,21 @@ export default TokenAuthenticator.extend({
     @method refreshAccessToken
     @private
   */
-  refreshAccessToken(token, headers) {
+  refreshAccessToken(token) {
     const data = this.makeRefreshData(token);
 
     return new Promise((resolve, reject) => {
-      this.makeRequest(this.serverTokenRefreshEndpoint, data, headers)
-        .then((response) => {
-          run(() => {
-            try {
-              const sessionData = this.handleAuthResponse(response);
-              this.trigger('sessionDataUpdated', sessionData);
-              resolve(sessionData);
-            } catch (error) {
-              reject(error);
-            }
-          });
-        }, xhr => {
-          this.handleTokenRefreshFail(xhr.status);
-          reject();
+      this.makeRequest(this.serverTokenRefreshEndpoint, data, this.headers).then(response => {
+          try {
+            const sessionData = this.handleAuthResponse(response);
+            this.trigger('sessionDataUpdated', sessionData);
+            return resolve(sessionData);
+          } catch (error) {
+            return reject(error);
+          }
+        }).catch(error => {
+          this.handleTokenRefreshFail(error.status);
+          return reject(error);
         });
     });
   },
@@ -216,11 +216,11 @@ export default TokenAuthenticator.extend({
   */
   makeRefreshData(refreshToken) {
     const data = {};
-    let lastObject = data;
     const nestings = this.refreshTokenPropertyName.split('.');
     const refreshTokenPropertyName = nestings.pop();
+    let lastObject = data;
 
-    nestings.forEach((nesting) => {
+    nestings.forEach(nesting => {
       lastObject[nesting] = {};
       lastObject = lastObject[nesting];
     });
@@ -242,7 +242,7 @@ export default TokenAuthenticator.extend({
 
     try {
       return JSON.parse(tokenData);
-    } catch (e) {
+    } catch (error) {
       return tokenData;
     }
   },
@@ -301,7 +301,7 @@ export default TokenAuthenticator.extend({
       this.scheduleAccessTokenRefresh(expiresAt, refreshToken);
     }
 
-    return assign(this.getResponseData(response), tokenExpireData);
+    return assign(response, tokenExpireData);
   },
 
   /**
