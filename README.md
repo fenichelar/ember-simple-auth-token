@@ -159,8 +159,8 @@ ENV['ember-simple-auth-token'] = {
 
 ## Upgrade Notes
 
-- `getAuthenticateData`, `identificationField`, and `passwordField` have been removed since version 4.0.0
-- `timeFactor` has been removed since version 2.1.0
+- `getResponseData`, `getAuthenticateData`, `config.identificationField`, and `config.passwordField` have been removed since version 4.0.0
+- `config.timeFactor` has been removed since version 2.1.0
 
 
 [travis-image]: https://travis-ci.org/jpadilla/ember-simple-auth-token.svg?branch=master
