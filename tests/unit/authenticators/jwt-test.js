@@ -57,13 +57,15 @@ module('JWT Authenticator', {
 test('#restore resolves when the data includes `token` and `expiresAt`', assert => {
   const currentTime = getConvertedTime(Date.now());
   const expiresAt = currentTime + 60;
-  const token = createFakeToken({
+  const tokenData = {
     [App.authenticator.tokenExpireName]: expiresAt
-  });
+  };
+  const token = createFakeToken(tokenData);
   const refreshToken = createFakeRefreshToken();
   const data = {
     [App.authenticator.tokenPropertyName]: token,
-    [App.authenticator.tokenExpireName]: expiresAt
+    [App.authenticator.tokenExpireName]: expiresAt,
+    [App.authenticator.tokenDataPropertyName]: tokenData
   };
   const response = {
     [App.authenticator.tokenPropertyName]: token,
@@ -110,14 +112,16 @@ test('#restore resolves when the data includes `token` and excludes `expiresAt`'
 test('#restore resolves when the data includes `token` and `expiresAt` and the token is expired', assert => {
   const currentTime = getConvertedTime(Date.now());
   const expiresAt = currentTime - 60 * 60;
-  const token = createFakeToken({
+  const tokenData = {
     [App.authenticator.tokenExpireName]: expiresAt
-  });
+  };
+  const token = createFakeToken(tokenData);
   const refreshToken = createFakeRefreshToken();
   const data = {
     [App.authenticator.tokenPropertyName]: token,
     [App.authenticator.refreshTokenPropertyName]: refreshToken,
-    [App.authenticator.tokenExpireName]: expiresAt
+    [App.authenticator.tokenExpireName]: expiresAt,
+    [App.authenticator.tokenDataPropertyName]: tokenData
   };
   const response = {
     [App.authenticator.tokenPropertyName]: token,
@@ -429,6 +433,7 @@ test('#authenticate successfully resolves with the correct data', assert => {
 
   return App.authenticator.authenticate(credentials).then(data => {
     delete data[App.authenticator.tokenExpireName];
+    delete data[App.authenticator.tokenDataPropertyName];
     assert.deepEqual(data, response);
   });
 });

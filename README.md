@@ -136,6 +136,7 @@ In addition to all the customization options available to the token authenticato
 ```js
 // config/environment.js
 ENV['ember-simple-auth-token'] = {
+  tokenDataPropertyName: 'tokenData'; // Key in session to store token data
   refreshAccessTokens: true, // Enables access token refreshing
   serverTokenRefreshEndpoint: '/api/token-refresh/', // Server endpoint to send refresh request
   refreshTokenPropertyName: 'refresh_token', // Key in server response that contains the refresh token

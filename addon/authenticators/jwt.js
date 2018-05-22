@@ -28,6 +28,7 @@ export default TokenAuthenticator.extend({
   init() {
     this._super(...arguments);
     const conf = config['ember-simple-auth-token'] || {};
+    this.tokenDataPropertyName = conf.tokenDataPropertyName || 'tokenData';
     this.refreshAccessTokens = conf.refreshAccessTokens === false ? false : true;
     this.serverTokenRefreshEndpoint = conf.serverTokenRefreshEndpoint || '/api/token-refresh/';
     this.refreshTokenPropertyName = conf.refreshTokenPropertyName || 'refresh_token';
@@ -301,7 +302,7 @@ export default TokenAuthenticator.extend({
       this.scheduleAccessTokenRefresh(expiresAt, refreshToken);
     }
 
-    return assign(response, tokenExpireData);
+    return assign(response, tokenExpireData, {tokenData: tokenData});
   },
 
   /**
