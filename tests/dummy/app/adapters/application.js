@@ -1,6 +1,4 @@
 import DS from 'ember-data';
-import DataAdapterMixin from 'ember-simple-auth/mixins/data-adapter-mixin';
+import TokenAuthorizerMixin from 'ember-simple-auth-token/mixins/token-authorizer';
 
-export default DS.RESTAdapter.extend(DataAdapterMixin, {
-  authorizer: 'authorizer:token'
-});
+export default DS.RESTAdapter.extend(TokenAuthorizerMixin);

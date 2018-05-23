@@ -7,13 +7,13 @@ module.exports = function(app) {
   apiTokenRefreshRouter.post('/', function(req, res) {
     jwt.verify(req.body.token, 'secret', function(err, decoded) {
       if (err) {
-        res
-          .status(401)
-          .send({
-            error: err
-          });
+        return res.status(401).send({
+          error: err
+        });
       } else {
-        res.send({
+        delete decoded.iat;
+        delete decoded.exp;
+        return res.send({
           token: jwt.sign(decoded, 'secret', { expiresIn: 10 })
         });
       }

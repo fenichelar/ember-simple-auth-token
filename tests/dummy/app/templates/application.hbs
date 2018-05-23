@@ -19,18 +19,8 @@
 
 <hr>
 
-<p>Settings</p>
-<pre>
-  ENV['ember-simple-auth-token'] = {
-    refreshTokenPropertyName: 'token',
-    serverTokenEndpoint: '/api/token-auth/',
-    serverTokenRefreshEndpoint: '/api/token-refresh/',
-    refreshLeeway: 5
-  };
-</pre>
+<p>Config:</p>
+<pre>{{config}}</pre>
 
-<p>Session Contents:</p>
+<p>Session Data:</p>
 <pre>{{sessionData}}</pre>
-
-<p>Token Contents:</p>
-<pre>{{tokenData}}</pre>
