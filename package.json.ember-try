@@ -1,0 +1,83 @@
+{
+  "name": "ember-simple-auth-token",
+  "version": "3.0.0",
+  "description": "An authenticator and authorizer for Ember Simple Auth that is compatible with token-based authentication like JWT in Ember CLI applications.",
+  "directories": {
+    "doc": "doc",
+    "test": "tests"
+  },
+  "scripts": {
+    "build": "ember build",
+    "start": "ember serve",
+    "test": "ember try:each"
+  },
+  "repository": "https://github.com/jpadilla/ember-simple-auth-token",
+  "author": {
+    "name": "José Padilla",
+    "email": "hello@jpadilla.com",
+    "url": "http://jpadilla.com"
+  },
+  "contributors": [
+    "Giovanni Collazo <hello@gcollazo.com>",
+    "Emmanuel Luciano <emma.luciano11@gmail.com>"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "ember-cli-babel": "^6.6.0"
+  },
+  "devDependencies": {
+    "body-parser": "^1.12.4",
+    "broccoli-asset-rev": "^2.4.5",
+    "broccoli-funnel": "^0.2.3",
+    "ember-ajax": "^3.0.0",
+    "ember-cli": "~3.1.2",
+    "ember-cli-dependency-checker": "^2.0.0",
+    "ember-cli-eslint": "^4.2.1",
+    "ember-cli-github-pages": "0.0.4",
+    "ember-cli-htmlbars": "^2.0.1",
+    "ember-cli-htmlbars-inline-precompile": "^1.0.0",
+    "ember-cli-inject-live-reload": "^1.4.1",
+    "ember-cli-qunit": "^4.1.1",
+    "ember-cli-release": "^1.0.0-beta.2",
+    "ember-cli-shims": "^1.2.0",
+    "ember-cli-sri": "^2.1.0",
+    "ember-cli-uglify": "^2.0.0",
+    "ember-data": "^2.17.0",
+    "ember-disable-prototype-extensions": "^1.1.2",
+    "ember-disable-proxy-controllers": "^1.0.1",
+    "ember-export-application-global": "^2.0.0",
+    "ember-load-initializers": "^1.0.0",
+    "ember-maybe-import-regenerator": "^0.1.6",
+    "ember-resolver": "^4.0.0",
+    "ember-simple-auth": "^1.4.0",
+    "ember-sinon": "^1.0.1",
+    "ember-source": "~3.1.0",
+    "ember-source-channel-url": "^1.0.1",
+    "ember-try": "^0.2.23",
+    "eslint-plugin-ember": "^5.0.0",
+    "eslint-plugin-node": "^6.0.1",
+    "express": "^4.12.3",
+    "glob": "^4.5.3",
+    "jsonwebtoken": "^5.0.0",
+    "loader.js": "^4.2.3",
+    "morgan": "^1.5.2"
+  },
+  "keywords": [
+    "ember-addon",
+    "token",
+    "jwt",
+    "auth",
+    "authentication",
+    "authorization"
+  ],
+  "engines": {
+    "node": "^4.5 || 6.* || >= 7.*"
+  },
+  "ember-addon": {
+    "configPath": "tests/dummy/config",
+    "demoURL": "https://jpadilla.github.io/ember-simple-auth-token/",
+    "versionCompatibility": {
+      "ember": ">=1.13.2 <=2.17.0"
+    }
+  }
+}
