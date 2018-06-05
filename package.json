@@ -19,10 +19,6 @@
     "email": "hello@jpadilla.com",
     "url": "http://jpadilla.com"
   },
-  "contributors": [
-    "Giovanni Collazo <hello@gcollazo.com>",
-    "Emmanuel Luciano <emma.luciano11@gmail.com>"
-  ],
   "license": "MIT",
   "dependencies": {
     "ember-cli-babel": "^6.6.0",
