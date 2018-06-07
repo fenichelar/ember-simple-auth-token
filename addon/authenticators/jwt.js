@@ -1,5 +1,5 @@
 import EmberObject from '@ember/object';
-import { assign } from '@ember/polyfills';
+import { assign, merge } from '@ember/polyfills';
 import { Promise, resolve } from 'rsvp';
 import { isEmpty } from '@ember/utils';
 import { cancel, later } from '@ember/runloop';
@@ -127,13 +127,14 @@ export default TokenAuthenticator.extend({
 
     @method authenticate
     @param {Object} credentials The credentials to authenticate the session with
+    @param {Object} headers Optional headers to send with the authentication request
     @return {Promise} A promise that resolves when an auth token is
                                  successfully acquired from the server and rejects
                                  otherwise
   */
-  authenticate(credentials) {
+  authenticate(credentials, headers) {
     return new Promise((resolve, reject) => {
-      this.makeRequest(this.serverTokenEndpoint, credentials, this.headers).then(response => {
+      this.makeRequest(this.serverTokenEndpoint, credentials, merge(this.headers, headers)).then(response => {
           try {
             const sessionData = this.handleAuthResponse(response);
             return resolve(sessionData);

@@ -62,11 +62,12 @@ export default Base.extend({
 
     @method authenticate
     @param {Object} credentials The credentials to authenticate the session with
+    @param {Object} headers Optional headers to send with the authentication request
     @return {Promise} A promise that resolves when an auth token is successfully acquired from the server and rejects otherwise
   */
-  authenticate(credentials) {
+  authenticate(credentials, headers) {
     return new Promise((resolve, reject) => {
-      this.makeRequest(this.serverTokenEndpoint, credentials, this.headers).then(response => {
+      this.makeRequest(this.serverTokenEndpoint, credentials, merge(this.headers, headers)).then(response => {
         return resolve(response);
       }).catch(error => {
         return reject(error);
