@@ -96,7 +96,7 @@ const decodedPayload = {
 
 To debug JSON Web Token issues, see [jwt][jwt].
 
-The JSON Web Token authenticator supports both separate access tokens and refresh tokens. By specifying the `tokenPropertyName` and the `refreshTokenPropertyName` to the same value, the same token will be used for both access and refresh requests. For more information about refresh tokens, see [this blog](blog-refresh-token).
+The JSON Web Token authenticator supports both separate access tokens and refresh tokens. By specifying the `tokenPropertyName` and the `refreshTokenPropertyName` to the same value, the same token will be used for both access and refresh requests. For more information about refresh tokens, see [this blog][blog-refresh-token].
 
 ### Authorizer Mixin
 
