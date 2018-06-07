@@ -1,5 +1,5 @@
 import EmberObject from '@ember/object';
-import { assign, merge } from '@ember/polyfills';
+import { assign } from '@ember/polyfills';
 import { Promise, resolve } from 'rsvp';
 import { isEmpty } from '@ember/utils';
 import { cancel, later } from '@ember/runloop';
@@ -134,7 +134,7 @@ export default TokenAuthenticator.extend({
   */
   authenticate(credentials, headers) {
     return new Promise((resolve, reject) => {
-      this.makeRequest(this.serverTokenEndpoint, credentials, merge(this.headers, headers)).then(response => {
+      this.makeRequest(this.serverTokenEndpoint, credentials, assign({}, this.headers, headers)).then(response => {
           try {
             const sessionData = this.handleAuthResponse(response);
             return resolve(sessionData);

@@ -1,6 +1,6 @@
 import EmberObject from '@ember/object';
 import fetch from 'fetch';
-import { merge } from '@ember/polyfills';
+import { assign } from '@ember/polyfills';
 import { Promise, resolve } from 'rsvp';
 import { isEmpty } from '@ember/utils';
 import Base from 'ember-simple-auth/authenticators/base';
@@ -67,7 +67,7 @@ export default Base.extend({
   */
   authenticate(credentials, headers) {
     return new Promise((resolve, reject) => {
-      this.makeRequest(this.serverTokenEndpoint, credentials, merge(this.headers, headers)).then(response => {
+      this.makeRequest(this.serverTokenEndpoint, credentials, assign({}, this.headers, headers)).then(response => {
         return resolve(response);
       }).catch(error => {
         return reject(error);
@@ -96,7 +96,7 @@ export default Base.extend({
     return new Promise((resolve, reject) => {
       return fetch(url, {
         method: 'POST',
-        headers: merge({
+        headers: assign({
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         }, headers),
