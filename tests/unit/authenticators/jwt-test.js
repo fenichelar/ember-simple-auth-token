@@ -586,6 +586,56 @@ test('#authenticate sends an fetch request with custom headers', assert => {
   });
 });
 
+test('#authenticate sends an fetch request with dynamic headers', assert => {
+  assert.expect(2);
+
+  const headers = {
+    'X-API-KEY': '123-abc',
+    'X-ANOTHER-HEADER': 0,
+    'Accept': 'application/vnd.api+json'
+  };
+
+  const token = createFakeToken();
+  const refreshToken = createFakeRefreshToken();
+  const credentials = createFakeCredentials();
+  const response = {
+    [App.authenticator.tokenPropertyName]: token,
+    [App.authenticator.refreshTokenPropertyName]: refreshToken
+  };
+  const refreshResponse = {
+    [App.authenticator.tokenPropertyName]: token,
+    [App.authenticator.refreshTokenPropertyName]: refreshToken
+  };
+
+  App.server.respondWith('POST', App.authenticator.serverTokenEndpoint, [
+    201,
+    {
+      'Content-Type': 'application/json'
+    },
+    JSON.stringify(response)
+  ]);
+  App.server.respondWith('POST', App.authenticator.serverTokenRefreshEndpoint, [
+    201,
+    {
+      'Content-Type': 'application/json'
+    },
+    JSON.stringify(refreshResponse)
+  ]);
+
+  return App.authenticator.authenticate(credentials, headers).then(() => {
+    const args = fetchWrapper.default.getCall(0).args;
+    assert.equal(args[0], App.authenticator.serverTokenEndpoint);
+    assert.deepEqual(args[1], {
+      method: 'POST',
+      body: JSON.stringify(credentials),
+      headers: merge({
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }, headers)
+    });
+  });
+});
+
 test('#authenticate rejects with the correct error', assert => {
   const credentials = createFakeCredentials();
 
