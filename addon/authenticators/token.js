@@ -103,16 +103,25 @@ export default Base.extend({
         body: JSON.stringify(data)
       }).then(response => {
         if (response.status >= 200 && response.status < 300) {
-          return response
+          response.json().then(json => {
+            return resolve(json);
+          }).catch(error => {
+            return reject(error);
+          })
         } else {
-          let error = new Error(response.statusText);
-          error.status = response.status;
-          return reject(error);
+          response.json().then(json => {
+            return reject({
+              statusText: response.statusText,
+              status: response.status,
+              json: json
+            });
+          }).catch(() => {
+            return reject({
+              statusText: response.statusText,
+              status: response.status
+            });
+          });
         }
-      }).then(response => {
-        return response.json()
-      }).then(response => {
-        return resolve(response);
       }).catch(error => {
         return reject(error);
       });
