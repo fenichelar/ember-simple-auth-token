@@ -109,12 +109,21 @@ export default Base.extend({
             return reject(error);
           })
         } else {
-          response.json().then(json => {
-            return reject({
-              statusText: response.statusText,
-              status: response.status,
-              json: json
-            });
+          response.text().then(text => {
+            try {
+              return reject({
+                statusText: response.statusText,
+                status: response.status,
+                text: text,
+                json: JSON.parse(text)
+              });
+            } catch (e) {
+              return reject({
+                statusText: response.statusText,
+                status: response.status,
+                text: text
+              });
+            }
           }).catch(() => {
             return reject({
               statusText: response.statusText,
