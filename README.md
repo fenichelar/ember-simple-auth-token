@@ -15,10 +15,9 @@ A demo is available [here][demo].
 
 ## Installation
 
-Before installing the Ember Simple Auth Token addon, [ember-simple-auth][ember-simple-auth] must be installed. Both addons can be installed with [Ember CLI][ember-cli] by running:
+Ember Simple Auth Token can be installed with [Ember CLI][ember-cli] by running:
 
 ```
-ember install ember-simple-auth
 ember install ember-simple-auth-token
 ```
 
