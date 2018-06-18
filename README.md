@@ -137,6 +137,7 @@ In addition to all the customization options available to the token authenticato
 ENV['ember-simple-auth-token'] = {
   tokenDataPropertyName: 'tokenData'; // Key in session to store token data
   refreshAccessTokens: true, // Enables access token refreshing
+  tokenExpirationInvalidateSession: true, // Enables session invalidation on token expiration
   serverTokenRefreshEndpoint: '/api/token-refresh/', // Server endpoint to send refresh request
   refreshTokenPropertyName: 'refresh_token', // Key in server response that contains the refresh token
   tokenExpireName: 'exp', // Field containing token expiration
