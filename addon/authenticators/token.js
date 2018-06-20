@@ -68,7 +68,7 @@ export default Base.extend({
   authenticate(credentials, headers) {
     return new Promise((resolve, reject) => {
       this.makeRequest(this.serverTokenEndpoint, credentials, assign({}, this.headers, headers)).then(response => {
-        return resolve(response);
+        return resolve(response.json);
       }).catch(error => {
         return reject(error);
       });
@@ -102,15 +102,17 @@ export default Base.extend({
         }, headers),
         body: JSON.stringify(data)
       }).then(response => {
-        if (response.ok) {
-          response.json().then(json => {
-            return resolve(json);
-          }).catch(error => {
-            return reject(error);
-          })
-        } else {
-          response.text().then(text => {
-            try {
+        response.text().then(text => {
+          try {
+            if (response.ok) {
+              return resolve({
+                statusText: response.statusText,
+                status: response.status,
+                headers: response.headers,
+                text: text,
+                json: JSON.parse(text)
+              });
+            } else {
               return reject({
                 statusText: response.statusText,
                 status: response.status,
@@ -118,22 +120,22 @@ export default Base.extend({
                 text: text,
                 json: JSON.parse(text)
               });
-            } catch (e) {
-              return reject({
-                statusText: response.statusText,
-                status: response.status,
-                headers: response.headers,
-                text: text
-              });
             }
-          }).catch(() => {
+          } catch (e) {
             return reject({
               statusText: response.statusText,
               status: response.status,
-              headers: response.headers
+              headers: response.headers,
+              text: text
             });
+          }
+        }).catch(() => {
+          return reject({
+            statusText: response.statusText,
+            status: response.status,
+            headers: response.headers
           });
-        }
+        });
       }).catch(error => {
         return reject(error);
       });

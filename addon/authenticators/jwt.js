@@ -139,7 +139,7 @@ export default TokenAuthenticator.extend({
     return new Promise((resolve, reject) => {
       this.makeRequest(this.serverTokenEndpoint, credentials, assign({}, this.headers, headers)).then(response => {
           try {
-            const sessionData = this.handleAuthResponse(response);
+            const sessionData = this.handleAuthResponse(response.json);
             return resolve(sessionData);
           } catch (error) {
             return reject(error);
@@ -199,7 +199,7 @@ export default TokenAuthenticator.extend({
     return new Promise((resolve, reject) => {
       this.makeRequest(this.serverTokenRefreshEndpoint, data, this.headers).then(response => {
           try {
-            const sessionData = this.handleAuthResponse(response);
+            const sessionData = this.handleAuthResponse(response.json);
             this.trigger('sessionDataUpdated', sessionData);
             return resolve(sessionData);
           } catch (error) {
