@@ -114,6 +114,7 @@ export default Base.extend({
               return reject({
                 statusText: response.statusText,
                 status: response.status,
+                headers: response.headers,
                 text: text,
                 json: JSON.parse(text)
               });
@@ -121,13 +122,15 @@ export default Base.extend({
               return reject({
                 statusText: response.statusText,
                 status: response.status,
+                headers: response.headers,
                 text: text
               });
             }
           }).catch(() => {
             return reject({
               statusText: response.statusText,
-              status: response.status
+              status: response.status,
+              headers: response.headers
             });
           });
         }
