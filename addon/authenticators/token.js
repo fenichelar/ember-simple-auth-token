@@ -102,7 +102,7 @@ export default Base.extend({
         }, headers),
         body: JSON.stringify(data)
       }).then(response => {
-        if (response.status >= 200 && response.status < 300) {
+        if (response.ok) {
           response.json().then(json => {
             return resolve(json);
           }).catch(error => {
