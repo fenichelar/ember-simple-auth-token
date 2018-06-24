@@ -15,10 +15,9 @@ A demo is available [here][demo].
 
 ## Installation
 
-Before installing the Ember Simple Auth Token addon, [ember-simple-auth][ember-simple-auth] must be installed. Both addons can be installed with [Ember CLI][ember-cli] by running:
+Ember Simple Auth Token can be installed with [Ember CLI][ember-cli] by running:
 
 ```
-ember install ember-simple-auth
 ember install ember-simple-auth-token
 ```
 
@@ -138,6 +137,7 @@ In addition to all the customization options available to the token authenticato
 ENV['ember-simple-auth-token'] = {
   tokenDataPropertyName: 'tokenData'; // Key in session to store token data
   refreshAccessTokens: true, // Enables access token refreshing
+  tokenExpirationInvalidateSession: true, // Enables session invalidation on token expiration
   serverTokenRefreshEndpoint: '/api/token-refresh/', // Server endpoint to send refresh request
   refreshTokenPropertyName: 'refresh_token', // Key in server response that contains the refresh token
   tokenExpireName: 'exp', // Field containing token expiration

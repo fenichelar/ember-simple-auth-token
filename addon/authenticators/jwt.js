@@ -30,6 +30,7 @@ export default TokenAuthenticator.extend({
     const conf = config['ember-simple-auth-token'] || {};
     this.tokenDataPropertyName = conf.tokenDataPropertyName || 'tokenData';
     this.refreshAccessTokens = conf.refreshAccessTokens === false ? false : true;
+    this.tokenExpirationInvalidateSession = conf.tokenExpirationInvalidateSession === false ? false : true;
     this.serverTokenRefreshEndpoint = conf.serverTokenRefreshEndpoint || '/api/token-refresh/';
     this.refreshTokenPropertyName = conf.refreshTokenPropertyName || 'refresh_token';
     this.tokenExpireName = conf.tokenExpireName || 'exp';
@@ -80,7 +81,9 @@ export default TokenAuthenticator.extend({
       if (expiresAt > now) {
         const wait = (expiresAt - now - this.refreshLeeway) * 1000;
 
-        this.scheduleAccessTokenExpiration(expiresAt);
+        if (this.tokenExpirationInvalidateSession) {
+          this.scheduleAccessTokenExpiration(expiresAt);
+        }
 
         if (wait > 0) {
           if (this.refreshAccessTokens) {
@@ -136,7 +139,7 @@ export default TokenAuthenticator.extend({
     return new Promise((resolve, reject) => {
       this.makeRequest(this.serverTokenEndpoint, credentials, assign({}, this.headers, headers)).then(response => {
           try {
-            const sessionData = this.handleAuthResponse(response);
+            const sessionData = this.handleAuthResponse(response.json);
             return resolve(sessionData);
           } catch (error) {
             return reject(error);
@@ -196,7 +199,7 @@ export default TokenAuthenticator.extend({
     return new Promise((resolve, reject) => {
       this.makeRequest(this.serverTokenRefreshEndpoint, data, this.headers).then(response => {
           try {
-            const sessionData = this.handleAuthResponse(response);
+            const sessionData = this.handleAuthResponse(response.json);
             this.trigger('sessionDataUpdated', sessionData);
             return resolve(sessionData);
           } catch (error) {
@@ -291,7 +294,10 @@ export default TokenAuthenticator.extend({
     const tokenExpireData = {};
 
     tokenExpireData[this.tokenExpireName] = expiresAt;
-    this.scheduleAccessTokenExpiration(expiresAt);
+
+    if (this.tokenExpirationInvalidateSession) {
+      this.scheduleAccessTokenExpiration(expiresAt);
+    }
 
     if (this.refreshAccessTokens) {
       const refreshToken = get(response, this.refreshTokenPropertyName);

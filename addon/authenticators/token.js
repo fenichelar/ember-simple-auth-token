@@ -68,7 +68,7 @@ export default Base.extend({
   authenticate(credentials, headers) {
     return new Promise((resolve, reject) => {
       this.makeRequest(this.serverTokenEndpoint, credentials, assign({}, this.headers, headers)).then(response => {
-        return resolve(response);
+        return resolve(response.json);
       }).catch(error => {
         return reject(error);
       });
@@ -102,17 +102,40 @@ export default Base.extend({
         }, headers),
         body: JSON.stringify(data)
       }).then(response => {
-        if (response.status >= 200 && response.status < 300) {
-          return response
-        } else {
-          let error = new Error(response.statusText);
-          error.status = response.status;
-          return reject(error);
-        }
-      }).then(response => {
-        return response.json()
-      }).then(response => {
-        return resolve(response);
+        response.text().then(text => {
+          try {
+            if (response.ok) {
+              return resolve({
+                statusText: response.statusText,
+                status: response.status,
+                headers: response.headers,
+                text: text,
+                json: JSON.parse(text)
+              });
+            } else {
+              return reject({
+                statusText: response.statusText,
+                status: response.status,
+                headers: response.headers,
+                text: text,
+                json: JSON.parse(text)
+              });
+            }
+          } catch (e) {
+            return reject({
+              statusText: response.statusText,
+              status: response.status,
+              headers: response.headers,
+              text: text
+            });
+          }
+        }).catch(() => {
+          return reject({
+            statusText: response.statusText,
+            status: response.status,
+            headers: response.headers
+          });
+        });
       }).catch(error => {
         return reject(error);
       });

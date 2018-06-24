@@ -1,6 +1,6 @@
 {
   "name": "ember-simple-auth-token",
-  "version": "4.0.2",
+  "version": "4.0.3",
   "description": "An authenticator and authorizer for Ember Simple Auth that is compatible with token-based authentication like JWT in Ember CLI applications.",
   "directories": {
     "doc": "doc",
@@ -23,7 +23,8 @@
   "dependencies": {
     "ember-cli-babel": "^6.6.0",
     "ember-get-config": "^0.2.4",
-    "ember-fetch": "^4.0.1"
+    "ember-fetch": "^4.0.1",
+    "ember-simple-auth": "^1.6.0"
   },
   "devDependencies": {
     "body-parser": "^1.18.2",
@@ -49,7 +50,6 @@
     "ember-load-initializers": "^1.0.0",
     "ember-maybe-import-regenerator": "^0.1.6",
     "ember-resolver": "^4.0.0",
-    "ember-simple-auth": "^1.6.0",
     "ember-sinon": "^2.1.0",
     "ember-source": "^3.1.0",
     "ember-source-channel-url": "^1.0.1",
