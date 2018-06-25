@@ -5,7 +5,8 @@ module.exports = {
     sourceType: 'module'
   },
   plugins: [
-    'ember'
+    'ember',
+    'no-unsafe-regex'
   ],
   extends: [
     'eslint:recommended',
@@ -15,23 +16,47 @@ module.exports = {
     browser: true
   },
   rules: {
-    semi: ['error', 'always']
+    'arrow-spacing': ['error', {'before': true, 'after': true}],
+    'callback-return': ['error', ['callback', 'cb', 'next', 'done', 'proceed']],
+    'camelcase': ['error', {'properties': 'always'}],
+    'comma-dangle': ['error', 'never'],
+    'comma-style': ['error', 'last'],
+    'curly': ['error'],
+    'eol-last': ['error'],
+    'eqeqeq': ['error', 'always'],
+    'handle-callback-err': ['error'],
+    'indent': ['error', 2, {'SwitchCase': 1}],
+    'linebreak-style': ['error', 'unix'],
+    'no-const-assign': ['error'],
+    'no-mixed-spaces-and-tabs': ['error', 'smart-tabs'],
+    'no-return-assign': ['error', 'always'],
+    'no-sequences': ['error'],
+    'no-trailing-spaces': ['error'],
+    'no-undef': ['error'],
+    'no-unexpected-multiline': ['error'],
+    'no-unsafe-regex/no-unsafe-regex': ['error'],
+    'no-unused-vars': ['error'],
+    'no-var': ['error'],
+    'one-var': ['error', 'never'],
+    'prefer-const': ['error'],
+    'rest-spread-spacing': ['error', 'never'],
+    'semi': ['error', 'always']
   },
   overrides: [
-    // node files
     {
       files: [
-        'ember-cli-build.js',
-        'index.js',
-        'testem.js',
+        'eslintrc.js',
         'blueprints/*/index.js',
         'config/**/*.js',
-        'tests/dummy/config/**/*.js',
-        'server/**/*.js'
+        'ember-cli-build.js',
+        'index.js',
+        'server/**/*.js',
+        'testem.js',
+        'tests/dummy/config/**/*.js'
       ],
       excludedFiles: [
-        'addon/**',
         'addon-test-support/**',
+        'addon/**',
         'app/**',
         'tests/dummy/app/**'
       ],
@@ -45,7 +70,8 @@ module.exports = {
       },
       plugins: ['node'],
       rules: Object.assign({}, require('eslint-plugin-node').configs.recommended.rules, {
-        // add your custom rules and overrides for node files here
+        'camelcase': ['off'],
+        'no-var': ['off']
       })
     }
   ]
