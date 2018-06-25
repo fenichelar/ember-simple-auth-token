@@ -32,6 +32,90 @@ module('Token Authenticator', {
   }
 });
 
+test('#makeRequest successfully resolves with the correct data', assert => {
+  const response = {
+    'testing': '123'
+  };
+  const credentials = createFakeCredentials();
+
+  App.server.respondWith('POST', '/endpoint', [
+    201,
+    {
+      'Content-Type': 'application/json'
+    },
+    JSON.stringify(response)
+  ]);
+
+  return App.authenticator.makeRequest('/endpoint', credentials).then(data => {
+    assert.deepEqual({
+      statusText: 'Created',
+      status: 201,
+      headers: {
+        map: {
+          'content-type': 'application/json'
+        }
+      },
+      text: JSON.stringify(response),
+      json: response
+    }, JSON.parse(JSON.stringify(data)));
+  });
+});
+
+test('#makeRequest successfully rejects with the correct data on JSON error', assert => {
+  const response = {
+    'testing': '123'
+  };
+  const credentials = createFakeCredentials();
+
+  App.server.respondWith('POST', '/endpoint', [
+    403,
+    {
+      'Content-Type': 'application/json'
+    },
+    JSON.stringify(response)
+  ]);
+
+  return App.authenticator.makeRequest('/endpoint', credentials).catch(data => {
+    assert.deepEqual({
+      statusText: 'Forbidden',
+      status: 403,
+      headers: {
+        map: {
+          'content-type': 'application/json'
+        }
+      },
+      text: JSON.stringify(response),
+      json: response
+    }, JSON.parse(JSON.stringify(data)));
+  });
+});
+
+test('#makeRequest successfully rejects with the correct data on HTML error', assert => {
+  const response = '<h1>Error</h1>';
+  const credentials = createFakeCredentials();
+
+  App.server.respondWith('POST', '/endpoint', [
+    403,
+    {
+      'Content-Type': 'text/html'
+    },
+    response
+  ]);
+
+  return App.authenticator.makeRequest('/endpoint', credentials).catch(data => {
+    assert.deepEqual({
+      statusText: 'Forbidden',
+      status: 403,
+      headers: {
+        map: {
+          'content-type': 'text/html'
+        }
+      },
+      text: response
+    }, JSON.parse(JSON.stringify(data)));
+  });
+});
+
 test('#restore resolves with the correct data', assert => {
   const response = {
     [App.authenticator.tokenPropertyName]: 'secret token!'
