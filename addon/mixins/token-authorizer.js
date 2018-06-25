@@ -42,8 +42,8 @@ export default Mixin.create(DataAdapterMixin, {
   authorize(xhr) {
     const data = get(this, 'session.data.authenticated');
     const token = get(data, this.get('tokenPropertyName'));
-    const prefix = this.get('authorizationPrefix')
-    const header = this.get('authorizationHeaderName')
+    const prefix = this.get('authorizationPrefix');
+    const header = this.get('authorizationHeaderName');
 
     if (this.get('session.isAuthenticated') && !isEmpty(token)) {
       xhr.setRequestHeader(header, prefix + token);

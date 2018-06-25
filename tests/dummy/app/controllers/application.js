@@ -1,7 +1,7 @@
 import Controller from '@ember/controller';
 import { inject } from '@ember/service';
 import { get, computed } from '@ember/object';
-import config from '../config/environment'
+import config from '../config/environment';
 
 export default Controller.extend({
   session: inject('session'),
