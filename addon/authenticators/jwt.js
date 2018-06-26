@@ -86,15 +86,9 @@ export default TokenAuthenticator.extend({
 
         if (wait > 0) {
           if (this.refreshAccessTokens) {
-            try {
-              this.scheduleAccessTokenRefresh(dataObject.get(this.tokenExpireName), refreshToken);
-              return resolve(data);
-            } catch (error) {
-              return reject(error);
-            }
-          } else {
-            return resolve(data);
+            this.scheduleAccessTokenRefresh(dataObject.get(this.tokenExpireName), refreshToken);
           }
+          return resolve(data);
         } else if (this.refreshAccessTokens) {
           return resolve(this.refreshAccessToken(refreshToken));
         } else {
@@ -105,11 +99,7 @@ export default TokenAuthenticator.extend({
         // we can't test this on the client so attempt to refresh the token.
         // If the server rejects the token the user session will be invalidated
         if (this.refreshAccessTokens) {
-          try {
-            return resolve(this.refreshAccessToken(refreshToken));
-          } catch (error) {
-            return reject(error);
-          }
+          return resolve(this.refreshAccessToken(refreshToken));
         } else {
           return reject(new Error('token is expired'));
         }
@@ -136,16 +126,9 @@ export default TokenAuthenticator.extend({
   */
   authenticate(credentials, headers) {
     return new Promise((resolve, reject) => {
-      this.makeRequest(this.serverTokenEndpoint, credentials, assign({}, this.headers, headers)).then(response => {
-        try {
-          const sessionData = this.handleAuthResponse(response.json);
-          return resolve(sessionData);
-        } catch (error) {
-          return reject(error);
-        }
-      }).catch(error => {
-        return reject(error);
-      });
+      this.makeRequest(this.serverTokenEndpoint, credentials, assign({}, this.headers, headers))
+        .then(response => this.handleAuthResponse(response.json))
+        .then(resolve, reject);
     });
   },
 
@@ -196,18 +179,16 @@ export default TokenAuthenticator.extend({
     const data = this.makeRefreshData(token);
 
     return new Promise((resolve, reject) => {
-      this.makeRequest(this.serverTokenRefreshEndpoint, data, this.headers).then(response => {
-        try {
+      this.makeRequest(this.serverTokenRefreshEndpoint, data, this.headers)
+        .then(response => {
           const sessionData = this.handleAuthResponse(response.json);
           this.trigger('sessionDataUpdated', sessionData);
-          return resolve(sessionData);
-        } catch (error) {
-          return reject(error);
-        }
-      }).catch(error => {
-        this.handleTokenRefreshFail(error.status);
-        return reject(error);
-      });
+          resolve(sessionData);
+        })
+        .catch(error => {
+          this.handleTokenRefreshFail(error.status);
+          reject(error);
+        });
     });
   },
 
