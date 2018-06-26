@@ -125,11 +125,8 @@ export default TokenAuthenticator.extend({
                                  otherwise
   */
   authenticate(credentials, headers) {
-    return new Promise((resolve, reject) => {
-      this.makeRequest(this.serverTokenEndpoint, credentials, assign({}, this.headers, headers))
-        .then(response => this.handleAuthResponse(response.json))
-        .then(resolve, reject);
-    });
+    return this.makeRequest(this.serverTokenEndpoint, credentials, assign({}, this.headers, headers))
+      .then(response => this.handleAuthResponse(response.json));
   },
 
   /**
@@ -178,18 +175,16 @@ export default TokenAuthenticator.extend({
   refreshAccessToken(token) {
     const data = this.makeRefreshData(token);
 
-    return new Promise((resolve, reject) => {
-      this.makeRequest(this.serverTokenRefreshEndpoint, data, this.headers)
-        .then(response => {
-          const sessionData = this.handleAuthResponse(response.json);
-          this.trigger('sessionDataUpdated', sessionData);
-          resolve(sessionData);
-        })
-        .catch(error => {
-          this.handleTokenRefreshFail(error.status);
-          reject(error);
-        });
-    });
+    return this.makeRequest(this.serverTokenRefreshEndpoint, data, this.headers)
+      .then(response => {
+        const sessionData = this.handleAuthResponse(response.json);
+        this.trigger('sessionDataUpdated', sessionData);
+        return sessionData;
+      })
+      .catch(error => {
+        this.handleTokenRefreshFail(error.status);
+        return Promise.reject(error);
+      });
   },
 
   /**
@@ -244,7 +239,7 @@ export default TokenAuthenticator.extend({
     delete this._refreshTokenTimeout;
     cancel(this._tokenExpirationTimeout);
     delete this._tokenExpirationTimeout;
-    return new resolve();
+    return resolve();
   },
 
   /**

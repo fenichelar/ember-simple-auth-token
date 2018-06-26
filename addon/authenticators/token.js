@@ -66,13 +66,8 @@ export default Base.extend({
     @return {Promise} A promise that resolves when an auth token is successfully acquired from the server and rejects otherwise
   */
   authenticate(credentials, headers) {
-    return new Promise((resolve, reject) => {
-      this.makeRequest(this.serverTokenEndpoint, credentials, assign({}, this.headers, headers)).then(response => {
-        return resolve(response.json);
-      }).catch(error => {
-        return reject(error);
-      });
-    });
+    return this.makeRequest(this.serverTokenEndpoint, credentials, assign({}, this.headers, headers))
+      .then(response => response.json);
   },
 
   /**
@@ -82,7 +77,7 @@ export default Base.extend({
     @return {Promise} A resolving promise
   */
   invalidate() {
-    return new resolve();
+    return resolve();
   },
 
   /**
