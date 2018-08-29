@@ -1,3 +1,5 @@
+/* global Buffer */
+
 import EmberObject, { get } from '@ember/object';
 import { assign } from '@ember/polyfills';
 import { Promise, resolve } from 'rsvp';
@@ -5,6 +7,11 @@ import { isEmpty } from '@ember/utils';
 import { cancel, later } from '@ember/runloop';
 import TokenAuthenticator from './token';
 import config from 'ember-get-config';
+
+const decode = str => {
+  console.log(str);
+  return atob ? atob(str) : Buffer.from(str, 'base64').toString('utf-8');
+};
 
 /**
   JWT (JSON Web Token) Authenticator that supports automatic token refresh.
@@ -218,7 +225,7 @@ export default TokenAuthenticator.extend({
   */
   getTokenData(token) {
     const payload = token.split('.')[1];
-    const decodedPayload = window.base64.decode(payload.replace(/-/g, '+').replace(/_/g, '/'));
+    const decodedPayload = decode(payload.replace(/-/g, '+').replace(/_/g, '/'));
     const tokenData = decodeURIComponent(window.escape(decodedPayload));
 
     try {
