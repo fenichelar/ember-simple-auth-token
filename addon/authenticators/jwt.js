@@ -9,7 +9,6 @@ import TokenAuthenticator from './token';
 import config from 'ember-get-config';
 
 const decode = str => {
-  console.log(str);
   return atob ? atob(str) : Buffer.from(str, 'base64').toString('utf-8');
 };
 
