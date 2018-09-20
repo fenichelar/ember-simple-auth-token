@@ -1,4 +1,4 @@
-/* global Buffer */
+/* global require */
 
 import EmberObject, { get } from '@ember/object';
 import { assign } from '@ember/polyfills';
@@ -9,7 +9,11 @@ import TokenAuthenticator from './token';
 import config from 'ember-get-config';
 
 const decode = str => {
-  return atob ? atob(str) : Buffer.from(str, 'base64').toString('utf-8');
+  try {
+    return atob ? atob(str) : require('buffer').Buffer.from(str, 'base64').toString('utf-8');
+  } catch (err) {
+    throw new Error('atob or buffer must be available for JWT parsing. If you are using FastBoot, make sure buffer is added to your fastbootDependencies.');
+  }
 };
 
 /**
