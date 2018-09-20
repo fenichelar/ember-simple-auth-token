@@ -9,16 +9,17 @@ import TokenAuthenticator from './token';
 import config from 'ember-get-config';
 
 const decode = str => {
-  try {
-    if (typeof atob === 'function') {
-      return atob(str);
-    } else if (typeof FastBoot === 'object') {
-      return FastBoot.require('buffer').Buffer.from(str, 'base64').toString('utf-8');
-    } else {
-      throw new Error();
+  if (typeof atob === 'function') {
+    return atob(str);
+  } else if (typeof FastBoot === 'object') {
+    try {
+      const buffer = FastBoot.require('buffer');
+      return buffer.Buffer.from(str, 'base64').toString('utf-8');
+    } catch (err) {
+      throw new Error('buffer must be available for decoding base64 strings in FastBoot. Make sure to add buffer to your fastbootDependencies.');
     }
-  } catch (err) {
-    throw new Error('atob or buffer must be available for JWT parsing. If you are using FastBoot, make sure buffer is added to your fastbootDependencies.');
+  } else {
+    throw new Error('Neither atob nor the FastBoot global are avaialble. Unable to decode base64 strings.');
   }
 };
 
