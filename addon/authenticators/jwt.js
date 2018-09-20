@@ -1,4 +1,4 @@
-/* global Buffer */
+/* global FastBoot */
 
 import EmberObject, { get } from '@ember/object';
 import { assign } from '@ember/polyfills';
@@ -10,9 +10,15 @@ import config from 'ember-get-config';
 
 const decode = str => {
   try {
-    return atob ? atob(str) : Buffer.from(str, 'base64').toString('utf-8');
+    if (typeof atob === 'function') {
+      return atob(str);
+    } else if (typeof FastBoot === 'object') {
+      return FastBoot.require('buffer').Buffer.from(str, 'base64').toString('utf-8');
+    } else {
+      throw new Error();
+    }
   } catch (err) {
-    throw new Error('atob or Buffer must be available for JWT parsing. If you are using FastBoot, make sure buffer is added to your fastbootDependencies.');
+    throw new Error('atob or buffer must be available for JWT parsing. If you are using FastBoot, make sure buffer is added to your fastbootDependencies.');
   }
 };
 
