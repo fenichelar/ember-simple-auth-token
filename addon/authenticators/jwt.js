@@ -1,3 +1,5 @@
+/* global FastBoot */
+
 import EmberObject, { get } from '@ember/object';
 import { assign } from '@ember/polyfills';
 import { Promise, resolve } from 'rsvp';
@@ -5,6 +7,21 @@ import { isEmpty } from '@ember/utils';
 import { cancel, later } from '@ember/runloop';
 import TokenAuthenticator from './token';
 import config from 'ember-get-config';
+
+const decode = str => {
+  if (typeof atob === 'function') {
+    return atob(str);
+  } else if (typeof FastBoot === 'object') {
+    try {
+      const buffer = FastBoot.require('buffer');
+      return buffer.Buffer.from(str, 'base64').toString('utf-8');
+    } catch (err) {
+      throw new Error('buffer must be available for decoding base64 strings in FastBoot. Make sure to add buffer to your fastbootDependencies.');
+    }
+  } else {
+    throw new Error('Neither atob nor the FastBoot global are avaialble. Unable to decode base64 strings.');
+  }
+};
 
 /**
   JWT (JSON Web Token) Authenticator that supports automatic token refresh.
@@ -152,7 +169,7 @@ export default TokenAuthenticator.extend({
           delete this._refreshTokenTimeout;
           this._refreshTokenTimeout = later(this, this.refreshAccessToken, refreshToken, wait);
         } else if (expiresAt > now) {
-          throw new Error('refreshLeeway is too large which is preventing token refresh');
+          throw new Error('refreshLeeway is too large which is preventing token refresh.');
         }
       }
     }
@@ -218,7 +235,8 @@ export default TokenAuthenticator.extend({
   */
   getTokenData(token) {
     const payload = token.split('.')[1];
-    const tokenData = decodeURIComponent(window.escape(atob(payload.replace (/-/g, '+').replace(/_/g, '/'))));
+    const decodedPayload = decode(payload.replace(/-/g, '+').replace(/_/g, '/'));
+    const tokenData = decodeURIComponent(window.escape(decodedPayload));
 
     try {
       return JSON.parse(tokenData);
