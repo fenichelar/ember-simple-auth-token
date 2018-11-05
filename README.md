@@ -159,6 +159,18 @@ ENV['ember-simple-auth-token'] = {
 };
 ```
 
+## Testing Configuration
+
+For acceptance testing, token refresh must be disabled to allow the test to exit. Therefore, the following configuration should be set:
+
+```js
+// config/environment.js
+ENV['ember-simple-auth-token'] = {
+  refreshAccessTokens: false,
+  tokenExpirationInvalidateSession: false,
+};
+```
+
 ## Upgrade Notes
 
 - `getResponseData`, `getAuthenticateData`, `config.identificationField`, and `config.passwordField` have been removed since version 4.0.0
