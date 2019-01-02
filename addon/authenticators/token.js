@@ -1,7 +1,7 @@
 import EmberObject from '@ember/object';
 import fetch from 'fetch';
 import { assign } from '@ember/polyfills';
-import { Promise, resolve } from 'rsvp';
+import { Promise, reject, resolve } from 'rsvp';
 import { isEmpty } from '@ember/utils';
 import Base from 'ember-simple-auth/authenticators/base';
 import config from 'ember-get-config';
@@ -88,36 +88,34 @@ export default Base.extend({
     @private
   */
   makeRequest(url, data, headers) {
-    return new Promise((resolve, reject) => {
-      return fetch(url, {
-        method: 'POST',
-        headers: assign({
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }, headers),
-        body: JSON.stringify(data)
-      }).then(response => {
-        const res = {
-          statusText: response.statusText,
-          status: response.status,
-          headers: response.headers
-        };
+    return fetch(url, {
+      method: 'POST',
+      headers: assign({
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }, headers),
+      body: JSON.stringify(data)
+    }).then(response => {
+      const res = {
+        statusText: response.statusText,
+        status: response.status,
+        headers: response.headers
+      };
 
-        response.text().then(text => {
-          res.text = text;
-          try {
-            res.json = JSON.parse(text);
-          } catch (e) {
-            return reject(res);
-          }
+      return response.text().then(text => {
+        res.text = text;
+        try {
+          res.json = JSON.parse(text);
+        } catch (e) {
+          return reject(res);
+        }
 
-          if (response.ok) {
-            resolve(res);
-          } else {
-            reject(res);
-          }
-        }).catch(() => reject(res));
-      }).catch(reject);
+        if (response.ok) {
+          return res;
+        } else {
+          return reject(res);
+        }
+      }).catch(() => reject(res));
     });
   }
 });
