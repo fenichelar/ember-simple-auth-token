@@ -6,8 +6,7 @@ import DataAdapterMixin from 'ember-simple-auth/mixins/data-adapter-mixin';
 import config from 'ember-get-config';
 
 /**
-  Authorizer Mixin that works with token-based authentication like JWT
-  by sending the `token` properties from the session in the `Authorization` header.
+  Authorizer Mixin that works with token-based authentication like JWT by sending the `token` properties from the session in the `Authorization` header.
 
   @class TokenAuthorizer
   @module ember-simple-auth-token/mixins/token-authorizer
@@ -18,7 +17,6 @@ export default Mixin.create(DataAdapterMixin, {
 
   /**
     @method init
-    @private
   */
   init() {
     this._super(...arguments);
@@ -29,8 +27,7 @@ export default Mixin.create(DataAdapterMixin, {
   },
 
   /**
-    Authorizes an XHR request by sending the `token`
-    properties from the session in the `Authorization` header:
+    Authorizes an XHR request by sending the `token` properties from the session in the `Authorization` header:
 
     ```
     Authorization: Bearer <token>
