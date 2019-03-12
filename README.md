@@ -21,7 +21,7 @@ Ember Simple Auth Token can be installed with [Ember CLI][ember-cli] by running:
 ember install ember-simple-auth-token
 ```
 
-If using FastBoot, `node-fetch` must be added to your `fastbootDependencies`. If using FastBoot and the JWT authenticator, `node-fetch` and `buffer` must be added to you `fastbootDependencies`.
+If using FastBoot, `ember-fetch` must be installed as a direct dependency and `node-fetch` must be added to your `fastbootDependencies`. If using FastBoot and the JWT authenticator, `node-fetch` and `buffer` must be added to you `fastbootDependencies`.
 
 ## Setup
 
