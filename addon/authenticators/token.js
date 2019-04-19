@@ -9,8 +9,7 @@ import config from 'ember-get-config';
 /**
   Authenticator that works with token-based authentication like JWT.
 
-  _The factory for this authenticator is registered as
-  `'authenticator:token'` in Ember's container._
+  _The factory for this authenticator is registered as `'authenticator:token'` in Ember's container._
 
   @class Token
   @namespace SimpleAuth.Authenticators
@@ -20,7 +19,6 @@ import config from 'ember-get-config';
 export default Base.extend({
   /**
     @method init
-    @private
   */
   init() {
     this._super(...arguments);
@@ -31,9 +29,7 @@ export default Base.extend({
   },
 
   /**
-    Restores the session from a set of session properties; __will return a
-    resolving promise when there's a non-empty `token` in the
-    `properties`__ and a rejecting promise otherwise.
+    Restores the session from a set of session properties; __will return a resolving promise when there's a non-empty `token` in the `properties`__ and a rejecting promise otherwise.
 
     @method restore
     @param {Object} properties The properties to restore the session from
@@ -52,13 +48,7 @@ export default Base.extend({
   },
 
   /**
-    Authenticates the session with the specified `credentials`; the credentials
-    are `POST`ed to the
-    [`Authenticators.Token#serverTokenEndpoint`](#SimpleAuth-Authenticators-Token-serverTokenEndpoint)
-    and if they are valid the server returns an auth token in
-    response. __If the credentials are valid and authentication succeeds, a
-    promise that resolves with the server's response is returned__, otherwise a
-    promise that rejects with the server error is returned.
+    Authenticates the session with the specified `credentials`; the credentials are `POST`ed to the [`Authenticators.Token#serverTokenEndpoint`](#SimpleAuth-Authenticators-Token-serverTokenEndpoint) and if they are valid the server returns an auth token in response. __If the credentials are valid and authentication succeeds, a promise that resolves with the server's response is returned__, otherwise a promise that rejects with the server error is returned.
 
     @method authenticate
     @param {Object} credentials The credentials to authenticate the session with
@@ -66,8 +56,9 @@ export default Base.extend({
     @return {Promise} A promise that resolves when an auth token is successfully acquired from the server and rejects otherwise
   */
   authenticate(credentials, headers) {
-    return this.makeRequest(this.serverTokenEndpoint, credentials, assign({}, this.headers, headers))
-      .then(response => response.json);
+    return this.makeRequest(this.serverTokenEndpoint, credentials, assign({}, this.headers, headers)).then(response => {
+      return response.json;
+    });
   },
 
   /**
@@ -85,7 +76,6 @@ export default Base.extend({
     @param {Object} url Server endpoint
     @param {Object} data Object that will be sent to server
     @param {Object} headers Additional headers that will be sent to server
-    @private
   */
   makeRequest(url, data, headers) {
     return fetch(url, {
@@ -115,7 +105,9 @@ export default Base.extend({
         } else {
           return reject(res);
         }
-      }).catch(() => reject(res));
+      }).catch(() => {
+        return reject(res);
+      });
     });
   }
 });

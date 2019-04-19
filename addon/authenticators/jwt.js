@@ -28,8 +28,7 @@ const decode = str => {
 
   Inspired by [ember-simple-auth-oauth2](https://github.com/simplabs/ember-simple-auth/tree/master/packages/ember-simple-auth-oauth2)
 
-  The factory for this authenticator is registered as
-  'authenticator:jwt` in Ember's container.
+  The factory for this authenticator is registered as 'authenticator:jwt` in Ember's container.
 
   @class JWT
   @namespace SimpleAuth.Authenticators
@@ -39,7 +38,6 @@ const decode = str => {
 export default TokenAuthenticator.extend({
   /**
     @method init
-    @private
   */
   init() {
     this._super(...arguments);
@@ -58,18 +56,14 @@ export default TokenAuthenticator.extend({
 
     It will return a resolving promise if one of two conditions is met:
 
-    1) Both `data.token` and `data.expiresAt` are non-empty and `expiresAt`
-       is greater than the calculated `now`.
-    2) If `data.token` is non-empty and the decoded token has a key for
-       `tokenExpireName`.
+    1) Both `data.token` and `data.expiresAt` are non-empty and `expiresAt` is greater than the calculated `now`.
+    2) If `data.token` is non-empty and the decoded token has a key for `tokenExpireName`.
 
-    If `refreshAccessTokens` is true, `scheduleAccessTokenRefresh` will
-    be called and an automatic token refresh will be initiated.
+    If `refreshAccessTokens` is true, `scheduleAccessTokenRefresh` will be called and an automatic token refresh will be initiated.
 
     @method restore
     @param {Object} data The data to restore the session from
-    @return {Promise} A promise that when it resolves results
-                                 in the session being authenticated
+    @return {Promise} A promise that when it resolves results in the session being authenticated
   */
   restore(data) {
     const dataObject = EmberObject.create(data);
@@ -85,8 +79,7 @@ export default TokenAuthenticator.extend({
       }
 
       if (isEmpty(expiresAt)) {
-        // Fetch the expire time from the token data since `expiresAt`
-        // wasn't included in the data object that was passed in.
+        // Fetch the expire time from the token data since `expiresAt` wasn't included in the data object that was passed in.
         const tokenData = this.getTokenData(token);
         expiresAt = tokenData[this.tokenExpireName];
         if (isEmpty(expiresAt)) {
@@ -112,9 +105,7 @@ export default TokenAuthenticator.extend({
           return reject(new Error('unable to refresh token'));
         }
       } else {
-        // the refresh token might not be expired,
-        // we can't test this on the client so attempt to refresh the token.
-        // If the server rejects the token the user session will be invalidated
+        // The refresh token might not be expired, we can't test this on the client so attempt to refresh the token. If the server rejects the token the user session will be invalidated
         if (this.refreshAccessTokens) {
           return resolve(this.refreshAccessToken(refreshToken));
         } else {
@@ -127,35 +118,27 @@ export default TokenAuthenticator.extend({
   /**
     Authenticates the session with the specified `credentials`.
 
-    It will return a resolving promise if it successfully posts a request
-    to the `JWT.serverTokenEndpoint` with the valid credentials.
+    It will return a resolving promise if it successfully posts a request to the `JWT.serverTokenEndpoint` with the valid credentials.
 
-    An automatic token refresh will be scheduled with the new expiration date
-    from the returned refresh token. That expiration will be merged with the
-    response and the promise resolved.
+    An automatic token refresh will be scheduled with the new expiration date from the returned refresh token. That expiration will be merged with the response and the promise resolved.
 
     @method authenticate
     @param {Object} credentials The credentials to authenticate the session with
     @param {Object} headers Optional headers to send with the authentication request
-    @return {Promise} A promise that resolves when an auth token is
-                                 successfully acquired from the server and rejects
-                                 otherwise
+    @return {Promise} A promise that resolves when an auth token is successfully acquired from the server and rejects otherwise
   */
   authenticate(credentials, headers) {
-    return this.makeRequest(this.serverTokenEndpoint, credentials, assign({}, this.headers, headers))
-      .then(response => this.handleAuthResponse(response.json));
+    return this.makeRequest(this.serverTokenEndpoint, credentials, assign({}, this.headers, headers)).then(response => {
+      return this.handleAuthResponse(response.json);
+    });
   },
 
   /**
-    Schedules a token refresh request to be sent to the backend after a calculated
-    `wait` time has passed.
+    Schedules a token refresh request to be sent to the backend after a calculated `wait` time has passed.
 
-    If both `token` and `expiresAt` are non-empty, and `expiresAt` minus the optional
-    refres leeway is greater than the calculated `now`, the token refresh will be scheduled
-    through later.
+    If both `token` and `expiresAt` are non-empty, and `expiresAt` minus the optional refres leeway is greater than the calculated `now`, the token refresh will be scheduled through later.
 
     @method scheduleAccessTokenRefresh
-    @private
   */
   scheduleAccessTokenRefresh(expiresAt, refreshToken) {
     if (this.refreshAccessTokens) {
@@ -178,30 +161,25 @@ export default TokenAuthenticator.extend({
   /**
     Makes a refresh token request to grab a new authenticated JWT token from the server.
 
-    It will return a resolving promise if a successful POST is made to the
-    `JWT.serverTokenRefreshEndpoint`.
+    It will return a resolving promise if a successful POST is made to the `JWT.serverTokenRefreshEndpoint`.
 
-    After the new token is obtained it will schedule the next automatic token refresh
-    based on the new `expiresAt` time.
+    After the new token is obtained it will schedule the next automatic token refresh based on the new `expiresAt` time.
 
     The session will be updated via the trigger `sessionDataUpdated`.
 
     @method refreshAccessToken
-    @private
   */
   refreshAccessToken(token) {
     const data = this.makeRefreshData(token);
 
-    return this.makeRequest(this.serverTokenRefreshEndpoint, data, this.headers)
-      .then(response => {
-        const sessionData = this.handleAuthResponse(response.json);
-        this.trigger('sessionDataUpdated', sessionData);
-        return sessionData;
-      })
-      .catch(error => {
-        this.handleTokenRefreshFail(error.status);
-        return Promise.reject(error);
-      });
+    return this.makeRequest(this.serverTokenRefreshEndpoint, data, this.headers).then(response => {
+      const sessionData = this.handleAuthResponse(response.json);
+      this.trigger('sessionDataUpdated', sessionData);
+      return sessionData;
+    }).catch(error => {
+      this.handleTokenRefreshFail(error.status);
+      return Promise.reject(error);
+    });
   },
 
   /**
@@ -246,8 +224,8 @@ export default TokenAuthenticator.extend({
   },
 
   /**
-    Cancels any outstanding automatic token refreshes and returns a resolving
-    promise.
+    Cancels any outstanding automatic token refreshes and returns a resolving promise.
+
     @method invalidate
     @param {Object} data The data of the session to be invalidated
     @return {Promise} A resolving promise
@@ -262,6 +240,7 @@ export default TokenAuthenticator.extend({
 
   /**
     Returns the current time as a timestamp in seconds
+
     @method getCurrentTime
     @return {Integer} timestamp
   */
@@ -273,8 +252,7 @@ export default TokenAuthenticator.extend({
     Handles authentication response from server, and returns session data
 
     @method handleAuthResponse
-    @private
-   */
+  */
   handleAuthResponse(response) {
     const token = get(response, this.tokenPropertyName);
 
@@ -306,13 +284,10 @@ export default TokenAuthenticator.extend({
   },
 
   /**
-    Handles token refresh fail status. If the server response to a token refresh has a
-    status of 401 or 403 then the token in the session will be invalidated and
-    the sessionInvalidated provided by ember-simple-auth will be triggered.
+    Handles token refresh fail status. If the server response to a token refresh has a status of 401 or 403 then the token in the session will be invalidated and the sessionInvalidated provided by ember-simple-auth will be triggered.
 
     @method handleTokenRefreshFail
   */
-
   handleTokenRefreshFail(refreshStatus) {
     if (refreshStatus === 401 || refreshStatus === 403) {
       return this.invalidate().then(() => {
@@ -325,7 +300,6 @@ export default TokenAuthenticator.extend({
     Schedules session invalidation at the time token expires.
 
     @method scheduleAccessTokenExpiration
-    @private
   */
   scheduleAccessTokenExpiration(expiresAt) {
     const now = this.getCurrentTime();
@@ -342,7 +316,6 @@ export default TokenAuthenticator.extend({
     Handles access token expiration
 
     @method handleAccessTokenExpiration
-    @private
   */
   handleAccessTokenExpiration() {
     return this.invalidate().then(() => {
