@@ -77,7 +77,7 @@
     "authorization"
   ],
   "engines": {
-    "node": ">= 6.*"
+    "node": ">= 8.*"
   },
   "ember-addon": {
     "configPath": "tests/dummy/config",
