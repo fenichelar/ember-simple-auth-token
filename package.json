@@ -54,7 +54,7 @@
     "ember-sinon": "^2.1.0",
     "ember-source": "^3.1.0",
     "ember-source-channel-url": "^1.0.1",
-    "ember-try": "^0.2.23",
+    "ember-try": "^1.4.0",
     "eslint-plugin-ember": "^5.2.0",
     "eslint-plugin-no-unsafe-regex": "^1.0.0",
     "eslint-plugin-node": "^6.0.1",
