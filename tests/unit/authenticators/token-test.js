@@ -4,7 +4,7 @@ import sinon from 'sinon';
 import startApp from '../../helpers/start-app';
 import * as fetchWrapper from 'fetch';
 import { run } from '@ember/runloop';
-import { merge } from '@ember/polyfills';
+import { assign } from '@ember/polyfills';
 import Token from 'ember-simple-auth-token/authenticators/token';
 
 let App;
@@ -241,7 +241,7 @@ test('#authenticate sends an fetch request with custom headers', assert => {
     assert.deepEqual(args[1], {
       method: 'POST',
       body: JSON.stringify(credentials),
-      headers: merge({
+      headers: assign({
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       }, App.authenticator.headers)
@@ -275,7 +275,7 @@ test('#authenticate sends an fetch request with dynamic headers', assert => {
     assert.deepEqual(args[1], {
       method: 'POST',
       body: JSON.stringify(credentials),
-      headers: merge({
+      headers: assign({
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       }, headers)
