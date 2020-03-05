@@ -4,6 +4,8 @@ node_js:
   # we recommend testing addons with the same minimum supported node version as Ember CLI
   # so that your addon works for all apps
   - "6"
+  - "8"
+  - "10"
 
 sudo: false
 dist: trusty
@@ -22,22 +24,95 @@ env:
   matrix:
     # we recommend new addons test the current and previous LTS
     # as well as latest stable release (bonus points to beta/canary)
-    - EMBER_TRY_SCENARIO=ember-lts-2.16
-    - EMBER_TRY_SCENARIO=ember-lts-2.18
-    - EMBER_TRY_SCENARIO=ember-lts-3.4
-    - EMBER_TRY_SCENARIO=ember-lts-3.8
-    - EMBER_TRY_SCENARIO=ember-lts-3.12
-    - EMBER_TRY_SCENARIO=ember-release
-    - EMBER_TRY_SCENARIO=ember-beta
-    - EMBER_TRY_SCENARIO=ember-canary
-    - EMBER_TRY_SCENARIO=ember-default
-    - EMBER_TRY_SCENARIO=ember-simple-auth-2.x NODE_VERSION=8
-    - EMBER_TRY_SCENARIO=ember-simple-auth-3.x NODE_VERSION=10
+    - EMBER_TRY_SCENARIO=ember-lts-2.16-ember-simple-auth-1.6
+    - EMBER_TRY_SCENARIO=ember-lts-2.16-ember-simple-auth-2.0
+    - EMBER_TRY_SCENARIO=ember-lts-2.18-ember-simple-auth-1.6
+    - EMBER_TRY_SCENARIO=ember-lts-2.18-ember-simple-auth-2.0
+    - EMBER_TRY_SCENARIO=ember-lts-3.4-ember-simple-auth-1.6
+    - EMBER_TRY_SCENARIO=ember-lts-3.4-ember-simple-auth-2.0
+    - EMBER_TRY_SCENARIO=ember-lts-3.4-ember-simple-auth-3.0
+    - EMBER_TRY_SCENARIO=ember-lts-3.8-ember-simple-auth-1.6
+    - EMBER_TRY_SCENARIO=ember-lts-3.8-ember-simple-auth-2.0
+    - EMBER_TRY_SCENARIO=ember-lts-3.8-ember-simple-auth-3.0
+    - EMBER_TRY_SCENARIO=ember-lts-3.12-ember-simple-auth-1.6
+    - EMBER_TRY_SCENARIO=ember-lts-3.12-ember-simple-auth-2.0
+    - EMBER_TRY_SCENARIO=ember-lts-3.12-ember-simple-auth-3.0
+    - EMBER_TRY_SCENARIO=ember-lts-3.16-ember-simple-auth-1.6
+    - EMBER_TRY_SCENARIO=ember-lts-3.16-ember-simple-auth-2.0
+    - EMBER_TRY_SCENARIO=ember-lts-3.16-ember-simple-auth-3.0
+    - EMBER_TRY_SCENARIO=ember-release-ember-simple-auth-1.6
+    - EMBER_TRY_SCENARIO=ember-release-ember-simple-auth-2.0
+    - EMBER_TRY_SCENARIO=ember-release-ember-simple-auth-3.0
+    - EMBER_TRY_SCENARIO=ember-beta-ember-simple-auth-1.6
+    - EMBER_TRY_SCENARIO=ember-beta-ember-simple-auth-2.0
+    - EMBER_TRY_SCENARIO=ember-beta-ember-simple-auth-3.0
+    - EMBER_TRY_SCENARIO=ember-canary-ember-simple-auth-1.6
+    - EMBER_TRY_SCENARIO=ember-canary-ember-simple-auth-2.0
+    - EMBER_TRY_SCENARIO=ember-canary-ember-simple-auth-3.0
 
 matrix:
   fast_finish: true
   allow_failures:
-    - env: EMBER_TRY_SCENARIO=ember-canary
+    - env: EMBER_TRY_SCENARIO=ember-canary-ember-simple-auth-1.6
+    - env: EMBER_TRY_SCENARIO=ember-canary-ember-simple-auth-2.0
+    - env: EMBER_TRY_SCENARIO=ember-canary-ember-simple-auth-3.0
+
+jobs:
+  exclude:
+    - node_js: 6
+      env: EMBER_TRY_SCENARIO=ember-lts-2.16-ember-simple-auth-2.0
+    - node_js: 6
+      env: EMBER_TRY_SCENARIO=ember-lts-2.16-ember-simple-auth-3.0
+    - node_js: 6
+      env: EMBER_TRY_SCENARIO=ember-lts-2.18-ember-simple-auth-2.0
+    - node_js: 6
+      env: EMBER_TRY_SCENARIO=ember-lts-2.18-ember-simple-auth-3.0
+    - node_js: 6
+      env: EMBER_TRY_SCENARIO=ember-lts-3.4-ember-simple-auth-2.0
+    - node_js: 6
+      env: EMBER_TRY_SCENARIO=ember-lts-3.4-ember-simple-auth-3.0
+    - node_js: 6
+      env: EMBER_TRY_SCENARIO=ember-lts-3.8-ember-simple-auth-2.0
+    - node_js: 6
+      env: EMBER_TRY_SCENARIO=ember-lts-3.8-ember-simple-auth-3.0
+    - node_js: 6
+      env: EMBER_TRY_SCENARIO=ember-lts-3.12-ember-simple-auth-2.0
+    - node_js: 6
+      env: EMBER_TRY_SCENARIO=ember-lts-3.12-ember-simple-auth-3.0
+    - node_js: 6
+      env: EMBER_TRY_SCENARIO=ember-lts-3.16-ember-simple-auth-2.0
+    - node_js: 6
+      env: EMBER_TRY_SCENARIO=ember-lts-3.16-ember-simple-auth-3.0
+    - node_js: 6
+      env: EMBER_TRY_SCENARIO=ember-release-ember-simple-auth-2.0
+    - node_js: 6
+      env: EMBER_TRY_SCENARIO=ember-release-ember-simple-auth-3.0
+    - node_js: 6
+      env: EMBER_TRY_SCENARIO=ember-beta-ember-simple-auth-2.0
+    - node_js: 6
+      env: EMBER_TRY_SCENARIO=ember-beta-ember-simple-auth-3.0
+    - node_js: 6
+      env: EMBER_TRY_SCENARIO=ember-canary-ember-simple-auth-2.0
+    - node_js: 6
+      env: EMBER_TRY_SCENARIO=ember-canary-ember-simple-auth-3.0
+    - node_js: 8
+      env: EMBER_TRY_SCENARIO=ember-lts-2.16-ember-simple-auth-3.0
+    - node_js: 8
+      env: EMBER_TRY_SCENARIO=ember-lts-2.18-ember-simple-auth-3.0
+    - node_js: 8
+      env: EMBER_TRY_SCENARIO=ember-lts-3.4-ember-simple-auth-3.0
+    - node_js: 8
+      env: EMBER_TRY_SCENARIO=ember-lts-3.8-ember-simple-auth-3.0
+    - node_js: 8
+      env: EMBER_TRY_SCENARIO=ember-lts-3.12-ember-simple-auth-3.0
+    - node_js: 8
+      env: EMBER_TRY_SCENARIO=ember-lts-3.16-ember-simple-auth-3.0
+    - node_js: 8
+      env: EMBER_TRY_SCENARIO=ember-release-ember-simple-auth-3.0
+    - node_js: 8
+      env: EMBER_TRY_SCENARIO=ember-beta-ember-simple-auth-3.0
+    - node_js: 8
+      env: EMBER_TRY_SCENARIO=ember-canary-ember-simple-auth-3.0
 
 before_install:
   - if [[ $NODE_VERSION ]]; then nvm install ${NODE_VERSION} && nvm use ${NODE_VERSION}; fi
