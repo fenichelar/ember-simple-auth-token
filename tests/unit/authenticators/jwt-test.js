@@ -4,7 +4,7 @@ import sinon from 'sinon';
 import startApp from '../../helpers/start-app';
 import * as fetchWrapper from 'fetch';
 import { run } from '@ember/runloop';
-import { merge } from '@ember/polyfills';
+import { assign } from '@ember/polyfills';
 import JWT from 'ember-simple-auth-token/authenticators/jwt';
 
 let App;
@@ -578,7 +578,7 @@ test('#authenticate sends an fetch request with custom headers', assert => {
     assert.deepEqual(args[1], {
       method: 'POST',
       body: JSON.stringify(credentials),
-      headers: merge({
+      headers: assign({
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       }, App.authenticator.headers)
@@ -628,7 +628,7 @@ test('#authenticate sends an fetch request with dynamic headers', assert => {
     assert.deepEqual(args[1], {
       method: 'POST',
       body: JSON.stringify(credentials),
-      headers: merge({
+      headers: assign({
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       }, headers)
@@ -963,7 +963,7 @@ test('#refreshAccessToken sends an fetch request with custom headers', assert =>
       body: JSON.stringify({
         [App.authenticator.refreshTokenPropertyName]: refreshToken
       }),
-      headers: merge({
+      headers: assign({
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       }, App.authenticator.headers)
