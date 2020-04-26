@@ -29,8 +29,8 @@ export default Mixin.create(DataAdapterMixin, {
   /*
     Adds the `token` property from the session to the `authorizationHeaderName`:
   */
-  headers: computed('session.isAuthenticated', function() {
-    const data = get(this, 'session.data.authenticated');
+  headers: computed('session.data.authenticated', function() {
+    const data = this.get('session.data.authenticated');
     const token = get(data, this.get('tokenPropertyName'));
     const prefix = this.get('authorizationPrefix');
     const header = this.get('authorizationHeaderName');
