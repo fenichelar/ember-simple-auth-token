@@ -17,7 +17,7 @@ const createFakeCredentials = () => {
 };
 
 const createFakeToken = obj => {
-  return 'a.' + btoa(JSON.stringify(obj)) + '.b';
+  return `a.${btoa(JSON.stringify(obj))}.b`;
 };
 
 const createFakeRefreshToken = () => {

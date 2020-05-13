@@ -7,7 +7,7 @@ export default Route.extend(AuthenticatedRouteMixin, {
   model: function () {
     const adapter = getOwner(this).lookup('adapter:application');
 
-    return adapter.ajax((ENV['API_URL'] || '') + '/api/users/', 'GET');
+    return adapter.ajax(`${ENV['API_URL'] || ''}/api/users/`, 'GET');
   },
 
   setupController: function (controller, model) {
