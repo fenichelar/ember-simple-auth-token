@@ -99,6 +99,24 @@ To debug JSON Web Token issues, see [jwt][jwt].
 
 The JSON Web Token authenticator supports both separate access tokens and refresh tokens. By specifying the `tokenPropertyName` and the `refreshTokenPropertyName` to the same value, the same token will be used for both access and refresh requests. For more information about refresh tokens, see [this blog][blog-refresh-token].
 
+### Adapter Mixin
+
+In order to send the token with all API requests made to the server, the token adapter mixin should be used:
+
+```js
+// app/adapters/application.js
+import DS from 'ember-data';
+import TokenAdapterMixin from 'ember-simple-auth-token/mixins/token-adapter';
+
+export default DS.JSONAPIAdapter.extend(TokenAdapterMixin);
+```
+
+The mixin will add the header to each API request:
+
+```
+Authorization: Bearer <token>
+```
+
 ### Authorizer Mixin
 
 In order to send the token with all API requests made to the server, the token authorizer mixin should be used:
