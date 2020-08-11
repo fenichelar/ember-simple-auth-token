@@ -96,7 +96,7 @@ export default TokenAuthenticator.extend({
 
         if (wait > 0) {
           if (this.refreshAccessTokens) {
-            this.scheduleAccessTokenRefresh(dataObject.get(this.tokenExpireName), refreshToken);
+            this.scheduleAccessTokenRefresh(expiresAt, refreshToken);
           }
           return resolve(data);
         } else if (this.refreshAccessTokens) {
