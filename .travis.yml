@@ -41,6 +41,9 @@ env:
     - EMBER_TRY_SCENARIO=ember-lts-3.20-ember-simple-auth-1.6
     - EMBER_TRY_SCENARIO=ember-lts-3.20-ember-simple-auth-2.0
     - EMBER_TRY_SCENARIO=ember-lts-3.20-ember-simple-auth-3.0
+    - EMBER_TRY_SCENARIO=ember-lts-3.24-ember-simple-auth-1.6
+    - EMBER_TRY_SCENARIO=ember-lts-3.24-ember-simple-auth-2.0
+    - EMBER_TRY_SCENARIO=ember-lts-3.24-ember-simple-auth-3.0
     - EMBER_TRY_SCENARIO=ember-release-ember-simple-auth-1.6
     - EMBER_TRY_SCENARIO=ember-release-ember-simple-auth-2.0
     - EMBER_TRY_SCENARIO=ember-release-ember-simple-auth-3.0

@@ -220,6 +220,39 @@ module.exports = function() {
           }
         },
         {
+          name: 'ember-lts-3.24-ember-simple-auth-1.6',
+          npm: {
+            dependencies: {
+              'ember-simple-auth': '^1.6.0'
+            },
+            devDependencies: {
+              'ember-source': '~3.24.0'
+            }
+          }
+        },
+        {
+          name: 'ember-lts-3.24-ember-simple-auth-2.0',
+          npm: {
+            dependencies: {
+              'ember-simple-auth': '^2.0.0'
+            },
+            devDependencies: {
+              'ember-source': '~3.24.0'
+            }
+          }
+        },
+        {
+          name: 'ember-lts-3.24-ember-simple-auth-3.0',
+          npm: {
+            dependencies: {
+              'ember-simple-auth': '^3.0.0'
+            },
+            devDependencies: {
+              'ember-source': '~3.24.0'
+            }
+          }
+        },
+        {
           name: 'ember-release-ember-simple-auth-1.6',
           npm: {
             dependencies: {
