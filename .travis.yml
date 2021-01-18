@@ -47,6 +47,8 @@ env:
     - EMBER_TRY_SCENARIO=ember-canary-ember-simple-auth-1.6
     - EMBER_TRY_SCENARIO=ember-canary-ember-simple-auth-2.0
     - EMBER_TRY_SCENARIO=ember-canary-ember-simple-auth-3.0
+    - EMBER_TRY_SCENARIO=ember-canary-ember-simple-auth-canary
+    - EMBER_TRY_SCENARIO=ember-release-ember-simple-auth-canary
 
 jobs:
   fast_finish: true
