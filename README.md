@@ -14,9 +14,15 @@ A demo is available [here][demo].
 
 ## Installation
 
-Ember Simple Auth Token can be installed with [Ember CLI][ember-cli] by running:
+First, install the version of Ember Simple Auth that is compatible with your version of Ember. Ember Simple Auth Token is tested with Ember Simple Auth 1.6.0 up to the latest release of 3.0. Other versions beyond version 3.0 may work if Emper Simple Auth hasn't changed anything we use, but we do not guarantee this.
 
+```bash
+ember install ember-simple-auth
 ```
+
+Then install Ember Simple Auth Token:
+
+```bash
 ember install ember-simple-auth-token
 ```
 
