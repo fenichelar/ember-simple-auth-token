@@ -3,7 +3,6 @@ import { getOwner } from '@ember/application';
 import { inject } from '@ember/service';
 import { get } from '@ember/object';
 import { isEmpty } from '@ember/utils';
-import DataAdapterMixin from 'ember-simple-auth/mixins/data-adapter-mixin';
 
 /**
   Authorizer Mixin that works with token-based authentication like JWT by sending the `token` properties from the session in the `Authorization` header.
@@ -12,7 +11,7 @@ import DataAdapterMixin from 'ember-simple-auth/mixins/data-adapter-mixin';
   @module ember-simple-auth-token/mixins/token-authorizer
   @extends Ember.Mixin
 */
-export default Mixin.create(DataAdapterMixin, {
+export default Mixin.create({
   session: inject('session'),
 
   /**
@@ -47,5 +46,18 @@ export default Mixin.create(DataAdapterMixin, {
     if (this.get('session.isAuthenticated') && !isEmpty(token)) {
       xhr.setRequestHeader(header, prefix + token);
     }
+  },
+
+  /**
+    Handles response from server.
+
+    @method authorize
+    @param {Number} status
+  */
+  handleResponse(status) {
+    if (status === 401 && this.get('session.isAuthenticated')) {
+      this.get('session').invalidate();
+    }
+    return this._super(...arguments);
   }
 });
