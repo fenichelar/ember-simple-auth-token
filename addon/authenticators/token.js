@@ -1,10 +1,10 @@
 import EmberObject from '@ember/object';
+import { getOwner } from '@ember/application';
 import fetch from 'fetch';
 import { assign } from '@ember/polyfills';
 import { Promise, reject, resolve } from 'rsvp';
 import { isEmpty } from '@ember/utils';
 import Base from 'ember-simple-auth/authenticators/base';
-import config from 'ember-get-config';
 
 /**
   Authenticator that works with token-based authentication like JWT.
@@ -22,10 +22,12 @@ export default Base.extend({
   */
   init() {
     this._super(...arguments);
-    const conf = config['ember-simple-auth-token'] || {};
-    this.serverTokenEndpoint = conf.serverTokenEndpoint || '/api/token-auth/';
-    this.tokenPropertyName = conf.tokenPropertyName || 'token';
-    this.headers = conf.headers || {};
+    const owner = getOwner(this);
+    const environment = owner ? owner.resolveRegistration('config:environment') || {} : {};
+    const config = environment['ember-simple-auth-token'] || {};
+    this.serverTokenEndpoint = config.serverTokenEndpoint || '/api/token-auth/';
+    this.tokenPropertyName = config.tokenPropertyName || 'token';
+    this.headers = config.headers || {};
   },
 
   /**

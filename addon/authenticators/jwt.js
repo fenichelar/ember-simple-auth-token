@@ -1,12 +1,12 @@
 /* global FastBoot */
 
 import EmberObject, { get } from '@ember/object';
+import { getOwner } from '@ember/application';
 import { assign } from '@ember/polyfills';
 import { Promise, resolve } from 'rsvp';
 import { isEmpty } from '@ember/utils';
 import { cancel, later } from '@ember/runloop';
 import TokenAuthenticator from './token';
-import config from 'ember-get-config';
 
 const decode = str => {
   if (typeof atob === 'function') {
@@ -41,14 +41,16 @@ export default TokenAuthenticator.extend({
   */
   init() {
     this._super(...arguments);
-    const conf = config['ember-simple-auth-token'] || {};
-    this.tokenDataPropertyName = conf.tokenDataPropertyName || 'tokenData';
-    this.refreshAccessTokens = conf.refreshAccessTokens === false ? false : true;
-    this.tokenExpirationInvalidateSession = conf.tokenExpirationInvalidateSession === false ? false : true;
-    this.serverTokenRefreshEndpoint = conf.serverTokenRefreshEndpoint || '/api/token-refresh/';
-    this.refreshTokenPropertyName = conf.refreshTokenPropertyName || 'refresh_token';
-    this.tokenExpireName = conf.tokenExpireName || 'exp';
-    this.refreshLeeway = conf.refreshLeeway || 0;
+    const owner = getOwner(this);
+    const environment = owner ? owner.resolveRegistration('config:environment') || {} : {};
+    const config = environment['ember-simple-auth-token'] || {};
+    this.tokenDataPropertyName = config.tokenDataPropertyName || 'tokenData';
+    this.refreshAccessTokens = config.refreshAccessTokens === false ? false : true;
+    this.tokenExpirationInvalidateSession = config.tokenExpirationInvalidateSession === false ? false : true;
+    this.serverTokenRefreshEndpoint = config.serverTokenRefreshEndpoint || '/api/token-refresh/';
+    this.refreshTokenPropertyName = config.refreshTokenPropertyName || 'refresh_token';
+    this.tokenExpireName = config.tokenExpireName || 'exp';
+    this.refreshLeeway = config.refreshLeeway || 0;
   },
 
   /**

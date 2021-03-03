@@ -1,8 +1,8 @@
 import Mixin from '@ember/object/mixin';
+import { getOwner } from '@ember/application';
 import { inject } from '@ember/service';
 import { get, computed } from '@ember/object';
 import { isEmpty } from '@ember/utils';
-import config from 'ember-get-config';
 import DataAdapterMixin from 'ember-simple-auth/mixins/data-adapter-mixin';
 
 /**
@@ -20,10 +20,12 @@ export default Mixin.create(DataAdapterMixin, {
   */
   init() {
     this._super(...arguments);
-    const conf = config['ember-simple-auth-token'] || {};
-    this.tokenPropertyName = conf.tokenPropertyName || 'token';
-    this.authorizationHeaderName = conf.authorizationHeaderName || 'Authorization';
-    this.authorizationPrefix = conf.authorizationPrefix === '' ? '' : conf.authorizationPrefix || 'Bearer ';
+    const owner = getOwner(this);
+    const environment = owner ? owner.resolveRegistration('config:environment') || {} : {};
+    const config = environment['ember-simple-auth-token'] || {};
+    this.tokenPropertyName = config.tokenPropertyName || 'token';
+    this.authorizationHeaderName = config.authorizationHeaderName || 'Authorization';
+    this.authorizationPrefix = config.authorizationPrefix === '' ? '' : config.authorizationPrefix || 'Bearer ';
   },
 
   /*

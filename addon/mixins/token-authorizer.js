@@ -1,9 +1,9 @@
 import Mixin from '@ember/object/mixin';
+import { getOwner } from '@ember/application';
 import { inject } from '@ember/service';
 import { get } from '@ember/object';
 import { isEmpty } from '@ember/utils';
 import DataAdapterMixin from 'ember-simple-auth/mixins/data-adapter-mixin';
-import config from 'ember-get-config';
 
 /**
   Authorizer Mixin that works with token-based authentication like JWT by sending the `token` properties from the session in the `Authorization` header.
@@ -20,10 +20,12 @@ export default Mixin.create(DataAdapterMixin, {
   */
   init() {
     this._super(...arguments);
-    const conf = config['ember-simple-auth-token'] || {};
-    this.tokenPropertyName = conf.tokenPropertyName || 'token';
-    this.authorizationHeaderName = conf.authorizationHeaderName || 'Authorization';
-    this.authorizationPrefix = conf.authorizationPrefix === '' ? '' : conf.authorizationPrefix || 'Bearer ';
+    const owner = getOwner(this);
+    const environment = owner ? owner.resolveRegistration('config:environment') || {} : {};
+    const config = environment['ember-simple-auth-token'] || {};
+    this.tokenPropertyName = config.tokenPropertyName || 'token';
+    this.authorizationHeaderName = config.authorizationHeaderName || 'Authorization';
+    this.authorizationPrefix = config.authorizationPrefix === '' ? '' : config.authorizationPrefix || 'Bearer ';
   },
 
   /**
