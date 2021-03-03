@@ -28,7 +28,7 @@ export default Mixin.create({
   },
 
   /*
-    Adds the `token` property from the session to the `authorizationHeaderName`:
+    Adds the `token` property from the session to the `authorizationHeaderName`.
   */
   headers: computed('session.data.authenticated', function() {
     const data = this.get('session.data.authenticated');
