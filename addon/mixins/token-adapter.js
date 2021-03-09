@@ -1,9 +1,8 @@
 import Mixin from '@ember/object/mixin';
+import { getOwner } from '@ember/application';
 import { inject } from '@ember/service';
 import { get, computed } from '@ember/object';
 import { isEmpty } from '@ember/utils';
-import config from 'ember-get-config';
-import DataAdapterMixin from 'ember-simple-auth/mixins/data-adapter-mixin';
 
 /**
   Adapter Mixin that works with token-based authentication like JWT.
@@ -12,7 +11,7 @@ import DataAdapterMixin from 'ember-simple-auth/mixins/data-adapter-mixin';
   @module ember-simple-auth-token/mixins/token-adapter
   @extends Ember.Mixin
 */
-export default Mixin.create(DataAdapterMixin, {
+export default Mixin.create({
   session: inject('session'),
 
   /**
@@ -20,14 +19,16 @@ export default Mixin.create(DataAdapterMixin, {
   */
   init() {
     this._super(...arguments);
-    const conf = config['ember-simple-auth-token'] || {};
-    this.tokenPropertyName = conf.tokenPropertyName || 'token';
-    this.authorizationHeaderName = conf.authorizationHeaderName || 'Authorization';
-    this.authorizationPrefix = conf.authorizationPrefix === '' ? '' : conf.authorizationPrefix || 'Bearer ';
+    const owner = getOwner(this);
+    const environment = owner ? owner.resolveRegistration('config:environment') || {} : {};
+    const config = environment['ember-simple-auth-token'] || {};
+    this.tokenPropertyName = config.tokenPropertyName || 'token';
+    this.authorizationHeaderName = config.authorizationHeaderName || 'Authorization';
+    this.authorizationPrefix = config.authorizationPrefix === '' ? '' : config.authorizationPrefix || 'Bearer ';
   },
 
   /*
-    Adds the `token` property from the session to the `authorizationHeaderName`:
+    Adds the `token` property from the session to the `authorizationHeaderName`.
   */
   headers: computed('session.data.authenticated', function() {
     const data = this.get('session.data.authenticated');
@@ -42,5 +43,18 @@ export default Mixin.create(DataAdapterMixin, {
     } else {
       return {};
     }
-  })
+  }),
+
+  /**
+    Handles response from server.
+
+    @method authorize
+    @param {Number} status
+  */
+  handleResponse(status) {
+    if (status === 401 && this.get('session.isAuthenticated')) {
+      this.get('session').invalidate();
+    }
+    return this._super(...arguments);
+  }
 });

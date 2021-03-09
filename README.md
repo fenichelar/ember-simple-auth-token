@@ -61,7 +61,7 @@ export default Controller.extend({
       const credentials = this.getProperties('username', 'password');
       const authenticator = 'authenticator:token'; // or 'authenticator:jwt'
 
-      this.get('session').authenticate(authenticator, credentials);
+      this.session.authenticate(authenticator, credentials);
     }
   }
 });
@@ -69,7 +69,7 @@ export default Controller.extend({
 
 #### JSON Web Token Authenticator
 
-The JSON Web Token authenticator will decode the token and look for the expiration time found. The difference in the current time and the token expiration time is calculated. The `refreshLeeway` is subtracted from this value to determine when the automatic token refresh request should be made.
+The JSON Web Token authenticator will decode the token and look for the expiration time. The difference in the current time and the token expiration time is calculated. The `refreshLeeway` is subtracted from this value to determine when the automatic token refresh request should be made.
 
 ```js
 // config/environment.js
@@ -99,9 +99,41 @@ To debug JSON Web Token issues, see [jwt][jwt].
 
 The JSON Web Token authenticator supports both separate access tokens and refresh tokens. By specifying the `tokenPropertyName` and the `refreshTokenPropertyName` to the same value, the same token will be used for both access and refresh requests. For more information about refresh tokens, see [this blog][blog-refresh-token].
 
+#### Adapter
+
+In order to send the token with all API requests made to the server, set the headers object in the adapter:
+
+```js
+// app/adapters/application.js
+import DS from 'ember-data';
+import { inject } from '@ember/service';
+import { computed } from '@ember/object';
+
+export default DS.JSONAPIAdapter.extend({
+  session: inject('session'),
+
+  headers: computed('session.isAuthenticated', 'session.data.authenticated.token', function() {
+    if (this.session.isAuthenticated) {
+      return {
+        Authorization: `Bearer ${this.session.data.authenticated.token}`,
+      };
+    } else {
+      return {};
+    }
+  }),
+
+  handleResponse(status) {
+    if (status === 401 && this.session.isAuthenticated) {
+      this.session.invalidate();
+    }
+    return this._super(...arguments);
+  },
+});
+```
+
 ### Mixins
 
-In order to send the token with all API requests made to the server, the `token-adapter` mixin or `token-authorizer` mixin should be used. When using `ember-simple-auth` >= 3.0.0, use the `token-adapter` mixin. When using `ember-simple-auth` < 3.0.0, use the `token-authorizer` mixin. The mixin will add the header to each API request:
+Although no longer recommended, the `token-adapter` mixin or `token-authorizer` mixin can be used in order to send the token with all API requests made to the server. When using `ember-simple-auth` >= 3.0.0, use the `token-adapter` mixin. When using `ember-simple-auth` < 3.0.0, use the `token-authorizer` mixin. The mixin will add the header to each API request:
 
 ```
 Authorization: Bearer <token>
@@ -136,7 +168,7 @@ export default DS.JSONAPIAdapter.extend(TokenAuthorizerMixin);
 ENV['ember-simple-auth-token'] = {
   serverTokenEndpoint: '/api/token-auth/', // Server endpoint to send authenticate request
   tokenPropertyName: 'token', // Key in server response that contains the access token
-  headers: {} // Headers to add to the
+  headers: {} // Headers to add to the authenticate request
 };
 ```
 
@@ -157,7 +189,7 @@ ENV['ember-simple-auth-token'] = {
 };
 ```
 
-#### Token Authenticator
+#### Mixins
 
 In addition to `tokenPropertyName` from the authenticator:
 

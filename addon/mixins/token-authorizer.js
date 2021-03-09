@@ -1,9 +1,8 @@
 import Mixin from '@ember/object/mixin';
+import { getOwner } from '@ember/application';
 import { inject } from '@ember/service';
 import { get } from '@ember/object';
 import { isEmpty } from '@ember/utils';
-import DataAdapterMixin from 'ember-simple-auth/mixins/data-adapter-mixin';
-import config from 'ember-get-config';
 
 /**
   Authorizer Mixin that works with token-based authentication like JWT by sending the `token` properties from the session in the `Authorization` header.
@@ -12,7 +11,7 @@ import config from 'ember-get-config';
   @module ember-simple-auth-token/mixins/token-authorizer
   @extends Ember.Mixin
 */
-export default Mixin.create(DataAdapterMixin, {
+export default Mixin.create({
   session: inject('session'),
 
   /**
@@ -20,10 +19,12 @@ export default Mixin.create(DataAdapterMixin, {
   */
   init() {
     this._super(...arguments);
-    const conf = config['ember-simple-auth-token'] || {};
-    this.tokenPropertyName = conf.tokenPropertyName || 'token';
-    this.authorizationHeaderName = conf.authorizationHeaderName || 'Authorization';
-    this.authorizationPrefix = conf.authorizationPrefix === '' ? '' : conf.authorizationPrefix || 'Bearer ';
+    const owner = getOwner(this);
+    const environment = owner ? owner.resolveRegistration('config:environment') || {} : {};
+    const config = environment['ember-simple-auth-token'] || {};
+    this.tokenPropertyName = config.tokenPropertyName || 'token';
+    this.authorizationHeaderName = config.authorizationHeaderName || 'Authorization';
+    this.authorizationPrefix = config.authorizationPrefix === '' ? '' : config.authorizationPrefix || 'Bearer ';
   },
 
   /**
@@ -45,5 +46,18 @@ export default Mixin.create(DataAdapterMixin, {
     if (this.get('session.isAuthenticated') && !isEmpty(token)) {
       xhr.setRequestHeader(header, prefix + token);
     }
+  },
+
+  /**
+    Handles response from server.
+
+    @method authorize
+    @param {Number} status
+  */
+  handleResponse(status) {
+    if (status === 401 && this.get('session.isAuthenticated')) {
+      this.get('session').invalidate();
+    }
+    return this._super(...arguments);
   }
 });
