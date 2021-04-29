@@ -294,8 +294,8 @@ export default TokenAuthenticator.extend({
 
     @method handleTokenRefreshFail
   */
-  handleTokenRefreshFail(refreshStatus, refreshToken, attempts) {
-    if (this.tokenRefreshInvalidateSessionResponseCodes.includes(refreshStatus)) {
+  handleTokenRefreshFail(refreshStatusCode, refreshToken, attempts) {
+    if (this.tokenRefreshInvalidateSessionResponseCodes.includes(refreshStatusCode)) {
       return this.invalidate().then(() => {
         this.trigger('sessionDataInvalidated');
       });
