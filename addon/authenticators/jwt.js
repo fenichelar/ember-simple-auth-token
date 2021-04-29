@@ -51,6 +51,11 @@ export default TokenAuthenticator.extend({
     this.refreshTokenPropertyName = config.refreshTokenPropertyName || 'refresh_token';
     this.tokenExpireName = config.tokenExpireName || 'exp';
     this.refreshLeeway = config.refreshLeeway || 0;
+    this.tokenRefreshInvalidateSessionResponseCodes = config.tokenRefreshInvalidateSessionResponseCodes || [401, 403];
+    this.refreshAccessTokenRetryAttempts = config.refreshAccessTokenRetryAttempts || 0;
+    this.refreshAccessTokenRetryTimeout = config.refreshAccessTokenRetryTimeout || 1000;
+    this.tokenRefreshFailInvalidateSession = config.tokenRefreshFailInvalidateSession === true ? true : false;
+    this._refreshAccessTokenRetryAttempts = 0;
   },
 
   /**
@@ -171,15 +176,16 @@ export default TokenAuthenticator.extend({
 
     @method refreshAccessToken
   */
-  refreshAccessToken(token) {
-    const data = this.makeRefreshData(token);
+  refreshAccessToken(refreshToken) {
+    const data = this.makeRefreshData(refreshToken);
 
     return this.makeRequest(this.serverTokenRefreshEndpoint, data, this.headers).then(response => {
       const sessionData = this.handleAuthResponse(response.json);
       this.trigger('sessionDataUpdated', sessionData);
+      this._refreshAccessTokenRetryAttempts = 0;
       return sessionData;
     }).catch(error => {
-      this.handleTokenRefreshFail(error.status);
+      this.handleTokenRefreshFail(error.status, refreshToken);
       return Promise.reject(error);
     });
   },
@@ -290,8 +296,16 @@ export default TokenAuthenticator.extend({
 
     @method handleTokenRefreshFail
   */
-  handleTokenRefreshFail(refreshStatus) {
-    if (refreshStatus === 401 || refreshStatus === 403) {
+  handleTokenRefreshFail(refreshStatus, refreshToken) {
+    if (this.tokenRefreshInvalidateSessionResponseCodes.includes(refreshStatus)) {
+      return this.invalidate().then(() => {
+        this.trigger('sessionDataInvalidated');
+      });
+    } else if (this._refreshAccessTokenRetryAttempts++ < this.refreshAccessTokenRetryAttempts) {
+      cancel(this._refreshTokenTimeout);
+      delete this._refreshTokenTimeout;
+      this._refreshTokenTimeout = later(this, this.refreshAccessToken, refreshToken, this.refreshAccessTokenRetryTimeout);
+    } else if (this.tokenRefreshFailInvalidateSession) {
       return this.invalidate().then(() => {
         this.trigger('sessionDataInvalidated');
       });
