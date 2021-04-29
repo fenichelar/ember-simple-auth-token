@@ -158,7 +158,7 @@ export default TokenAuthenticator.extend({
         if (wait > 0) {
           cancel(this._refreshTokenTimeout);
           delete this._refreshTokenTimeout;
-          this._refreshTokenTimeout = later(this, this.refreshAccessToken, refreshToken, wait);
+          this._refreshTokenTimeout = later(this, this.refreshAccessToken, refreshToken, 0, wait);
         } else if (expiresAt > now) {
           throw new Error('refreshLeeway is too large which is preventing token refresh.');
         }
