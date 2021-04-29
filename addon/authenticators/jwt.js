@@ -55,7 +55,6 @@ export default TokenAuthenticator.extend({
     this.refreshAccessTokenRetryAttempts = config.refreshAccessTokenRetryAttempts || 0;
     this.refreshAccessTokenRetryTimeout = config.refreshAccessTokenRetryTimeout || 1000;
     this.tokenRefreshFailInvalidateSession = config.tokenRefreshFailInvalidateSession === true ? true : false;
-    this._refreshAccessTokenRetryAttempts = 0;
   },
 
   /**
@@ -107,14 +106,14 @@ export default TokenAuthenticator.extend({
           }
           return resolve(data);
         } else if (this.refreshAccessTokens) {
-          return resolve(this.refreshAccessToken(refreshToken));
+          return resolve(this.refreshAccessToken(refreshToken, 0));
         } else {
           return reject(new Error('unable to refresh token'));
         }
       } else {
         // The refresh token might not be expired, we can't test this on the client so attempt to refresh the token. If the server rejects the token the user session will be invalidated
         if (this.refreshAccessTokens) {
-          return resolve(this.refreshAccessToken(refreshToken));
+          return resolve(this.refreshAccessToken(refreshToken, 0));
         } else {
           return reject(new Error('token is expired'));
         }
@@ -176,16 +175,15 @@ export default TokenAuthenticator.extend({
 
     @method refreshAccessToken
   */
-  refreshAccessToken(refreshToken) {
+  refreshAccessToken(refreshToken, attempts) {
     const data = this.makeRefreshData(refreshToken);
 
     return this.makeRequest(this.serverTokenRefreshEndpoint, data, this.headers).then(response => {
       const sessionData = this.handleAuthResponse(response.json);
       this.trigger('sessionDataUpdated', sessionData);
-      this._refreshAccessTokenRetryAttempts = 0;
       return sessionData;
     }).catch(error => {
-      this.handleTokenRefreshFail(error.status, refreshToken);
+      this.handleTokenRefreshFail(error.status, refreshToken, attempts);
       return Promise.reject(error);
     });
   },
@@ -296,15 +294,15 @@ export default TokenAuthenticator.extend({
 
     @method handleTokenRefreshFail
   */
-  handleTokenRefreshFail(refreshStatus, refreshToken) {
+  handleTokenRefreshFail(refreshStatus, refreshToken, attempts) {
     if (this.tokenRefreshInvalidateSessionResponseCodes.includes(refreshStatus)) {
       return this.invalidate().then(() => {
         this.trigger('sessionDataInvalidated');
       });
-    } else if (this._refreshAccessTokenRetryAttempts++ < this.refreshAccessTokenRetryAttempts) {
+    } else if (attempts++ < this.refreshAccessTokenRetryAttempts) {
       cancel(this._refreshTokenTimeout);
       delete this._refreshTokenTimeout;
-      this._refreshTokenTimeout = later(this, this.refreshAccessToken, refreshToken, this.refreshAccessTokenRetryTimeout);
+      this._refreshTokenTimeout = later(this, this.refreshAccessToken, refreshToken, attempts, this.refreshAccessTokenRetryTimeout);
     } else if (this.tokenRefreshFailInvalidateSession) {
       return this.invalidate().then(() => {
         this.trigger('sessionDataInvalidated');
