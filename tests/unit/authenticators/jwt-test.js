@@ -3,6 +3,7 @@ import { test } from 'ember-qunit';
 import sinon from 'sinon';
 import startApp from '../../helpers/start-app';
 import * as fetchWrapper from 'fetch';
+import * as runWrapper from '@ember/runloop';
 import { run } from '@ember/runloop';
 import { assign } from '@ember/polyfills';
 import JWT from 'ember-simple-auth-token/authenticators/jwt';
@@ -36,18 +37,17 @@ module('JWT Authenticator', {
     App.server.autoRespond = true;
     App.authenticator = JWT.create();
     sinon.spy(fetchWrapper, 'default');
-    sinon.spy(run, 'later');
+    sinon.spy(runWrapper, 'later');
     sinon.spy(App.authenticator, 'invalidate');
     sinon.spy(App.authenticator, 'refreshAccessToken');
     sinon.spy(App.authenticator, 'scheduleAccessTokenRefresh');
-
   },
   afterEach() {
     run(App, App.destroy);
     App.xhr.restore();
     App.server.restore();
     fetchWrapper.default.restore();
-    run.later.restore();
+    runWrapper.later.restore();
     App.authenticator.invalidate.restore();
     App.authenticator.refreshAccessToken.restore();
     App.authenticator.scheduleAccessTokenRefresh.restore();
@@ -263,7 +263,7 @@ test('#restore schedules a token refresh when `refreshAccessTokens` is true', as
   ]);
 
   return App.authenticator.restore(data).then(() => {
-    assert.equal(run.later.getCalls().some(call => {
+    assert.equal(runWrapper.later.getCalls().some(call => {
       return call.args[1] === App.authenticator.refreshAccessToken && call.args[2] === refreshToken;
     }), true);
   });
@@ -297,7 +297,7 @@ test('#restore does not schedule a token refresh when `refreshAccessTokens` is f
   ]);
 
   return App.authenticator.restore(data).then(() => {
-    assert.equal(run.later.getCalls().some(call => {
+    assert.equal(runWrapper.later.getCalls().some(call => {
       return call.args[1] === App.authenticator.refreshAccessToken;
     }), false);
   });
@@ -329,7 +329,7 @@ test('#restore does not schedule a token refresh when the token is expired', ass
   ]);
 
   return App.authenticator.restore(data).then(() => {
-    assert.equal(run.later.getCalls().some(call => {
+    assert.equal(runWrapper.later.getCalls().some(call => {
       return call.args[1] === App.authenticator.refreshAccessToken;
     }), false);
   });
@@ -363,7 +363,7 @@ test('#restore schedules a token refresh when the token is farther than the `ref
   ]);
 
   return App.authenticator.restore(data).then(() => {
-    assert.equal(run.later.getCalls().some(call => {
+    assert.equal(runWrapper.later.getCalls().some(call => {
       return call.args[1] === App.authenticator.refreshAccessToken && call.args[2] === refreshToken;
     }), true);
   });
@@ -397,7 +397,7 @@ test('#restore does not schedule a token refresh when the token is closer than t
   ]);
 
   return App.authenticator.restore(data).catch(() => {
-    assert.equal(run.later.getCalls().some(call => {
+    assert.equal(runWrapper.later.getCalls().some(call => {
       return call.args[1] === App.authenticator.refreshAccessToken;
     }), false);
   });
@@ -685,7 +685,7 @@ test('#authenticate schedules a token refresh when `refreshAccessTokens` is true
   ]);
 
   return App.authenticator.authenticate(credentials).then(() => {
-    assert.equal(run.later.getCalls().some(call => {
+    assert.equal(runWrapper.later.getCalls().some(call => {
       return call.args[1] === App.authenticator.refreshAccessToken && call.args[2] === refreshToken;
     }), true);
   });
@@ -726,7 +726,7 @@ test('#authenticate does not schedule a token refresh when `refreshAccessTokens`
   ]);
 
   return App.authenticator.authenticate(credentials).then(() => {
-    assert.equal(run.later.getCalls().some(call => {
+    assert.equal(runWrapper.later.getCalls().some(call => {
       return call.args[1] === App.authenticator.refreshAccessToken;
     }), false);
   });
@@ -765,7 +765,7 @@ test('#authenticate does not schedule a token refresh when the token is expired'
   ]);
 
   return App.authenticator.authenticate(credentials).then(() => {
-    assert.equal(run.later.getCalls().some(call => {
+    assert.equal(runWrapper.later.getCalls().some(call => {
       return call.args[1] === App.authenticator.refreshAccessToken;
     }), false);
   });
@@ -806,7 +806,7 @@ test('#authenticate schedules a token refresh when the token is farther than the
   ]);
 
   return App.authenticator.authenticate(credentials).then(() => {
-    assert.equal(run.later.getCalls().some(call => {
+    assert.equal(runWrapper.later.getCalls().some(call => {
       return call.args[1] === App.authenticator.refreshAccessToken && call.args[2] === refreshToken;
     }), true);
   });
@@ -847,7 +847,7 @@ test('#authenticate does not schedule a token refresh when the token is closer t
   ]);
 
   return App.authenticator.authenticate(credentials).catch(() => {
-    assert.equal(run.later.getCalls().some(call => {
+    assert.equal(runWrapper.later.getCalls().some(call => {
       return call.args[1] === App.authenticator.refreshAccessToken;
     }), false);
   });
