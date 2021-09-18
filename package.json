@@ -49,7 +49,7 @@
     "ember-load-initializers": "^1.0.0",
     "ember-maybe-import-regenerator": "^0.1.6",
     "ember-resolver": "^4.0.0",
-    "ember-sinon": "^2.1.0",
+    "ember-sinon-qunit": "^6.0.0",
     "ember-source": "^3.1.0",
     "ember-source-channel-url": "^1.0.1",
     "ember-try": "^1.4.0",
