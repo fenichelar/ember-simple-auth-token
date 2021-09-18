@@ -25,7 +25,7 @@ const createFakeRefreshToken = () => {
 };
 
 const getConvertedTime = time => {
-  return time / 1000;
+  return Math.round(time / 1000);
 };
 
 module('JWT Authenticator', {
