@@ -42,14 +42,6 @@ jobs:
           - ember-release-ember-simple-auth-2.0
           - ember-release-ember-simple-auth-3.0
           - ember-release-ember-simple-auth-4.0
-          - ember-beta-ember-simple-auth-1.6
-          - ember-beta-ember-simple-auth-2.0
-          - ember-beta-ember-simple-auth-3.0
-          - ember-beta-ember-simple-auth-4.0
-          - ember-canary-ember-simple-auth-1.6
-          - ember-canary-ember-simple-auth-2.0
-          - ember-canary-ember-simple-auth-3.0
-          - ember-canary-ember-simple-auth-4.0
     steps:
     - uses: actions/checkout@v2
     - name: Test scenario ${{ matrix.scenario }}
