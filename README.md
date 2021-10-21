@@ -1,6 +1,6 @@
 # Ember Simple Auth Token
 
-[![travis-image]][travis]
+[![github-actions-image]][github-actions]
 [![ember-observer-image]][ember-observer]
 [![npm-image]][npm]
 
@@ -219,8 +219,8 @@ ENV['ember-simple-auth-token'] = {
 - `config.timeFactor` has been removed since version 2.1.0
 
 
-[travis-image]: https://travis-ci.org/jpadilla/ember-simple-auth-token.svg?branch=master
-[travis]: https://travis-ci.org/jpadilla/ember-simple-auth-token
+[github-actions-image]: https://github.com/jpadilla/ember-simple-auth-token/actions/workflows/test.yml/badge.svg
+[github-actions]: https://github.com/jpadilla/ember-simple-auth-token/actions/workflows/test.yml
 [ember-observer-image]: https://emberobserver.com/badges/ember-simple-auth-token.svg
 [ember-observer]: https://emberobserver.com/addons/ember-simple-auth-token
 [npm-image]: https://img.shields.io/npm/v/ember-simple-auth-token.svg
