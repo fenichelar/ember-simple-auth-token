@@ -1,4 +1,4 @@
-name: Ember Test
+name: ember test
 on:
   push:
     branches: [ master ]
