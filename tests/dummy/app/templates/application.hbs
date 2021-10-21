@@ -1,15 +1,15 @@
 <h2 id="title">Demo: ember-simple-auth-token</h2>
 
 <ul>
-  {{#link-to 'index' tagName='li'}}
+  {{#link-to "index" tagName="li"}}
     <a style="cursor: pointer">Protected Page</a>
   {{/link-to}}
   {{#if session.isAuthenticated}}
     <li>
-      <a {{ action 'invalidateSession' }}>Logout</a>
+      <a {{ action "invalidateSession" }}>Logout</a>
     </li>
   {{else}}
-    {{#link-to 'login' tagName='li'}}
+    {{#link-to "login" tagName="li"}}
       <a style="cursor: pointer">Login</a>
     {{/link-to}}
   {{/if}}
