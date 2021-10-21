@@ -3,7 +3,6 @@ import { test } from 'ember-qunit';
 import sinon from 'sinon';
 import startApp from '../../helpers/start-app';
 import * as fetchWrapper from 'fetch';
-import { run as runWrapper } from '@ember/runloop';
 import { assign } from '@ember/polyfills';
 import JWT from 'ember-simple-auth-token/authenticators/jwt';
 
@@ -36,7 +35,6 @@ module('JWT Authenticator', {
     App.server.autoRespond = true;
     App.authenticator = JWT.create();
     sinon.spy(fetchWrapper, 'default');
-    sinon.spy(runWrapper, 'later');
     sinon.spy(App.authenticator, 'invalidate');
     sinon.spy(App.authenticator, 'refreshAccessToken');
     sinon.spy(App.authenticator, 'scheduleAccessTokenRefresh');
@@ -239,7 +237,7 @@ test('#restore rejects when `token` is excluded', assert => {
 });
 
 test('#restore schedules a token refresh when `refreshAccessTokens` is true', assert => {
-  assert.expect(3);
+  assert.expect(1);
 
   const currentTime = getConvertedTime(Date.now());
   const expiresAt = currentTime + 60;
@@ -266,14 +264,12 @@ test('#restore schedules a token refresh when `refreshAccessTokens` is true', as
   ]);
 
   return App.authenticator.restore(data).then(() => {
-    assert.equal(runWrapper.later.callCount, 2);
-    assert.equal(runWrapper.later.getCall(1).args[1], App.authenticator.refreshAccessToken);
-    assert.equal(runWrapper.later.getCall(1).args[2], refreshToken);
+    assert.equal(App.authenticator.scheduleAccessTokenRefresh.callCount, 1);
   });
 });
 
 test('#restore does not schedule a token refresh when `refreshAccessTokens` is false', assert => {
-  assert.expect(2);
+  assert.expect(1);
 
   App.authenticator.refreshAccessTokens = false;
 
@@ -302,13 +298,12 @@ test('#restore does not schedule a token refresh when `refreshAccessTokens` is f
   ]);
 
   return App.authenticator.restore(data).then(() => {
-    assert.equal(runWrapper.later.callCount, 1);
-    assert.notEqual(runWrapper.later.getCall(0).args[1], App.authenticator.refreshAccessToken);
+    assert.equal(App.authenticator.scheduleAccessTokenRefresh.callCount, 0);
   });
 });
 
-test('#restore does not schedule a token refresh when the token is expired', assert => {
-  assert.expect(2);
+test('#restore immediately refreshes the token when the token is expired', assert => {
+  assert.expect(1);
 
   const currentTime = getConvertedTime(Date.now());
   const expiresAt = currentTime - 60;
@@ -335,13 +330,12 @@ test('#restore does not schedule a token refresh when the token is expired', ass
   ]);
 
   return App.authenticator.restore(data).then(() => {
-    assert.equal(runWrapper.later.callCount, 1);
-    assert.notEqual(runWrapper.later.getCall(0).args[1], App.authenticator.refreshAccessToken);
+    assert.equal(App.authenticator.refreshAccessToken.callCount, 1);
   });
 });
 
 test('#restore schedules a token refresh when the token is farther than the `refreshLeeway` to expiration', assert => {
-  assert.expect(3);
+  assert.expect(1);
 
   App.authenticator.refreshLeeway = 30;
 
@@ -370,14 +364,12 @@ test('#restore schedules a token refresh when the token is farther than the `ref
   ]);
 
   return App.authenticator.restore(data).then(() => {
-    assert.equal(runWrapper.later.callCount, 2);
-    assert.equal(runWrapper.later.getCall(1).args[1], App.authenticator.refreshAccessToken);
-    assert.equal(runWrapper.later.getCall(1).args[2], refreshToken);
+    assert.equal(App.authenticator.scheduleAccessTokenRefresh.callCount, 1);
   });
 });
 
-test('#restore does not schedule a token refresh when the token is closer than the `refreshLeeway` to expiration', assert => {
-  assert.expect(3);
+test('#restore immediately refreshes the token when the token is closer than the `refreshLeeway` to expiration', assert => {
+  assert.expect(1);
 
   App.authenticator.refreshLeeway = 120;
 
@@ -406,9 +398,7 @@ test('#restore does not schedule a token refresh when the token is closer than t
   ]);
 
   return App.authenticator.restore(data).catch(() => {
-    assert.equal(runWrapper.later.callCount, 2);
-    assert.notEqual(runWrapper.later.getCall(0).args[1], App.authenticator.refreshAccessToken);
-    assert.notEqual(runWrapper.later.getCall(1).args[1], App.authenticator.refreshAccessToken);
+    assert.equal(App.authenticator.refreshAccessToken.callCount, 1);
   });
 });
 
@@ -666,7 +656,7 @@ test('#authenticate rejects with the correct error', assert => {
 });
 
 test('#authenticate schedules a token refresh when `refreshAccessTokens` is true', assert => {
-  assert.expect(3);
+  assert.expect(1);
 
   const currentTime = getConvertedTime(Date.now());
   const expiresAt = currentTime + 60;
@@ -700,14 +690,12 @@ test('#authenticate schedules a token refresh when `refreshAccessTokens` is true
   ]);
 
   return App.authenticator.authenticate(credentials).then(() => {
-    assert.equal(runWrapper.later.callCount, 2);
-    assert.equal(runWrapper.later.getCall(1).args[1], App.authenticator.refreshAccessToken);
-    assert.equal(runWrapper.later.getCall(1).args[2], refreshToken);
+    assert.equal(App.authenticator.scheduleAccessTokenRefresh.callCount, 1);
   });
 });
 
 test('#authenticate does not schedule a token refresh when `refreshAccessTokens` is false', assert => {
-  assert.expect(2);
+  assert.expect(1);
 
   App.authenticator.refreshAccessTokens = false;
 
@@ -743,13 +731,12 @@ test('#authenticate does not schedule a token refresh when `refreshAccessTokens`
   ]);
 
   return App.authenticator.authenticate(credentials).then(() => {
-    assert.equal(runWrapper.later.callCount, 1);
-    assert.notEqual(runWrapper.later.getCall(0).args[1], App.authenticator.refreshAccessToken);
+    assert.equal(App.authenticator.scheduleAccessTokenRefresh.callCount, 0);
   });
 });
 
-test('#authenticate does not schedule a token refresh when the token is expired', assert => {
-  assert.expect(2);
+test('#authenticate immediately refreshes the token when the token is expired', assert => {
+  assert.expect(1);
 
   const currentTime = getConvertedTime(Date.now());
   const expiresAt = currentTime - 60;
@@ -783,13 +770,12 @@ test('#authenticate does not schedule a token refresh when the token is expired'
   ]);
 
   return App.authenticator.authenticate(credentials).then(() => {
-    assert.equal(runWrapper.later.callCount, 1);
-    assert.notEqual(runWrapper.later.getCall(0).args[1], App.authenticator.refreshAccessToken);
+    assert.equal(App.authenticator.refreshAccessToken.callCount, 0);
   });
 });
 
 test('#authenticate schedules a token refresh when the token is farther than the `refreshLeeway` to expiration', assert => {
-  assert.expect(3);
+  assert.expect(1);
 
   App.authenticator.refreshLeeway = 30;
 
@@ -825,51 +811,7 @@ test('#authenticate schedules a token refresh when the token is farther than the
   ]);
 
   return App.authenticator.authenticate(credentials).then(() => {
-    assert.equal(runWrapper.later.callCount, 2);
-    assert.equal(runWrapper.later.getCall(1).args[1], App.authenticator.refreshAccessToken);
-    assert.equal(runWrapper.later.getCall(1).args[2], refreshToken);
-  });
-});
-
-test('#authenticate does not schedule a token refresh when the token is closer than the `refreshLeeway` to expiration', assert => {
-  assert.expect(2);
-
-  App.authenticator.refreshLeeway = 120;
-
-  const currentTime = getConvertedTime(Date.now());
-  const expiresAt = currentTime + 60;
-  const token = createFakeToken({
-    [App.authenticator.tokenExpireName]: expiresAt
-  });
-  const refreshToken = createFakeRefreshToken();
-  const credentials = createFakeCredentials();
-  const response = {
-    [App.authenticator.tokenPropertyName]: token,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
-  };
-  const refreshResponse = {
-    [App.authenticator.tokenPropertyName]: token,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
-  };
-
-  App.server.respondWith('POST', App.authenticator.serverTokenEndpoint, [
-    201,
-    {
-      'Content-Type': 'application/json'
-    },
-    JSON.stringify(response)
-  ]);
-  App.server.respondWith('POST', App.authenticator.serverTokenRefreshEndpoint, [
-    201,
-    {
-      'Content-Type': 'application/json'
-    },
-    JSON.stringify(refreshResponse)
-  ]);
-
-  return App.authenticator.authenticate(credentials).catch(() => {
-    assert.equal(runWrapper.later.callCount, 1);
-    assert.notEqual(runWrapper.later.getCall(0).args[1], App.authenticator.refreshAccessToken);
+    assert.equal(App.authenticator.scheduleAccessTokenRefresh.callCount, 1);
   });
 });
 
