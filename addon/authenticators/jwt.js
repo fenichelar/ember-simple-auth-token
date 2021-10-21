@@ -51,6 +51,10 @@ export default TokenAuthenticator.extend({
     this.refreshTokenPropertyName = config.refreshTokenPropertyName || 'refresh_token';
     this.tokenExpireName = config.tokenExpireName || 'exp';
     this.refreshLeeway = config.refreshLeeway || 0;
+    this.tokenRefreshInvalidateSessionResponseCodes = config.tokenRefreshInvalidateSessionResponseCodes || [401, 403];
+    this.refreshAccessTokenRetryAttempts = config.refreshAccessTokenRetryAttempts || 0;
+    this.refreshAccessTokenRetryTimeout = config.refreshAccessTokenRetryTimeout || 1000;
+    this.tokenRefreshFailInvalidateSession = config.tokenRefreshFailInvalidateSession === true ? true : false;
   },
 
   /**
@@ -102,14 +106,14 @@ export default TokenAuthenticator.extend({
           }
           return resolve(data);
         } else if (this.refreshAccessTokens) {
-          return resolve(this.refreshAccessToken(refreshToken));
+          return resolve(this.refreshAccessToken(refreshToken, 0));
         } else {
           return reject(new Error('unable to refresh token'));
         }
       } else {
         // The refresh token might not be expired, we can't test this on the client so attempt to refresh the token. If the server rejects the token the user session will be invalidated
         if (this.refreshAccessTokens) {
-          return resolve(this.refreshAccessToken(refreshToken));
+          return resolve(this.refreshAccessToken(refreshToken, 0));
         } else {
           return reject(new Error('token is expired'));
         }
@@ -152,7 +156,7 @@ export default TokenAuthenticator.extend({
         if (wait > 0) {
           cancel(this._refreshTokenTimeout);
           delete this._refreshTokenTimeout;
-          this._refreshTokenTimeout = later(this, this.refreshAccessToken, refreshToken, wait);
+          this._refreshTokenTimeout = later(this, this.refreshAccessToken, refreshToken, 0, wait);
         } else if (expiresAt > now) {
           throw new Error('refreshLeeway is too large which is preventing token refresh.');
         }
@@ -171,15 +175,15 @@ export default TokenAuthenticator.extend({
 
     @method refreshAccessToken
   */
-  refreshAccessToken(token) {
-    const data = this.makeRefreshData(token);
+  refreshAccessToken(refreshToken, attempts) {
+    const data = this.makeRefreshData(refreshToken);
 
     return this.makeRequest(this.serverTokenRefreshEndpoint, data, this.headers).then(response => {
       const sessionData = this.handleAuthResponse(response.json);
       this.trigger('sessionDataUpdated', sessionData);
       return sessionData;
     }).catch(error => {
-      this.handleTokenRefreshFail(error.status);
+      this.handleTokenRefreshFail(error.status, refreshToken, attempts);
       return Promise.reject(error);
     });
   },
@@ -290,8 +294,16 @@ export default TokenAuthenticator.extend({
 
     @method handleTokenRefreshFail
   */
-  handleTokenRefreshFail(refreshStatus) {
-    if (refreshStatus === 401 || refreshStatus === 403) {
+  handleTokenRefreshFail(refreshStatusCode, refreshToken, attempts) {
+    if (this.tokenRefreshInvalidateSessionResponseCodes.includes(refreshStatusCode)) {
+      return this.invalidate().then(() => {
+        this.trigger('sessionDataInvalidated');
+      });
+    } else if (attempts++ < this.refreshAccessTokenRetryAttempts) {
+      cancel(this._refreshTokenTimeout);
+      delete this._refreshTokenTimeout;
+      this._refreshTokenTimeout = later(this, this.refreshAccessToken, refreshToken, attempts, this.refreshAccessTokenRetryTimeout);
+    } else if (this.tokenRefreshFailInvalidateSession) {
       return this.invalidate().then(() => {
         this.trigger('sessionDataInvalidated');
       });
