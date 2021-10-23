@@ -1,6 +1,6 @@
 # Ember Simple Auth Token
 
-[![travis-image]][travis]
+[![github-actions-image]][github-actions]
 [![ember-observer-image]][ember-observer]
 [![npm-image]][npm]
 
@@ -185,7 +185,11 @@ ENV['ember-simple-auth-token'] = {
   serverTokenRefreshEndpoint: '/api/token-refresh/', // Server endpoint to send refresh request
   refreshTokenPropertyName: 'refresh_token', // Key in server response that contains the refresh token
   tokenExpireName: 'exp', // Field containing token expiration
-  refreshLeeway: 0 // Amount of time to send refresh request before token expiration
+  refreshLeeway: 0, // Amount of time in seconds to send refresh request before token expiration
+  tokenRefreshInvalidateSessionResponseCodes: [401, 403], // Array of response codes that cause an immediate session invalidation if received when attempting to refresh the token
+  refreshAccessTokenRetryAttempts: 0, // Number of token retry attempts to make
+  refreshAccessTokenRetryTimeout: 1000, // Amount of time in milliseconds to wait between token refresh retry attempts
+  tokenRefreshFailInvalidateSession: false // Enables session invalidation if all token refresh retry requests fail
 };
 ```
 
@@ -219,8 +223,8 @@ ENV['ember-simple-auth-token'] = {
 - `config.timeFactor` has been removed since version 2.1.0
 
 
-[travis-image]: https://travis-ci.org/jpadilla/ember-simple-auth-token.svg?branch=master
-[travis]: https://travis-ci.org/jpadilla/ember-simple-auth-token
+[github-actions-image]: https://github.com/jpadilla/ember-simple-auth-token/actions/workflows/test.yml/badge.svg
+[github-actions]: https://github.com/jpadilla/ember-simple-auth-token/actions/workflows/test.yml
 [ember-observer-image]: https://emberobserver.com/badges/ember-simple-auth-token.svg
 [ember-observer]: https://emberobserver.com/addons/ember-simple-auth-token
 [npm-image]: https://img.shields.io/npm/v/ember-simple-auth-token.svg

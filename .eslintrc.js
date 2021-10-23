@@ -5,8 +5,7 @@ module.exports = {
     sourceType: 'module'
   },
   plugins: [
-    'ember',
-    'no-unsafe-regex'
+    'ember'
   ],
   extends: [
     'eslint:recommended',
@@ -34,7 +33,6 @@ module.exports = {
     'no-trailing-spaces': ['error'],
     'no-undef': ['error'],
     'no-unexpected-multiline': ['error'],
-    'no-unsafe-regex/no-unsafe-regex': ['error'],
     'no-unused-vars': ['error'],
     'no-var': ['error'],
     'one-var': ['error', 'never'],

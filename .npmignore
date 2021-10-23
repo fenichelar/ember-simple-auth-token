@@ -12,6 +12,7 @@
 .gitignore
 .watchmanconfig
 .travis.yml
+.github
 bower.json
 ember-cli-build.js
 testem.js
