@@ -14,7 +14,7 @@
     "test:all": "ember try:each",
     "deploy": "ember build -prod && ember github-pages:commit --message \"Deploy gh-pages from commit $(git rev-parse HEAD)\" && git push origin gh-pages:gh-pages"
   },
-  "repository": "https://github.com/jpadilla/ember-simple-auth-token",
+  "repository": "https://github.com/fenichelar/ember-simple-auth-token",
   "author": {
     "name": "José Padilla",
     "email": "hello@jpadilla.com",
@@ -78,7 +78,7 @@
   },
   "ember-addon": {
     "configPath": "tests/dummy/config",
-    "demoURL": "https://jpadilla.github.io/ember-simple-auth-token/",
+    "demoURL": "https://fenichelar.github.io/ember-simple-auth-token/",
     "versionCompatibility": {
       "ember": ">=2.16.0 <=3.24.0"
     }
