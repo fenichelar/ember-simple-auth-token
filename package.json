@@ -81,7 +81,7 @@
     "configPath": "tests/dummy/config",
     "demoURL": "https://fenichelar.github.io/ember-simple-auth-token/",
     "versionCompatibility": {
-      "ember": ">=2.16.0 <=3.24.0"
+      "ember": ">=2.16.0 <=3.28.0"
     }
   }
 }

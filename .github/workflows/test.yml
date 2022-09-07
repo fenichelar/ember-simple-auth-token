@@ -39,6 +39,10 @@ jobs:
           - ember-lts-3.24-ember-simple-auth-2.0
           - ember-lts-3.24-ember-simple-auth-3.0
           - ember-lts-3.24-ember-simple-auth-4.0
+          - ember-lts-3.28-ember-simple-auth-1.6
+          - ember-lts-3.28-ember-simple-auth-2.0
+          - ember-lts-3.28-ember-simple-auth-3.0
+          - ember-lts-3.28-ember-simple-auth-4.0
           - ember-release-ember-simple-auth-1.6
           - ember-release-ember-simple-auth-2.0
           - ember-release-ember-simple-auth-3.0
