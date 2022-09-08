@@ -2,7 +2,6 @@
 
 import EmberObject, { get } from '@ember/object';
 import { getOwner } from '@ember/application';
-import { assign } from '@ember/polyfills';
 import { Promise, resolve } from 'rsvp';
 import { isEmpty } from '@ember/utils';
 import { cancel, later } from '@ember/runloop';
@@ -134,7 +133,7 @@ export default TokenAuthenticator.extend({
     @return {Promise} Promise that resolves when an auth token is successfully acquired from the server and rejects otherwise
   */
   authenticate(credentials, headers) {
-    return this.makeRequest(this.serverTokenEndpoint, credentials, assign({}, this.headers, headers)).then(response => {
+    return this.makeRequest(this.serverTokenEndpoint, credentials, {...this.headers, ...headers}).then(response => {
       return this.handleAuthResponse(response.json);
     });
   },
@@ -293,7 +292,7 @@ export default TokenAuthenticator.extend({
       this.scheduleAccessTokenRefresh(expiresAt, refreshToken);
     }
 
-    return assign(response, tokenExpireData, {tokenData: tokenData});
+    return {...response, ...tokenExpireData, tokenData: tokenData};
   },
 
   /**
