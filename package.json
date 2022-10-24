@@ -17,9 +17,7 @@
   },
   "repository": "https://github.com/fenichelar/ember-simple-auth-token",
   "author": {
-    "name": "José Padilla",
-    "email": "hello@jpadilla.com",
-    "url": "http://jpadilla.com"
+    "name": "Alec Fenichel"
   },
   "license": "MIT",
   "dependencies": {
