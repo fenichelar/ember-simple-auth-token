@@ -26,7 +26,7 @@
     "ember-simple-auth": "^1.6.0 || ^2.0.0 || ^3.0.0 || ^4.0.0 || ^5.0.0"
   },
   "devDependencies": {
-    "body-parser": "^1.18.2",
+    "body-parser": "^1.20.2",
     "broccoli-asset-rev": "^2.4.5",
     "broccoli-funnel": "^2.0.1",
     "ember-ajax": "^3.0.0",
@@ -54,7 +54,7 @@
     "ember-try": "^1.4.0",
     "eslint-plugin-ember": "^5.2.0",
     "eslint-plugin-node": "^6.0.1",
-    "express": "^4.16.3",
+    "express": "^4.18.2",
     "glob": "^7.1.2",
     "jsonwebtoken": "^8.2.1",
     "loader.js": "^4.2.3",
