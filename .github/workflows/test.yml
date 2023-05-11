@@ -27,22 +27,27 @@ jobs:
           - ember-lts-3.12-ember-simple-auth-2.0
           - ember-lts-3.12-ember-simple-auth-3.0
           - ember-lts-3.12-ember-simple-auth-4.0
+          - ember-lts-3.12-ember-simple-auth-5.0
           - ember-lts-3.16-ember-simple-auth-1.6
           - ember-lts-3.16-ember-simple-auth-2.0
           - ember-lts-3.16-ember-simple-auth-3.0
           - ember-lts-3.16-ember-simple-auth-4.0
+          - ember-lts-3.16-ember-simple-auth-5.0
           - ember-lts-3.20-ember-simple-auth-1.6
           - ember-lts-3.20-ember-simple-auth-2.0
           - ember-lts-3.20-ember-simple-auth-3.0
           - ember-lts-3.20-ember-simple-auth-4.0
+          - ember-lts-3.20-ember-simple-auth-5.0
           - ember-lts-3.24-ember-simple-auth-1.6
           - ember-lts-3.24-ember-simple-auth-2.0
           - ember-lts-3.24-ember-simple-auth-3.0
           - ember-lts-3.24-ember-simple-auth-4.0
+          - ember-lts-3.24-ember-simple-auth-5.0
           - ember-lts-3.28-ember-simple-auth-1.6
           - ember-lts-3.28-ember-simple-auth-2.0
           - ember-lts-3.28-ember-simple-auth-3.0
           - ember-lts-3.28-ember-simple-auth-4.0
+          - ember-lts-3.28-ember-simple-auth-5.0
         experimental:
           - false
         include:
@@ -54,6 +59,8 @@ jobs:
             experimental: true
           - scenario: ember-release-ember-simple-auth-4.0
             experimental: true
+          - scenario: ember-release-ember-simple-auth-5.0
+            experimental: true
           - scenario: ember-beta-ember-simple-auth-1.6
             experimental: true
           - scenario: ember-beta-ember-simple-auth-2.0
@@ -62,6 +69,8 @@ jobs:
             experimental: true
           - scenario: ember-beta-ember-simple-auth-4.0
             experimental: true
+          - scenario: ember-beta-ember-simple-auth-5.0
+            experimental: true
           - scenario: ember-canary-ember-simple-auth-1.6
             experimental: true
           - scenario: ember-canary-ember-simple-auth-2.0
@@ -69,6 +78,8 @@ jobs:
           - scenario: ember-canary-ember-simple-auth-3.0
             experimental: true
           - scenario: ember-canary-ember-simple-auth-4.0
+            experimental: true
+          - scenario: ember-canary-ember-simple-auth-5.0
             experimental: true
     steps:
     - uses: actions/checkout@v2

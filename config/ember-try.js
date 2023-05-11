@@ -197,6 +197,17 @@ module.exports = function() {
           }
         },
         {
+          name: 'ember-lts-3.12-ember-simple-auth-5.0',
+          npm: {
+            dependencies: {
+              'ember-simple-auth': '^5.0.0'
+            },
+            devDependencies: {
+              'ember-source': '~3.12.0'
+            }
+          }
+        },
+        {
           name: 'ember-lts-3.16-ember-simple-auth-1.6',
           npm: {
             dependencies: {
@@ -236,6 +247,17 @@ module.exports = function() {
           npm: {
             dependencies: {
               'ember-simple-auth': '^4.0.0'
+            },
+            devDependencies: {
+              'ember-source': '~3.16.0'
+            }
+          }
+        },
+        {
+          name: 'ember-lts-3.16-ember-simple-auth-5.0',
+          npm: {
+            dependencies: {
+              'ember-simple-auth': '^5.0.0'
             },
             devDependencies: {
               'ember-source': '~3.16.0'
@@ -289,6 +311,17 @@ module.exports = function() {
           }
         },
         {
+          name: 'ember-lts-3.20-ember-simple-auth-5.0',
+          npm: {
+            dependencies: {
+              'ember-simple-auth': '^5.0.0'
+            },
+            devDependencies: {
+              'ember-source': '~3.20.0'
+            }
+          }
+        },
+        {
           name: 'ember-lts-3.24-ember-simple-auth-1.6',
           npm: {
             dependencies: {
@@ -328,6 +361,17 @@ module.exports = function() {
           npm: {
             dependencies: {
               'ember-simple-auth': '^4.0.0'
+            },
+            devDependencies: {
+              'ember-source': '~3.24.0'
+            }
+          }
+        },
+        {
+          name: 'ember-lts-3.24-ember-simple-auth-5.0',
+          npm: {
+            dependencies: {
+              'ember-simple-auth': '^5.0.0'
             },
             devDependencies: {
               'ember-source': '~3.24.0'
@@ -381,6 +425,17 @@ module.exports = function() {
           }
         },
         {
+          name: 'ember-lts-3.28-ember-simple-auth-5.0',
+          npm: {
+            dependencies: {
+              'ember-simple-auth': '^5.0.0'
+            },
+            devDependencies: {
+              'ember-source': '~3.28.0'
+            }
+          }
+        },
+        {
           name: 'ember-release-ember-simple-auth-1.6',
           npm: {
             dependencies: {
@@ -420,6 +475,17 @@ module.exports = function() {
           npm: {
             dependencies: {
               'ember-simple-auth': '^4.0.0'
+            },
+            devDependencies: {
+              'ember-source': urls[0]
+            }
+          }
+        },
+        {
+          name: 'ember-release-ember-simple-auth-5.0',
+          npm: {
+            dependencies: {
+              'ember-simple-auth': '^5.0.0'
             },
             devDependencies: {
               'ember-source': urls[0]
@@ -473,6 +539,17 @@ module.exports = function() {
           }
         },
         {
+          name: 'ember-beta-ember-simple-auth-5.0',
+          npm: {
+            dependencies: {
+              'ember-simple-auth': '^5.0.0'
+            },
+            devDependencies: {
+              'ember-source': urls[1]
+            }
+          }
+        },
+        {
           name: 'ember-canary-ember-simple-auth-1.6',
           npm: {
             dependencies: {
@@ -512,6 +589,17 @@ module.exports = function() {
           npm: {
             dependencies: {
               'ember-simple-auth': '^4.0.0'
+            },
+            devDependencies: {
+              'ember-source': urls[2]
+            }
+          }
+        },
+        {
+          name: 'ember-canary-ember-simple-auth-5.0',
+          npm: {
+            dependencies: {
+              'ember-simple-auth': '^5.0.0'
             },
             devDependencies: {
               'ember-source': urls[2]
