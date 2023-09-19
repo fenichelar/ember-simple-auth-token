@@ -1,13 +1,12 @@
+import { action } from '@ember/object';
 import Route from '@ember/routing/route';
 import { inject } from '@ember/service';
-import ApplicationRouteMixin from 'ember-simple-auth/mixins/application-route-mixin';
 
-export default Route.extend(ApplicationRouteMixin, {
-  session: inject('session'),
+export default class ApplicationRoute extends Route {
+  @inject session;
 
-  actions: {
-    invalidateSession: function() {
-      this.get('session').invalidate();
-    }
+  @action
+  invalidateSession() {
+    this.get('session').invalidate();
   }
-});
+};
