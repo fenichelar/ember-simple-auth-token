@@ -144,7 +144,7 @@ Authorization: Bearer <token>
 ```js
 // app/adapters/application.js
 import DS from 'ember-data';
-import TokenAdapterMixin from 'ember-simple-auth-token/mixins/token-adapter';
+import TokenAdapterMixin from '@triptyk/ember-simple-auth-token/mixins/token-adapter';
 
 export default DS.JSONAPIAdapter.extend(TokenAdapterMixin);
 ```
@@ -154,7 +154,7 @@ export default DS.JSONAPIAdapter.extend(TokenAdapterMixin);
 ```js
 // app/adapters/application.js
 import DS from 'ember-data';
-import TokenAuthorizerMixin from 'ember-simple-auth-token/mixins/token-authorizer';
+import TokenAuthorizerMixin from '@triptyk/ember-simple-auth-token/mixins/token-authorizer';
 
 export default DS.JSONAPIAdapter.extend(TokenAuthorizerMixin);
 ```
@@ -223,8 +223,8 @@ ENV['ember-simple-auth-token'] = {
 - `config.timeFactor` has been removed since version 2.1.0
 
 
-[github-actions-image]: https://github.com/fenichelar/ember-simple-auth-token/actions/workflows/test.yml/badge.svg
-[github-actions]: https://github.com/fenichelar/ember-simple-auth-token/actions/workflows/test.yml
+[github-actions-image]: https://github.com/fenichelar/@triptyk/ember-simple-auth-token/actions/workflows/test.yml/badge.svg
+[github-actions]: https://github.com/fenichelar/@triptyk/ember-simple-auth-token/actions/workflows/test.yml
 [ember-observer-image]: https://emberobserver.com/badges/ember-simple-auth-token.svg
 [ember-observer]: https://emberobserver.com/addons/ember-simple-auth-token
 [npm-image]: https://img.shields.io/npm/v/ember-simple-auth-token.svg

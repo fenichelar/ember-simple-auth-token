@@ -1,5 +1,5 @@
 import EmberObject from '@ember/object';
-import TokenAdapterMixin from 'ember-simple-auth-token/mixins/token-adapter';
+import TokenAdapterMixin from '@triptyk/ember-simple-auth-token/mixins/token-adapter';
 import { module, test } from 'qunit';
 
 module('Unit | Mixin | token-adapter', function() {

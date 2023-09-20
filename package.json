@@ -1,6 +1,6 @@
 {
   "name": "@triptyk/ember-simple-auth-token",
-  "version": "5.3.4",
+  "version": "5.3.5",
   "description": "An authenticator and authorizer for Ember Simple Auth that is compatible with token-based authentication like JWT in Ember CLI applications.",
   "directories": {
     "doc": "doc",
@@ -81,7 +81,7 @@
   },
   "ember-addon": {
     "configPath": "tests/dummy/config",
-    "demoURL": "https://fenichelar.github.io/ember-simple-auth-token/",
+    "demoURL": "https://fenichelar.github.io/@triptyk/ember-simple-auth-token/",
     "versionCompatibility": {
       "ember": ">=2.16.0 <=3.28.0"
     }

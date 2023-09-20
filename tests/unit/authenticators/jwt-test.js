@@ -4,7 +4,7 @@ import sinon from 'sinon';
 import startApp from '../../helpers/start-app';
 import * as fetchWrapper from 'fetch';
 import { assign } from '@ember/polyfills';
-import JWT from 'ember-simple-auth-token/authenticators/jwt';
+import JWT from '@triptyk/ember-simple-auth-token/authenticators/jwt';
 
 let App;
 

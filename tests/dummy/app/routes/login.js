@@ -5,6 +5,6 @@ export default class LoginRoute extends Route {
     @inject session;
 
     beforeModel(transition) {
-        this.session.requireAuthentication(transition, 'login');
+      this.session.requireAuthentication(transition, 'login');
     }
 }

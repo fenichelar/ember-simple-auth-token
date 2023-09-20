@@ -8,7 +8,7 @@ import { isEmpty } from '@ember/utils';
   Authorizer Mixin that works with token-based authentication like JWT by sending the `token` properties from the session in the `Authorization` header.
 
   @class TokenAuthorizer
-  @module ember-simple-auth-token/mixins/token-authorizer
+  @module @triptyk/ember-simple-auth-token/mixins/token-authorizer
   @extends Ember.Mixin
 */
 export default Mixin.create({

@@ -9,4 +9,4 @@ export default class ApplicationRoute extends Route {
   invalidateSession() {
     this.get('session').invalidate();
   }
-};
+}

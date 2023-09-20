@@ -8,7 +8,7 @@ import { isEmpty } from '@ember/utils';
   Adapter Mixin that works with token-based authentication like JWT.
 
   @class TokenAdapter
-  @module ember-simple-auth-token/mixins/token-adapter
+  @module @triptyk/ember-simple-auth-token/mixins/token-adapter
   @extends Ember.Mixin
 */
 export default Mixin.create({

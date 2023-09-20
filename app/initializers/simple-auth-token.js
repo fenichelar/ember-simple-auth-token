@@ -1,5 +1,5 @@
-import TokenAuthenticator from 'ember-simple-auth-token/authenticators/token';
-import JWTAuthenticator from 'ember-simple-auth-token/authenticators/jwt';
+import TokenAuthenticator from '@triptyk/ember-simple-auth-token/authenticators/token';
+import JWTAuthenticator from '@triptyk/ember-simple-auth-token/authenticators/jwt';
 
 /**
   Ember Simple Auth Token's Initializer.

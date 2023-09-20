@@ -31,7 +31,7 @@ const decode = str => {
 
   @class JWT
   @namespace SimpleAuth.Authenticators
-  @module ember-simple-auth-token/authenticators/jwt
+  @module @triptyk/ember-simple-auth-token/authenticators/jwt
   @extends TokenAuthenticator
 */
 export default TokenAuthenticator.extend({

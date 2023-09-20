@@ -5,7 +5,7 @@ import ENV from '../config/environment';
 
 export default class IndexRoute extends Route {
   @inject session;
-  
+
   model() {
     const adapter = getOwner(this).lookup('adapter:application');
     return adapter.ajax(`${ENV['API_URL'] || ''}/api/users/`, 'GET');
