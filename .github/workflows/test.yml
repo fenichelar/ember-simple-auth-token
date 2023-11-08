@@ -82,11 +82,11 @@ jobs:
           - scenario: ember-canary-ember-simple-auth-5.0
             experimental: true
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Test scenario ${{ matrix.scenario }}
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
         node-version: 14.x
     - run: npm ci
     - run: npm run lint:js
-    - run: node_modules/.bin/ember try:one ${{ matrix.scenario }} --skip-cleanup
+    - run: npm run try:one ${{ matrix.scenario }} --skip-cleanup
