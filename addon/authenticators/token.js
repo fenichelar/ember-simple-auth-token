@@ -16,11 +16,9 @@ import Base from 'ember-simple-auth/authenticators/base';
   @extends Base
 */
 export default class TokenAuthenticator extends Base {
-  /**
-    @method init
-  */
-  init() {
-    this._super(...arguments);
+
+  constructor(...args) {
+    super(...args);
     const owner = getOwner(this);
     const environment = owner ? owner.resolveRegistration('config:environment') || {} : {};
     const config = environment['ember-simple-auth-token'] || {};

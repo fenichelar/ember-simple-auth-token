@@ -1,13 +1,11 @@
-/* global FastBoot */
-
-import EmberObject, { get } from '@ember/object';
+import { get } from '@ember/object';
 import { getOwner } from '@ember/application';
 import { Promise, resolve } from 'rsvp';
 import { isEmpty } from '@ember/utils';
 import { cancel, later } from '@ember/runloop';
 import TokenAuthenticator from './token';
 
-const decode = str => {
+const decode = (str) => {
   if (typeof atob === 'function') {
     return atob(str);
   } else if (typeof FastBoot === 'object') {
@@ -15,10 +13,14 @@ const decode = str => {
       const buffer = FastBoot.require('buffer');
       return buffer.Buffer.from(str, 'base64').toString('utf-8');
     } catch (err) {
-      throw new Error('buffer must be available for decoding base64 strings in FastBoot. Make sure to add buffer to your fastbootDependencies.');
+      throw new Error(
+        'buffer must be available for decoding base64 strings in FastBoot. Make sure to add buffer to your fastbootDependencies.',
+      );
     }
   } else {
-    throw new Error('Neither atob nor the FastBoot global are avaialble. Unable to decode base64 strings.');
+    throw new Error(
+      'Neither atob nor the FastBoot global are avaialble. Unable to decode base64 strings.',
+    );
   }
 };
 
@@ -35,25 +37,32 @@ const decode = str => {
   @extends TokenAuthenticator
 */
 export default class JwtAuthenticator extends TokenAuthenticator {
-  /**
-    @method init
-  */
-  init() {
-    this._super(...arguments);
+  constructor(...args) {
+    super(...args);
     const owner = getOwner(this);
-    const environment = owner ? owner.resolveRegistration('config:environment') || {} : {};
+    const environment = owner
+      ? owner.resolveRegistration('config:environment') || {}
+      : {};
     const config = environment['ember-simple-auth-token'] || {};
     this.tokenDataPropertyName = config.tokenDataPropertyName || 'tokenData';
-    this.refreshAccessTokens = config.refreshAccessTokens === false ? false : true;
-    this.tokenExpirationInvalidateSession = config.tokenExpirationInvalidateSession === false ? false : true;
-    this.serverTokenRefreshEndpoint = config.serverTokenRefreshEndpoint || '/api/token-refresh/';
-    this.refreshTokenPropertyName = config.refreshTokenPropertyName || 'refresh_token';
+    this.refreshAccessTokens =
+      config.refreshAccessTokens === false ? false : true;
+    this.tokenExpirationInvalidateSession =
+      config.tokenExpirationInvalidateSession === false ? false : true;
+    this.serverTokenRefreshEndpoint =
+      config.serverTokenRefreshEndpoint || '/api/token-refresh/';
+    this.refreshTokenPropertyName =
+      config.refreshTokenPropertyName || 'refresh_token';
     this.tokenExpireName = config.tokenExpireName || 'exp';
     this.refreshLeeway = config.refreshLeeway || 0;
-    this.tokenRefreshInvalidateSessionResponseCodes = config.tokenRefreshInvalidateSessionResponseCodes || [401, 403];
-    this.refreshAccessTokenRetryAttempts = config.refreshAccessTokenRetryAttempts || 0;
-    this.refreshAccessTokenRetryTimeout = config.refreshAccessTokenRetryTimeout || 1000;
-    this.tokenRefreshFailInvalidateSession = config.tokenRefreshFailInvalidateSession === true ? true : false;
+    this.tokenRefreshInvalidateSessionResponseCodes =
+      config.tokenRefreshInvalidateSessionResponseCodes || [401, 403];
+    this.refreshAccessTokenRetryAttempts =
+      config.refreshAccessTokenRetryAttempts || 0;
+    this.refreshAccessTokenRetryTimeout =
+      config.refreshAccessTokenRetryTimeout || 1000;
+    this.tokenRefreshFailInvalidateSession =
+      config.tokenRefreshFailInvalidateSession === true ? true : false;
   }
 
   /**
@@ -70,54 +79,52 @@ export default class JwtAuthenticator extends TokenAuthenticator {
     @param {Object} data Data to restore the session from
     @return {Promise} Promise that when it resolves results in the session being authenticated
   */
-  restore(data) {
-    const dataObject = EmberObject.create(data);
+  async restore(data) {
+    const dataObject = {
+      ...data,
+    };
 
-    return new Promise((resolve, reject) => {
-      const now = this.getCurrentTime();
-      const token = dataObject.get(this.tokenPropertyName);
-      const refreshToken = dataObject.get(this.refreshTokenPropertyName);
-      let expiresAt = dataObject.get(this.tokenExpireName);
+    const now = this.getCurrentTime();
+    const token = get(dataObject, this.tokenPropertyName);
+    const refreshToken = get(dataObject, this.refreshTokenPropertyName);
+    let expiresAt = get(dataObject, this.tokenExpireName);
 
-      if (isEmpty(token)) {
-        return reject(new Error('empty token'));
-      }
+    if (isEmpty(token)) {
+      throw new Error('empty token');
+    }
 
+    if (isEmpty(expiresAt)) {
+      const tokenData = this.getTokenData(token);
+      expiresAt = tokenData[this.tokenExpireName];
       if (isEmpty(expiresAt)) {
-        // Fetch the expire time from the token data since `expiresAt` wasn't included in the data object that was passed in.
-        const tokenData = this.getTokenData(token);
-        expiresAt = tokenData[this.tokenExpireName];
-        if (isEmpty(expiresAt)) {
-          return resolve(data);
-        }
+        return data;
+      }
+    }
+
+    if (expiresAt > now) {
+      const wait = (expiresAt - now - this.refreshLeeway) * 1000;
+
+      if (this.tokenExpirationInvalidateSession) {
+        this.scheduleAccessTokenExpiration(expiresAt);
       }
 
-      if (expiresAt > now) {
-        const wait = (expiresAt - now - this.refreshLeeway) * 1000;
-
-        if (this.tokenExpirationInvalidateSession) {
-          this.scheduleAccessTokenExpiration(expiresAt);
-        }
-
-        if (wait > 0) {
-          if (this.refreshAccessTokens) {
-            this.scheduleAccessTokenRefresh(expiresAt, refreshToken);
-          }
-          return resolve(data);
-        } else if (this.refreshAccessTokens) {
-          return resolve(this.refreshAccessToken(refreshToken, 0));
-        } else {
-          return reject(new Error('unable to refresh token'));
-        }
-      } else {
-        // The refresh token might not be expired, we can't test this on the client so attempt to refresh the token. If the server rejects the token the user session will be invalidated
+      if (wait > 0) {
         if (this.refreshAccessTokens) {
-          return resolve(this.refreshAccessToken(refreshToken, 0));
-        } else {
-          return reject(new Error('token is expired'));
+          this.scheduleAccessTokenRefresh(expiresAt, refreshToken);
         }
+        return data;
+      } else if (this.refreshAccessTokens) {
+        return await this.refreshAccessToken(refreshToken, 0);
+      } else {
+        throw new Error('unable to refresh token');
       }
-    });
+    } else {
+      if (this.refreshAccessTokens) {
+        return await this.refreshAccessToken(refreshToken, 0);
+      } else {
+        throw new Error('token is expired');
+      }
+    }
   }
 
   /**
@@ -132,10 +139,12 @@ export default class JwtAuthenticator extends TokenAuthenticator {
     @param {Object} headers Headers to send with the authentication request
     @return {Promise} Promise that resolves when an auth token is successfully acquired from the server and rejects otherwise
   */
-  authenticate(credentials, headers) {
-    return this.makeRequest(this.serverTokenEndpoint, credentials, {...this.headers, ...headers}).then(response => {
-      return this.handleAuthResponse(response.json);
+  async authenticate(credentials, headers) {
+    const response = await this.makeRequest(this.serverTokenEndpoint, credentials, {
+      ...this.headers,
+      ...headers,
     });
+    return this.handleAuthResponse(response.json);
   }
 
   /**
@@ -149,7 +158,6 @@ export default class JwtAuthenticator extends TokenAuthenticator {
   */
   scheduleAccessTokenRefresh(expiresAt, refreshToken) {
     if (this.refreshAccessTokens) {
-
       const now = this.getCurrentTime();
       const wait = (expiresAt - now - this.refreshLeeway) * 1000;
 
@@ -157,9 +165,17 @@ export default class JwtAuthenticator extends TokenAuthenticator {
         if (wait > 0) {
           cancel(this._refreshTokenTimeout);
           delete this._refreshTokenTimeout;
-          this._refreshTokenTimeout = later(this, this.refreshAccessToken, refreshToken, 0, wait);
+          this._refreshTokenTimeout = later(
+            this,
+            this.refreshAccessToken,
+            refreshToken,
+            0,
+            wait,
+          );
         } else if (expiresAt > now) {
-          throw new Error('refreshLeeway is too large which is preventing token refresh.');
+          throw new Error(
+            'refreshLeeway is too large which is preventing token refresh.',
+          );
         }
       }
     }
@@ -179,17 +195,18 @@ export default class JwtAuthenticator extends TokenAuthenticator {
     @param {Integer} attempts Number of attempts that have been made so far
     @return {Promise} Promise that resolves when an auth token is successfully acquired from the server and rejects otherwise
   */
-  refreshAccessToken(refreshToken, attempts) {
+  async refreshAccessToken(refreshToken, attempts) {
     const data = this.makeRefreshData(refreshToken);
 
-    return this.makeRequest(this.serverTokenRefreshEndpoint, data, this.headers).then(response => {
+    try {
+      const response = await this.makeRequest(this.serverTokenRefreshEndpoint, data, this.headers);
       const sessionData = this.handleAuthResponse(response.json);
       this.trigger('sessionDataUpdated', sessionData);
       return sessionData;
-    }).catch(error => {
+    } catch (error) {
       this.handleTokenRefreshFail(error.status, refreshToken, attempts);
-      return Promise.reject(error);
-    });
+      return await Promise.reject(error);
+    }
   }
 
   /**
@@ -206,7 +223,7 @@ export default class JwtAuthenticator extends TokenAuthenticator {
     const refreshTokenPropertyName = nestings.pop();
     let lastObject = data;
 
-    nestings.forEach(nesting => {
+    nestings.forEach((nesting) => {
       lastObject[nesting] = {};
       lastObject = lastObject[nesting];
     });
@@ -225,7 +242,9 @@ export default class JwtAuthenticator extends TokenAuthenticator {
   */
   getTokenData(token) {
     const payload = token.split('.')[1];
-    const decodedPayload = decode(payload.replace(/-/g, '+').replace(/_/g, '/'));
+    const decodedPayload = decode(
+      payload.replace(/-/g, '+').replace(/_/g, '/'),
+    );
     const tokenData = decodeURIComponent(window.escape(decodedPayload));
 
     try {
@@ -256,7 +275,7 @@ export default class JwtAuthenticator extends TokenAuthenticator {
     @return {Integer} timestamp
   */
   getCurrentTime() {
-    return Math.floor((new Date()).getTime() / 1000);
+    return Math.floor(new Date().getTime() / 1000);
   }
 
   /**
@@ -286,13 +305,15 @@ export default class JwtAuthenticator extends TokenAuthenticator {
       const refreshToken = get(response, this.refreshTokenPropertyName);
 
       if (isEmpty(refreshToken)) {
-        throw new Error('Refresh token is empty. Please check your backend response.');
+        throw new Error(
+          'Refresh token is empty. Please check your backend response.',
+        );
       }
 
       this.scheduleAccessTokenRefresh(expiresAt, refreshToken);
     }
 
-    return {...response, ...tokenExpireData, tokenData: tokenData};
+    return { ...response, ...tokenExpireData, tokenData: tokenData };
   }
 
   /**
@@ -304,14 +325,24 @@ export default class JwtAuthenticator extends TokenAuthenticator {
     @param {Integer} attempts Number of attempts that have been made so far
   */
   handleTokenRefreshFail(refreshStatusCode, refreshToken, attempts) {
-    if (this.tokenRefreshInvalidateSessionResponseCodes.includes(refreshStatusCode)) {
+    if (
+      this.tokenRefreshInvalidateSessionResponseCodes.includes(
+        refreshStatusCode,
+      )
+    ) {
       return this.invalidate().then(() => {
         this.trigger('sessionDataInvalidated');
       });
     } else if (attempts++ < this.refreshAccessTokenRetryAttempts) {
       cancel(this._refreshTokenTimeout);
       delete this._refreshTokenTimeout;
-      this._refreshTokenTimeout = later(this, this.refreshAccessToken, refreshToken, attempts, this.refreshAccessTokenRetryTimeout);
+      this._refreshTokenTimeout = later(
+        this,
+        this.refreshAccessToken,
+        refreshToken,
+        attempts,
+        this.refreshAccessTokenRetryTimeout,
+      );
     } else if (this.tokenRefreshFailInvalidateSession) {
       return this.invalidate().then(() => {
         this.trigger('sessionDataInvalidated');
@@ -332,7 +363,11 @@ export default class JwtAuthenticator extends TokenAuthenticator {
     if (!isEmpty(expiresAt)) {
       cancel(this._tokenExpirationTimeout);
       delete this._tokenExpirationTimeout;
-      this._tokenExpirationTimeout = later(this, this.handleAccessTokenExpiration, wait);
+      this._tokenExpirationTimeout = later(
+        this,
+        this.handleAccessTokenExpiration,
+        wait,
+      );
     }
   }
 
@@ -341,9 +376,8 @@ export default class JwtAuthenticator extends TokenAuthenticator {
 
     @method handleAccessTokenExpiration
   */
-  handleAccessTokenExpiration() {
-    return this.invalidate().then(() => {
-      this.trigger('sessionDataInvalidated');
-    });
+  async handleAccessTokenExpiration() {
+    await this.invalidate();
+    this.trigger('sessionDataInvalidated');
   }
 }

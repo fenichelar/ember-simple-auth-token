@@ -1,9 +1,7 @@
-import { module } from 'qunit';
-import { test } from 'ember-qunit';
+import { module, test } from 'qunit';
 import sinon from 'sinon';
 import startApp from '../../helpers/start-app';
 import * as fetchWrapper from 'fetch';
-import { assign } from '@ember/polyfills';
 import Token from '@triptyk/ember-simple-auth-token/authenticators/token';
 
 let App;
@@ -247,7 +245,7 @@ test('#authenticate sends an fetch request with custom headers', assert => {
     assert.deepEqual(fetchWrapper.default.getCall(0).args[1], {
       method: 'POST',
       body: JSON.stringify(credentials),
-      headers: assign({
+      headers: Object.assign({
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       }, App.authenticator.headers)
@@ -283,7 +281,7 @@ test('#authenticate sends an fetch request with dynamic headers', assert => {
     assert.deepEqual(fetchWrapper.default.getCall(0).args[1], {
       method: 'POST',
       body: JSON.stringify(credentials),
-      headers: assign({
+      headers: Object.assign({
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       }, headers)
