@@ -3,17 +3,21 @@
 <h2 id="title">Welcome to Ember</h2>
 
 <ul>
-  {{#link-to "index" tagName="li"}}
-    <a style="cursor: pointer">Protected Page</a>
-  {{/link-to}}
-  {{#if session.isAuthenticated}}
+  <li>
+    <LinkTo @route="index">
+      Protected Page
+    </LinkTo>
+  </li>
+  {{#if this.session.isAuthenticated}}
     <li>
-      <a {{ action "invalidateSession" }}>Logout</a>
+      <button type="button" {{on "click" this.invalidateSession}}>Logout</button>
     </li>
   {{else}}
-    {{#link-to "login" tagName="li"}}
-      <a style="cursor: pointer">Login</a>
-    {{/link-to}}
+    <li>
+      <LinkTo @route="login">
+        Login
+      </LinkTo>
+    </li>
   {{/if}}
 </ul>
 
@@ -22,7 +26,7 @@
 <hr>
 
 <p>Config:</p>
-<pre>{{config}}</pre>
+<pre>{{this.config}}</pre>
 
 <p>Session Data:</p>
-<pre>{{sessionData}}</pre>
+<pre>{{this.sessionData}}</pre>

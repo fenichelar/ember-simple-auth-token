@@ -1,9 +1,9 @@
-module.exports = function(app) {
+module.exports = function (app) {
   var express = require('express');
   var jwt = require('jsonwebtoken');
   var usersRouter = express.Router();
 
-  usersRouter.get('/', function(req, res) {
+  usersRouter.get('/', function (req, res) {
     var authorizationHeader = req.headers.authorization || '';
     var token = authorizationHeader.split('Bearer ')[1];
 
@@ -12,7 +12,7 @@ module.exports = function(app) {
     }
     var user = jwt.verify(token, 'secret');
 
-    return res.send({username: user.username});
+    return res.send({ username: user.username });
   });
 
   app.use('/api/users', usersRouter);

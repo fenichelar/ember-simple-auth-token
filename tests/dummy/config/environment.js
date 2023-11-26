@@ -26,8 +26,8 @@ module.exports = function (environment) {
       'connect-src': "'self'",
       'img-src': "'self'",
       'style-src': "'self' 'unsafe-inline' https://maxcdn.bootstrapcdn.com",
-      'media-src': "'self'"
-    }
+      'media-src': "'self'",
+    },
   };
 
   if (environment === 'development') {
@@ -41,7 +41,7 @@ module.exports = function (environment) {
       refreshTokenPropertyName: 'token',
       serverTokenEndpoint: '/api/token-auth/',
       serverTokenRefreshEndpoint: '/api/token-refresh/',
-      refreshLeeway: 5
+      refreshLeeway: 5,
     };
   }
 
@@ -66,12 +66,12 @@ module.exports = function (environment) {
       refreshTokenPropertyName: 'token',
       serverTokenEndpoint: `${ENV.API_URL}/api/token-auth/`,
       serverTokenRefreshEndpoint: `${ENV.API_URL}/api/token-refresh/`,
-      refreshLeeway: 5
+      refreshLeeway: 5,
     };
   }
 
   ENV['ember-simple-auth'] = {
-    applicationRootUrl: ENV.rootURL
+    applicationRootUrl: ENV.rootURL,
   };
 
   return ENV;

@@ -16,11 +16,12 @@ import Base from 'ember-simple-auth/authenticators/base';
   @extends Base
 */
 export default class TokenAuthenticator extends Base {
-
   constructor(...args) {
     super(...args);
     const owner = getOwner(this);
-    const environment = owner ? owner.resolveRegistration('config:environment') || {} : {};
+    const environment = owner
+      ? owner.resolveRegistration('config:environment') || {}
+      : {};
     const config = environment['ember-simple-auth-token'] || {};
     this.serverTokenEndpoint = config.serverTokenEndpoint || '/api/token-auth/';
     this.tokenPropertyName = config.tokenPropertyName || 'token';
@@ -55,7 +56,10 @@ export default class TokenAuthenticator extends Base {
     @return {Promise} Promise that resolves when an auth token is successfully acquired from the server and rejects otherwise
   */
   authenticate(credentials, headers) {
-    return this.makeRequest(this.serverTokenEndpoint, credentials, {...this.headers, ...headers}).then(response => {
+    return this.makeRequest(this.serverTokenEndpoint, credentials, {
+      ...this.headers,
+      ...headers,
+    }).then((response) => {
       return response.json;
     });
   }
@@ -81,34 +85,37 @@ export default class TokenAuthenticator extends Base {
     return fetch(url, {
       method: 'POST',
       headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
         'Content-Type': 'application/json',
-        ...headers
+        ...headers,
       },
-      body: JSON.stringify(data)
-    }).then(response => {
+      body: JSON.stringify(data),
+    }).then((response) => {
       const res = {
         statusText: response.statusText,
         status: response.status,
-        headers: response.headers
+        headers: response.headers,
       };
 
-      return response.text().then(text => {
-        res.text = text;
-        try {
-          res.json = JSON.parse(text);
-        } catch (e) {
-          return reject(res);
-        }
+      return response
+        .text()
+        .then((text) => {
+          res.text = text;
+          try {
+            res.json = JSON.parse(text);
+          } catch (e) {
+            return reject(res);
+          }
 
-        if (response.ok) {
-          return res;
-        } else {
+          if (response.ok) {
+            return res;
+          } else {
+            return reject(res);
+          }
+        })
+        .catch(() => {
           return reject(res);
-        }
-      }).catch(() => {
-        return reject(res);
-      });
+        });
     });
   }
 }

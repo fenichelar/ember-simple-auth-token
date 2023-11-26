@@ -10,6 +10,7 @@ const decode = (str) => {
     return atob(str);
   } else if (typeof FastBoot === 'object') {
     try {
+      // eslint-disable-next-line no-undef
       const buffer = FastBoot.require('buffer');
       return buffer.Buffer.from(str, 'base64').toString('utf-8');
     } catch (err) {
@@ -140,10 +141,14 @@ export default class JwtAuthenticator extends TokenAuthenticator {
     @return {Promise} Promise that resolves when an auth token is successfully acquired from the server and rejects otherwise
   */
   async authenticate(credentials, headers) {
-    const response = await this.makeRequest(this.serverTokenEndpoint, credentials, {
-      ...this.headers,
-      ...headers,
-    });
+    const response = await this.makeRequest(
+      this.serverTokenEndpoint,
+      credentials,
+      {
+        ...this.headers,
+        ...headers,
+      },
+    );
     return this.handleAuthResponse(response.json);
   }
 
@@ -199,7 +204,11 @@ export default class JwtAuthenticator extends TokenAuthenticator {
     const data = this.makeRefreshData(refreshToken);
 
     try {
-      const response = await this.makeRequest(this.serverTokenRefreshEndpoint, data, this.headers);
+      const response = await this.makeRequest(
+        this.serverTokenRefreshEndpoint,
+        data,
+        this.headers,
+      );
       const sessionData = this.handleAuthResponse(response.json);
       this.trigger('sessionDataUpdated', sessionData);
       return sessionData;

@@ -7,6 +7,6 @@ export default class ApplicationRoute extends Route {
 
   @action
   invalidateSession() {
-    this.get('session').invalidate();
+    this.session.invalidate();
   }
 }

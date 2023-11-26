@@ -13,7 +13,7 @@ export default class IndexRoute extends Route {
 
   setupController(_, model) {
     if (!model.username) {
-      this.get('session').invalidate();
+      this.session.invalidate();
     }
   }
 }

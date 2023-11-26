@@ -11,5 +11,5 @@ export default {
   initialize(container) {
     container.register('authenticator:token', TokenAuthenticator);
     container.register('authenticator:jwt', JWTAuthenticator);
-  }
+  },
 };

@@ -1,3 +1,4 @@
+/* eslint-disable qunit/require-expect */
 import { module, test } from 'qunit';
 import sinon from 'sinon';
 import startApp from '../../helpers/start-app';
@@ -9,11 +10,11 @@ let App;
 const createFakeCredentials = () => {
   return {
     username: 'test@test.com',
-    password: 'password'
+    password: 'password',
   };
 };
 
-const createFakeToken = obj => {
+const createFakeToken = (obj) => {
   return `a.${btoa(JSON.stringify(obj))}.b`;
 };
 
@@ -21,7 +22,7 @@ const createFakeRefreshToken = () => {
   return btoa('91df47a8-8c7f-4411-98e7-43bfd32df5c4');
 };
 
-const getConvertedTime = time => {
+const getConvertedTime = (time) => {
   return Math.round(time / 1000);
 };
 
@@ -36,75 +37,75 @@ module('JWT Authenticator', {
     sinon.spy(App.authenticator, 'invalidate');
     sinon.spy(App.authenticator, 'refreshAccessToken');
     sinon.spy(App.authenticator, 'scheduleAccessTokenRefresh');
-  }
+  },
 });
 
-test('#restore resolves when the data includes `token` and `expiresAt`', assert => {
+test('#restore resolves when the data includes `token` and `expiresAt`', (assert) => {
   assert.expect(1);
 
   const currentTime = getConvertedTime(Date.now());
   const expiresAt = currentTime + 60;
   const tokenData = {
-    [App.authenticator.tokenExpireName]: expiresAt
+    [App.authenticator.tokenExpireName]: expiresAt,
   };
   const token = createFakeToken(tokenData);
   const refreshToken = createFakeRefreshToken();
   const data = {
     [App.authenticator.tokenPropertyName]: token,
     [App.authenticator.tokenExpireName]: expiresAt,
-    [App.authenticator.tokenDataPropertyName]: tokenData
+    [App.authenticator.tokenDataPropertyName]: tokenData,
   };
   const response = {
     [App.authenticator.tokenPropertyName]: token,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
 
   App.server.respondWith('POST', App.authenticator.serverTokenRefreshEndpoint, [
     201,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify(response)
+    JSON.stringify(response),
   ]);
 
-  return App.authenticator.restore(data).then(content => {
+  return App.authenticator.restore(data).then((content) => {
     assert.deepEqual(content, data);
   });
 });
 
-test('#restore resolves when the data includes `token` and excludes `expiresAt`', assert => {
+test('#restore resolves when the data includes `token` and excludes `expiresAt`', (assert) => {
   assert.expect(1);
 
   const token = createFakeToken();
   const refreshToken = createFakeRefreshToken();
   const data = {
-    [App.authenticator.tokenPropertyName]: token
+    [App.authenticator.tokenPropertyName]: token,
   };
   const response = {
     [App.authenticator.tokenPropertyName]: token,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
 
   App.server.respondWith('POST', App.authenticator.serverTokenRefreshEndpoint, [
     201,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify(response)
+    JSON.stringify(response),
   ]);
 
-  return App.authenticator.restore(data).then(content => {
+  return App.authenticator.restore(data).then((content) => {
     assert.deepEqual(content, data);
   });
 });
 
-test('#restore resolves when the data includes `token` and `expiresAt` and the token is expired', assert => {
+test('#restore resolves when the data includes `token` and `expiresAt` and the token is expired', (assert) => {
   assert.expect(1);
 
   const currentTime = getConvertedTime(Date.now());
   const expiresAt = currentTime - 60 * 60;
   const tokenData = {
-    [App.authenticator.tokenExpireName]: expiresAt
+    [App.authenticator.tokenExpireName]: expiresAt,
   };
   const token = createFakeToken(tokenData);
   const refreshToken = createFakeRefreshToken();
@@ -112,27 +113,27 @@ test('#restore resolves when the data includes `token` and `expiresAt` and the t
     [App.authenticator.tokenPropertyName]: token,
     [App.authenticator.refreshTokenPropertyName]: refreshToken,
     [App.authenticator.tokenExpireName]: expiresAt,
-    [App.authenticator.tokenDataPropertyName]: tokenData
+    [App.authenticator.tokenDataPropertyName]: tokenData,
   };
   const response = {
     [App.authenticator.tokenPropertyName]: token,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
 
   App.server.respondWith('POST', App.authenticator.serverTokenRefreshEndpoint, [
     201,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify(response)
+    JSON.stringify(response),
   ]);
 
-  return App.authenticator.restore(data).then(content => {
+  return App.authenticator.restore(data).then((content) => {
     assert.deepEqual(content, data);
   });
 });
 
-test('#restore rejects when the data includes `token` and `expiresAt`, the token is expired, and `refreshAccessTokens` is false', assert => {
+test('#restore rejects when the data includes `token` and `expiresAt`, the token is expired, and `refreshAccessTokens` is false', (assert) => {
   assert.expect(1);
 
   App.authenticator.refreshAccessTokens = false;
@@ -140,24 +141,24 @@ test('#restore rejects when the data includes `token` and `expiresAt`, the token
   const currentTime = getConvertedTime(Date.now());
   const expiresAt = currentTime - 60;
   const token = createFakeToken({
-    [App.authenticator.tokenExpireName]: expiresAt
+    [App.authenticator.tokenExpireName]: expiresAt,
   });
   const refreshToken = createFakeRefreshToken();
   const data = {
     [App.authenticator.tokenPropertyName]: token,
-    [App.authenticator.tokenExpireName]: expiresAt
+    [App.authenticator.tokenExpireName]: expiresAt,
   };
   const response = {
     [App.authenticator.tokenPropertyName]: token,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
 
   App.server.respondWith('POST', App.authenticator.serverTokenRefreshEndpoint, [
     201,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify(response)
+    JSON.stringify(response),
   ]);
 
   return App.authenticator.restore(data).catch(() => {
@@ -165,7 +166,7 @@ test('#restore rejects when the data includes `token` and `expiresAt`, the token
   });
 });
 
-test('#restore resolves when the data includes `token` and `expiresAt` and `tokenPropertyName` is a nested object', assert => {
+test('#restore resolves when the data includes `token` and `expiresAt` and `tokenPropertyName` is a nested object', (assert) => {
   assert.expect(1);
 
   App.authenticator.tokenPropertyName = 'auth.nested.token';
@@ -173,40 +174,40 @@ test('#restore resolves when the data includes `token` and `expiresAt` and `toke
   const currentTime = getConvertedTime(Date.now());
   const expiresAt = currentTime + 60;
   const token = createFakeToken({
-    [App.authenticator.tokenExpireName]: expiresAt
+    [App.authenticator.tokenExpireName]: expiresAt,
   });
   const refreshToken = createFakeRefreshToken();
   const data = {
     auth: {
       nested: {
-        token: token
-      }
+        token: token,
+      },
     },
-    [App.authenticator.tokenExpireName]: expiresAt
+    [App.authenticator.tokenExpireName]: expiresAt,
   };
   const response = {
     auth: {
       nested: {
-        token: token
-      }
+        token: token,
+      },
     },
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
 
   App.server.respondWith('POST', App.authenticator.serverTokenRefreshEndpoint, [
     201,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify(response)
+    JSON.stringify(response),
   ]);
 
-  return App.authenticator.restore(data).then(content => {
+  return App.authenticator.restore(data).then((content) => {
     assert.deepEqual(content, data);
   });
 });
 
-test('#restore rejects when `token` is excluded', assert => {
+test('#restore rejects when `token` is excluded', (assert) => {
   assert.expect(1);
 
   const currentTime = getConvertedTime(Date.now());
@@ -214,19 +215,19 @@ test('#restore rejects when `token` is excluded', assert => {
   const refreshToken = createFakeRefreshToken();
   const data = {
     [App.authenticator.tokenPropertyName]: null,
-    [App.authenticator.tokenExpireName]: expiresAt
+    [App.authenticator.tokenExpireName]: expiresAt,
   };
   const response = {
     [App.authenticator.tokenPropertyName]: null,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
 
   App.server.respondWith('POST', App.authenticator.serverTokenRefreshEndpoint, [
     201,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify(response)
+    JSON.stringify(response),
   ]);
 
   return App.authenticator.restore(data).catch(() => {
@@ -234,39 +235,42 @@ test('#restore rejects when `token` is excluded', assert => {
   });
 });
 
-test('#restore schedules a token refresh when `refreshAccessTokens` is true', assert => {
+test('#restore schedules a token refresh when `refreshAccessTokens` is true', (assert) => {
   assert.expect(1);
 
   const currentTime = getConvertedTime(Date.now());
   const expiresAt = currentTime + 60;
   const token = createFakeToken({
-    [App.authenticator.tokenExpireName]: expiresAt
+    [App.authenticator.tokenExpireName]: expiresAt,
   });
   const refreshToken = createFakeRefreshToken();
   const data = {
     [App.authenticator.tokenPropertyName]: token,
     [App.authenticator.tokenExpireName]: expiresAt,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
   const response = {
     [App.authenticator.tokenPropertyName]: token,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
 
   App.server.respondWith('POST', App.authenticator.serverTokenRefreshEndpoint, [
     201,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify(response)
+    JSON.stringify(response),
   ]);
 
   return App.authenticator.restore(data).then(() => {
-    assert.equal(App.authenticator.scheduleAccessTokenRefresh.callCount, 1);
+    assert.strictEqual(
+      App.authenticator.scheduleAccessTokenRefresh.callCount,
+      1,
+    );
   });
 });
 
-test('#restore does not schedule a token refresh when `refreshAccessTokens` is false', assert => {
+test('#restore does not schedule a token refresh when `refreshAccessTokens` is false', (assert) => {
   assert.expect(1);
 
   App.authenticator.refreshAccessTokens = false;
@@ -274,65 +278,68 @@ test('#restore does not schedule a token refresh when `refreshAccessTokens` is f
   const currentTime = getConvertedTime(Date.now());
   const expiresAt = currentTime + 60;
   const token = createFakeToken({
-    [App.authenticator.tokenExpireName]: expiresAt
+    [App.authenticator.tokenExpireName]: expiresAt,
   });
   const refreshToken = createFakeRefreshToken();
   const data = {
     [App.authenticator.tokenPropertyName]: token,
     [App.authenticator.tokenExpireName]: expiresAt,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
   const response = {
     [App.authenticator.tokenPropertyName]: token,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
 
   App.server.respondWith('POST', App.authenticator.serverTokenRefreshEndpoint, [
     201,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify(response)
+    JSON.stringify(response),
   ]);
 
   return App.authenticator.restore(data).then(() => {
-    assert.equal(App.authenticator.scheduleAccessTokenRefresh.callCount, 0);
+    assert.strictEqual(
+      App.authenticator.scheduleAccessTokenRefresh.callCount,
+      0,
+    );
   });
 });
 
-test('#restore immediately refreshes the token when the token is expired', assert => {
+test('#restore immediately refreshes the token when the token is expired', (assert) => {
   assert.expect(1);
 
   const currentTime = getConvertedTime(Date.now());
   const expiresAt = currentTime - 60;
   const token = createFakeToken({
-    [App.authenticator.tokenExpireName]: expiresAt
+    [App.authenticator.tokenExpireName]: expiresAt,
   });
   const refreshToken = createFakeRefreshToken();
   const data = {
     [App.authenticator.tokenPropertyName]: token,
     [App.authenticator.tokenExpireName]: expiresAt,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
   const response = {
     [App.authenticator.tokenPropertyName]: token,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
 
   App.server.respondWith('POST', App.authenticator.serverTokenRefreshEndpoint, [
     201,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify(response)
+    JSON.stringify(response),
   ]);
 
   return App.authenticator.restore(data).then(() => {
-    assert.equal(App.authenticator.refreshAccessToken.callCount, 1);
+    assert.strictEqual(App.authenticator.refreshAccessToken.callCount, 1);
   });
 });
 
-test('#restore schedules a token refresh when the token is farther than the `refreshLeeway` to expiration', assert => {
+test('#restore schedules a token refresh when the token is farther than the `refreshLeeway` to expiration', (assert) => {
   assert.expect(1);
 
   App.authenticator.refreshLeeway = 30;
@@ -340,33 +347,36 @@ test('#restore schedules a token refresh when the token is farther than the `ref
   const currentTime = getConvertedTime(Date.now());
   const expiresAt = currentTime + 60;
   const token = createFakeToken({
-    [App.authenticator.tokenExpireName]: expiresAt
+    [App.authenticator.tokenExpireName]: expiresAt,
   });
   const refreshToken = createFakeRefreshToken();
   const data = {
     [App.authenticator.tokenPropertyName]: token,
     [App.authenticator.tokenExpireName]: expiresAt,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
   const response = {
     [App.authenticator.tokenPropertyName]: token,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
 
   App.server.respondWith('POST', App.authenticator.serverTokenRefreshEndpoint, [
     201,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify(response)
+    JSON.stringify(response),
   ]);
 
   return App.authenticator.restore(data).then(() => {
-    assert.equal(App.authenticator.scheduleAccessTokenRefresh.callCount, 1);
+    assert.strictEqual(
+      App.authenticator.scheduleAccessTokenRefresh.callCount,
+      1,
+    );
   });
 });
 
-test('#restore immediately refreshes the token when the token is closer than the `refreshLeeway` to expiration', assert => {
+test('#restore immediately refreshes the token when the token is closer than the `refreshLeeway` to expiration', (assert) => {
   assert.expect(1);
 
   App.authenticator.refreshLeeway = 120;
@@ -374,33 +384,33 @@ test('#restore immediately refreshes the token when the token is closer than the
   const currentTime = getConvertedTime(Date.now());
   const expiresAt = currentTime + 60;
   const token = createFakeToken({
-    [App.authenticator.tokenExpireName]: expiresAt
+    [App.authenticator.tokenExpireName]: expiresAt,
   });
   const refreshToken = createFakeRefreshToken();
   const data = {
     [App.authenticator.tokenPropertyName]: token,
     [App.authenticator.tokenExpireName]: expiresAt,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
   const response = {
     [App.authenticator.tokenPropertyName]: token,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
 
   App.server.respondWith('POST', App.authenticator.serverTokenRefreshEndpoint, [
     201,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify(response)
+    JSON.stringify(response),
   ]);
 
   return App.authenticator.restore(data).catch(() => {
-    assert.equal(App.authenticator.refreshAccessToken.callCount, 1);
+    assert.strictEqual(App.authenticator.refreshAccessToken.callCount, 1);
   });
 });
 
-test('#authenticate successfully resolves with the correct data', assert => {
+test('#authenticate successfully resolves with the correct data', (assert) => {
   assert.expect(1);
 
   const token = createFakeToken();
@@ -408,36 +418,36 @@ test('#authenticate successfully resolves with the correct data', assert => {
   const credentials = createFakeCredentials();
   const response = {
     [App.authenticator.tokenPropertyName]: token,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
   const refreshResponse = {
     [App.authenticator.tokenPropertyName]: token,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
 
   App.server.respondWith('POST', App.authenticator.serverTokenEndpoint, [
     201,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify(response)
+    JSON.stringify(response),
   ]);
   App.server.respondWith('POST', App.authenticator.serverTokenRefreshEndpoint, [
     201,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify(refreshResponse)
+    JSON.stringify(refreshResponse),
   ]);
 
-  return App.authenticator.authenticate(credentials).then(data => {
+  return App.authenticator.authenticate(credentials).then((data) => {
     delete data[App.authenticator.tokenExpireName];
     delete data[App.authenticator.tokenDataPropertyName];
     assert.deepEqual(data, response);
   });
 });
 
-test('#authenticate sends a fetch request to the token endpoint', assert => {
+test('#authenticate sends a fetch request to the token endpoint', (assert) => {
   assert.expect(3);
 
   const token = createFakeToken();
@@ -445,43 +455,46 @@ test('#authenticate sends a fetch request to the token endpoint', assert => {
   const credentials = createFakeCredentials();
   const response = {
     [App.authenticator.tokenPropertyName]: token,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
   const refreshResponse = {
     [App.authenticator.tokenPropertyName]: token,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
 
   App.server.respondWith('POST', App.authenticator.serverTokenEndpoint, [
     201,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify(response)
+    JSON.stringify(response),
   ]);
   App.server.respondWith('POST', App.authenticator.serverTokenRefreshEndpoint, [
     201,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify(refreshResponse)
+    JSON.stringify(refreshResponse),
   ]);
 
   return App.authenticator.authenticate(credentials).then(() => {
-    assert.equal(fetchWrapper.default.callCount, 1);
-    assert.equal(fetchWrapper.default.getCall(0).args[0], App.authenticator.serverTokenEndpoint);
+    assert.strictEqual(fetchWrapper.default.callCount, 1);
+    assert.strictEqual(
+      fetchWrapper.default.getCall(0).args[0],
+      App.authenticator.serverTokenEndpoint,
+    );
     assert.deepEqual(fetchWrapper.default.getCall(0).args[1], {
       method: 'POST',
       body: JSON.stringify(credentials),
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
     });
   });
 });
 
-test('#authenticate sends a fetch request to the token endpoint when `tokenPropertyName` is a nested object', assert => {
+test('#authenticate sends a fetch request to the token endpoint when `tokenPropertyName` is a nested object', (assert) => {
   assert.expect(3);
 
   App.authenticator.tokenPropertyName = 'auth.nested.token';
@@ -492,56 +505,59 @@ test('#authenticate sends a fetch request to the token endpoint when `tokenPrope
   const response = {
     auth: {
       nested: {
-        token: token
-      }
+        token: token,
+      },
     },
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
   const refreshResponse = {
     auth: {
       nested: {
-        token: token
-      }
+        token: token,
+      },
     },
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
 
   App.server.respondWith('POST', App.authenticator.serverTokenEndpoint, [
     201,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify(response)
+    JSON.stringify(response),
   ]);
   App.server.respondWith('POST', App.authenticator.serverTokenRefreshEndpoint, [
     201,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify(refreshResponse)
+    JSON.stringify(refreshResponse),
   ]);
 
   return App.authenticator.authenticate(credentials).then(() => {
-    assert.equal(fetchWrapper.default.callCount, 1);
-    assert.equal(fetchWrapper.default.getCall(0).args[0], App.authenticator.serverTokenEndpoint);
+    assert.strictEqual(fetchWrapper.default.callCount, 1);
+    assert.strictEqual(
+      fetchWrapper.default.getCall(0).args[0],
+      App.authenticator.serverTokenEndpoint,
+    );
     assert.deepEqual(fetchWrapper.default.getCall(0).args[1], {
       method: 'POST',
       body: JSON.stringify(credentials),
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
     });
   });
 });
 
-test('#authenticate sends an fetch request with custom headers', assert => {
+test('#authenticate sends an fetch request with custom headers', (assert) => {
   assert.expect(3);
 
   App.authenticator.headers = {
     'X-API-KEY': '123-abc',
     'X-ANOTHER-HEADER': 0,
-    'Accept': 'application/vnd.api+json'
+    Accept: 'application/vnd.api+json',
   };
 
   const token = createFakeToken();
@@ -549,49 +565,55 @@ test('#authenticate sends an fetch request with custom headers', assert => {
   const credentials = createFakeCredentials();
   const response = {
     [App.authenticator.tokenPropertyName]: token,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
   const refreshResponse = {
     [App.authenticator.tokenPropertyName]: token,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
 
   App.server.respondWith('POST', App.authenticator.serverTokenEndpoint, [
     201,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify(response)
+    JSON.stringify(response),
   ]);
   App.server.respondWith('POST', App.authenticator.serverTokenRefreshEndpoint, [
     201,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify(refreshResponse)
+    JSON.stringify(refreshResponse),
   ]);
 
   return App.authenticator.authenticate(credentials).then(() => {
-    assert.equal(fetchWrapper.default.callCount, 1);
-    assert.equal(fetchWrapper.default.getCall(0).args[0], App.authenticator.serverTokenEndpoint);
+    assert.strictEqual(fetchWrapper.default.callCount, 1);
+    assert.strictEqual(
+      fetchWrapper.default.getCall(0).args[0],
+      App.authenticator.serverTokenEndpoint,
+    );
     assert.deepEqual(fetchWrapper.default.getCall(0).args[1], {
       method: 'POST',
       body: JSON.stringify(credentials),
-      headers: Object.assign({
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }, App.authenticator.headers)
+      headers: Object.assign(
+        {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        App.authenticator.headers,
+      ),
     });
   });
 });
 
-test('#authenticate sends an fetch request with dynamic headers', assert => {
+test('#authenticate sends an fetch request with dynamic headers', (assert) => {
   assert.expect(3);
 
   const headers = {
     'X-API-KEY': '123-abc',
     'X-ANOTHER-HEADER': 0,
-    'Accept': 'application/vnd.api+json'
+    Accept: 'application/vnd.api+json',
   };
 
   const token = createFakeToken();
@@ -599,43 +621,49 @@ test('#authenticate sends an fetch request with dynamic headers', assert => {
   const credentials = createFakeCredentials();
   const response = {
     [App.authenticator.tokenPropertyName]: token,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
   const refreshResponse = {
     [App.authenticator.tokenPropertyName]: token,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
 
   App.server.respondWith('POST', App.authenticator.serverTokenEndpoint, [
     201,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify(response)
+    JSON.stringify(response),
   ]);
   App.server.respondWith('POST', App.authenticator.serverTokenRefreshEndpoint, [
     201,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify(refreshResponse)
+    JSON.stringify(refreshResponse),
   ]);
 
   return App.authenticator.authenticate(credentials, headers).then(() => {
-    assert.equal(fetchWrapper.default.callCount, 1);
-    assert.equal(fetchWrapper.default.getCall(0).args[0], App.authenticator.serverTokenEndpoint);
+    assert.strictEqual(fetchWrapper.default.callCount, 1);
+    assert.strictEqual(
+      fetchWrapper.default.getCall(0).args[0],
+      App.authenticator.serverTokenEndpoint,
+    );
     assert.deepEqual(fetchWrapper.default.getCall(0).args[1], {
       method: 'POST',
       body: JSON.stringify(credentials),
-      headers: Object.assign({
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }, headers)
+      headers: Object.assign(
+        {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        headers,
+      ),
     });
   });
 });
 
-test('#authenticate rejects with the correct error', assert => {
+test('#authenticate rejects with the correct error', (assert) => {
   assert.expect(1);
 
   const credentials = createFakeCredentials();
@@ -643,56 +671,59 @@ test('#authenticate rejects with the correct error', assert => {
   App.server.respondWith('POST', App.authenticator.serverTokenEndpoint, [
     400,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify({})
+    JSON.stringify({}),
   ]);
 
-  return App.authenticator.authenticate(credentials).catch(error => {
-    assert.equal(error.status, 400);
+  return App.authenticator.authenticate(credentials).catch((error) => {
+    assert.strictEqual(error.status, 400);
   });
 });
 
-test('#authenticate schedules a token refresh when `refreshAccessTokens` is true', assert => {
+test('#authenticate schedules a token refresh when `refreshAccessTokens` is true', (assert) => {
   assert.expect(1);
 
   const currentTime = getConvertedTime(Date.now());
   const expiresAt = currentTime + 60;
   const token = createFakeToken({
-    [App.authenticator.tokenExpireName]: expiresAt
+    [App.authenticator.tokenExpireName]: expiresAt,
   });
   const refreshToken = createFakeRefreshToken();
   const credentials = createFakeCredentials();
   const response = {
     [App.authenticator.tokenPropertyName]: token,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
   const refreshResponse = {
     [App.authenticator.tokenPropertyName]: token,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
 
   App.server.respondWith('POST', App.authenticator.serverTokenEndpoint, [
     201,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify(response)
+    JSON.stringify(response),
   ]);
   App.server.respondWith('POST', App.authenticator.serverTokenRefreshEndpoint, [
     201,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify(refreshResponse)
+    JSON.stringify(refreshResponse),
   ]);
 
   return App.authenticator.authenticate(credentials).then(() => {
-    assert.equal(App.authenticator.scheduleAccessTokenRefresh.callCount, 1);
+    assert.strictEqual(
+      App.authenticator.scheduleAccessTokenRefresh.callCount,
+      1,
+    );
   });
 });
 
-test('#authenticate does not schedule a token refresh when `refreshAccessTokens` is false', assert => {
+test('#authenticate does not schedule a token refresh when `refreshAccessTokens` is false', (assert) => {
   assert.expect(1);
 
   App.authenticator.refreshAccessTokens = false;
@@ -700,79 +731,82 @@ test('#authenticate does not schedule a token refresh when `refreshAccessTokens`
   const currentTime = getConvertedTime(Date.now());
   const expiresAt = currentTime + 60;
   const token = createFakeToken({
-    [App.authenticator.tokenExpireName]: expiresAt
+    [App.authenticator.tokenExpireName]: expiresAt,
   });
   const refreshToken = createFakeRefreshToken();
   const credentials = createFakeCredentials();
   const response = {
     [App.authenticator.tokenPropertyName]: token,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
   const refreshResponse = {
     [App.authenticator.tokenPropertyName]: token,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
 
   App.server.respondWith('POST', App.authenticator.serverTokenEndpoint, [
     201,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify(response)
+    JSON.stringify(response),
   ]);
   App.server.respondWith('POST', App.authenticator.serverTokenRefreshEndpoint, [
     201,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify(refreshResponse)
+    JSON.stringify(refreshResponse),
   ]);
 
   return App.authenticator.authenticate(credentials).then(() => {
-    assert.equal(App.authenticator.scheduleAccessTokenRefresh.callCount, 0);
+    assert.strictEqual(
+      App.authenticator.scheduleAccessTokenRefresh.callCount,
+      0,
+    );
   });
 });
 
-test('#authenticate immediately refreshes the token when the token is expired', assert => {
+test('#authenticate immediately refreshes the token when the token is expired', (assert) => {
   assert.expect(1);
 
   const currentTime = getConvertedTime(Date.now());
   const expiresAt = currentTime - 60;
   const token = createFakeToken({
-    [App.authenticator.tokenExpireName]: expiresAt
+    [App.authenticator.tokenExpireName]: expiresAt,
   });
   const refreshToken = createFakeRefreshToken();
   const credentials = createFakeCredentials();
   const response = {
     [App.authenticator.tokenPropertyName]: token,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
   const refreshResponse = {
     [App.authenticator.tokenPropertyName]: token,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
 
   App.server.respondWith('POST', App.authenticator.serverTokenEndpoint, [
     201,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify(response)
+    JSON.stringify(response),
   ]);
   App.server.respondWith('POST', App.authenticator.serverTokenRefreshEndpoint, [
     201,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify(refreshResponse)
+    JSON.stringify(refreshResponse),
   ]);
 
   return App.authenticator.authenticate(credentials).then(() => {
-    assert.equal(App.authenticator.refreshAccessToken.callCount, 0);
+    assert.strictEqual(App.authenticator.refreshAccessToken.callCount, 0);
   });
 });
 
-test('#authenticate schedules a token refresh when the token is farther than the `refreshLeeway` to expiration', assert => {
+test('#authenticate schedules a token refresh when the token is farther than the `refreshLeeway` to expiration', (assert) => {
   assert.expect(1);
 
   App.authenticator.refreshLeeway = 30;
@@ -780,74 +814,80 @@ test('#authenticate schedules a token refresh when the token is farther than the
   const currentTime = getConvertedTime(Date.now());
   const expiresAt = currentTime + 60;
   const token = createFakeToken({
-    [App.authenticator.tokenExpireName]: expiresAt
+    [App.authenticator.tokenExpireName]: expiresAt,
   });
   const refreshToken = createFakeRefreshToken();
   const credentials = createFakeCredentials();
   const response = {
     [App.authenticator.tokenPropertyName]: token,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
   const refreshResponse = {
     [App.authenticator.tokenPropertyName]: token,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
 
   App.server.respondWith('POST', App.authenticator.serverTokenEndpoint, [
     201,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify(response)
+    JSON.stringify(response),
   ]);
   App.server.respondWith('POST', App.authenticator.serverTokenRefreshEndpoint, [
     201,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify(refreshResponse)
+    JSON.stringify(refreshResponse),
   ]);
 
   return App.authenticator.authenticate(credentials).then(() => {
-    assert.equal(App.authenticator.scheduleAccessTokenRefresh.callCount, 1);
+    assert.strictEqual(
+      App.authenticator.scheduleAccessTokenRefresh.callCount,
+      1,
+    );
   });
 });
 
-test('#refreshAccessToken sends an fetch request to the refresh token endpoint', assert => {
+test('#refreshAccessToken sends an fetch request to the refresh token endpoint', (assert) => {
   assert.expect(3);
 
   const token = createFakeToken();
   const refreshToken = createFakeRefreshToken();
   const response = {
     [App.authenticator.tokenPropertyName]: token,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
 
   App.server.respondWith('POST', App.authenticator.serverTokenRefreshEndpoint, [
     201,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify(response)
+    JSON.stringify(response),
   ]);
 
   return App.authenticator.refreshAccessToken(refreshToken).then(() => {
-    assert.equal(fetchWrapper.default.callCount, 1);
-    assert.equal(fetchWrapper.default.getCall(0).args[0], App.authenticator.serverTokenRefreshEndpoint);
+    assert.strictEqual(fetchWrapper.default.callCount, 1);
+    assert.strictEqual(
+      fetchWrapper.default.getCall(0).args[0],
+      App.authenticator.serverTokenRefreshEndpoint,
+    );
     assert.deepEqual(fetchWrapper.default.getCall(0).args[1], {
       method: 'POST',
       body: JSON.stringify({
-        [App.authenticator.refreshTokenPropertyName]: refreshToken
+        [App.authenticator.refreshTokenPropertyName]: refreshToken,
       }),
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
     });
   });
 });
 
-test('#refreshAccessToken sends an fetch request to the refresh token endpoint when `refreshTokenPropertyName` is a nested object', assert => {
+test('#refreshAccessToken sends an fetch request to the refresh token endpoint when `refreshTokenPropertyName` is a nested object', (assert) => {
   assert.expect(3);
 
   App.authenticator.refreshTokenPropertyName = 'auth.nested.refreshToken';
@@ -858,110 +898,118 @@ test('#refreshAccessToken sends an fetch request to the refresh token endpoint w
     [App.authenticator.tokenPropertyName]: token,
     auth: {
       nested: {
-        refreshToken: refreshToken
-      }
-    }
+        refreshToken: refreshToken,
+      },
+    },
   };
 
   App.server.respondWith('POST', App.authenticator.serverTokenRefreshEndpoint, [
     201,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify(response)
+    JSON.stringify(response),
   ]);
 
   return App.authenticator.refreshAccessToken(refreshToken).then(() => {
-    assert.equal(fetchWrapper.default.callCount, 1);
-    assert.equal(fetchWrapper.default.getCall(0).args[0], App.authenticator.serverTokenRefreshEndpoint);
+    assert.strictEqual(fetchWrapper.default.callCount, 1);
+    assert.strictEqual(
+      fetchWrapper.default.getCall(0).args[0],
+      App.authenticator.serverTokenRefreshEndpoint,
+    );
     assert.deepEqual(fetchWrapper.default.getCall(0).args[1], {
       method: 'POST',
       body: JSON.stringify({
         auth: {
           nested: {
-            refreshToken: refreshToken
-          }
-        }
+            refreshToken: refreshToken,
+          },
+        },
       }),
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
     });
   });
 });
 
-test('#refreshAccessToken sends an fetch request with custom headers', assert => {
+test('#refreshAccessToken sends an fetch request with custom headers', (assert) => {
   assert.expect(3);
 
   App.authenticator.headers = {
     'X-API-KEY': '123-abc',
     'X-ANOTHER-HEADER': 0,
-    'Accept': 'application/vnd.api+json'
+    Accept: 'application/vnd.api+json',
   };
 
   const token = createFakeToken();
   const refreshToken = createFakeRefreshToken();
   const response = {
     [App.authenticator.tokenPropertyName]: token,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
 
   App.server.respondWith('POST', App.authenticator.serverTokenRefreshEndpoint, [
     201,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify(response)
+    JSON.stringify(response),
   ]);
 
   return App.authenticator.refreshAccessToken(refreshToken).then(() => {
-    assert.equal(fetchWrapper.default.callCount, 1);
-    assert.equal(fetchWrapper.default.getCall(0).args[0], App.authenticator.serverTokenRefreshEndpoint);
+    assert.strictEqual(fetchWrapper.default.callCount, 1);
+    assert.strictEqual(
+      fetchWrapper.default.getCall(0).args[0],
+      App.authenticator.serverTokenRefreshEndpoint,
+    );
     assert.deepEqual(fetchWrapper.default.getCall(0).args[1], {
       method: 'POST',
       body: JSON.stringify({
-        [App.authenticator.refreshTokenPropertyName]: refreshToken
+        [App.authenticator.refreshTokenPropertyName]: refreshToken,
       }),
-      headers: Object.assign({
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }, App.authenticator.headers)
+      headers: Object.assign(
+        {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        App.authenticator.headers,
+      ),
     });
   });
 });
 
-test('#refreshAccessToken triggers the `sessionDataUpdated` event on successful request', assert => {
+test('#refreshAccessToken triggers the `sessionDataUpdated` event on successful request', (assert) => {
   assert.expect(3);
 
   const currentTime = getConvertedTime(Date.now());
   const expiresAt = currentTime + 60;
   const token = createFakeToken({
-    [App.authenticator.tokenExpireName]: expiresAt
+    [App.authenticator.tokenExpireName]: expiresAt,
   });
   const refreshToken = createFakeRefreshToken();
   const response = {
     [App.authenticator.tokenPropertyName]: token,
-    [App.authenticator.refreshTokenPropertyName]: refreshToken
+    [App.authenticator.refreshTokenPropertyName]: refreshToken,
   };
 
   App.server.respondWith('POST', App.authenticator.serverTokenRefreshEndpoint, [
     201,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify(response)
+    JSON.stringify(response),
   ]);
 
-  return App.authenticator.refreshAccessToken(refreshToken).then(data => {
+  return App.authenticator.refreshAccessToken(refreshToken).then((data) => {
     assert.ok(data[App.authenticator.tokenExpireName]);
     assert.ok(data[App.authenticator.tokenExpireName] > 0);
     assert.deepEqual(data.token, token);
   });
 });
 
-
-test('#refreshAccessToken invalidates session when the server responds with 401', assert => {
+test('#refreshAccessToken invalidates session when the server responds with 401', (assert) => {
   assert.expect(1);
 
   const refreshToken = createFakeRefreshToken();
@@ -969,17 +1017,17 @@ test('#refreshAccessToken invalidates session when the server responds with 401'
   App.server.respondWith('POST', App.authenticator.serverTokenRefreshEndpoint, [
     401,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify({})
+    JSON.stringify({}),
   ]);
 
   return App.authenticator.refreshAccessToken(refreshToken).catch(() => {
-    assert.equal(App.authenticator.invalidate.callCount, 1);
+    assert.strictEqual(App.authenticator.invalidate.callCount, 1);
   });
 });
 
-test('#refreshAccessToken invalidates session when the server responds with 403', assert => {
+test('#refreshAccessToken invalidates session when the server responds with 403', (assert) => {
   assert.expect(1);
 
   const refreshToken = createFakeRefreshToken();
@@ -987,17 +1035,17 @@ test('#refreshAccessToken invalidates session when the server responds with 403'
   App.server.respondWith('POST', App.authenticator.serverTokenRefreshEndpoint, [
     403,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify({})
+    JSON.stringify({}),
   ]);
 
   return App.authenticator.refreshAccessToken(refreshToken).catch(() => {
-    assert.equal(App.authenticator.invalidate.callCount, 1);
+    assert.strictEqual(App.authenticator.invalidate.callCount, 1);
   });
 });
 
-test('#refreshAccessToken does not invalidate session when the server responds with 500', assert => {
+test('#refreshAccessToken does not invalidate session when the server responds with 500', (assert) => {
   assert.expect(1);
 
   const refreshToken = createFakeRefreshToken();
@@ -1005,36 +1053,43 @@ test('#refreshAccessToken does not invalidate session when the server responds w
   App.server.respondWith('POST', App.authenticator.serverTokenRefreshEndpoint, [
     500,
     {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    JSON.stringify({})
+    JSON.stringify({}),
   ]);
 
   return App.authenticator.refreshAccessToken(refreshToken).catch(() => {
-    assert.equal(App.authenticator.invalidate.callCount, 0);
+    assert.strictEqual(App.authenticator.invalidate.callCount, 0);
   });
 });
 
-test('#getTokenData returns correct data', assert => {
+test('#getTokenData returns correct data', (assert) => {
   assert.expect(2);
 
   const stringTokenData = 'test@test.com';
   const objectTokenData = {
-    username: stringTokenData
+    username: stringTokenData,
   };
 
   const objectToken = createFakeToken(objectTokenData);
   const stringToken = createFakeToken(stringTokenData);
 
-  assert.deepEqual(App.authenticator.getTokenData(objectToken), objectTokenData);
-  assert.equal(App.authenticator.getTokenData(stringToken), stringTokenData);
+  assert.deepEqual(
+    App.authenticator.getTokenData(objectToken),
+    objectTokenData,
+  );
+  assert.strictEqual(
+    App.authenticator.getTokenData(stringToken),
+    stringTokenData,
+  );
 });
 
-test('#getTokenData returns correctly encoded data', assert => {
+test('#getTokenData returns correctly encoded data', (assert) => {
   assert.expect(1);
 
-  const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE0NTQxNzM1NzEsImRhdGEiOnsiYXV0aGVudGljYXRlZCI6dHJ1ZSwidXNlciI6eyJpZCI6IjdhMWRkYzJmLWI5MTAtNDY2Yi04MDhhLTUxOTUyOTkwZjUyNyIsIm5hbWUiOiJUaG9yYmrDuHJuIEhlcm1hbnNlbiIsIm1vYmlsZSI6IjQwNDUxMzg5IiwiZW1haWwiOiJ0aEBza2FsYXIubm8iLCJsb2NhbGUiOiJuYiIsInNpZ25faW5fY291bnQiOjI1fX19.se8PT5e1G1_xhPTQf_16BIv0Q9uEjQxLGE3iTJwhAec';
+  const token =
+    'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE0NTQxNzM1NzEsImRhdGEiOnsiYXV0aGVudGljYXRlZCI6dHJ1ZSwidXNlciI6eyJpZCI6IjdhMWRkYzJmLWI5MTAtNDY2Yi04MDhhLTUxOTUyOTkwZjUyNyIsIm5hbWUiOiJUaG9yYmrDuHJuIEhlcm1hbnNlbiIsIm1vYmlsZSI6IjQwNDUxMzg5IiwiZW1haWwiOiJ0aEBza2FsYXIubm8iLCJsb2NhbGUiOiJuYiIsInNpZ25faW5fY291bnQiOjI1fX19.se8PT5e1G1_xhPTQf_16BIv0Q9uEjQxLGE3iTJwhAec';
 
   const data = App.authenticator.getTokenData(token);
-  assert.equal(data.data.user.name, 'Thorbjørn Hermansen');
+  assert.strictEqual(data.data.user.name, 'Thorbjørn Hermansen');
 });

@@ -1,7 +1,7 @@
-<form {{action "authenticate" on="submit"}}>
+<form {{on "submit" this.authenticate}}>
   <label for="username">Login</label>
-  {{input id="username" placeholder="Enter Login" value=username}}
+  <Input id="username" placeholder="Enter Login" @value={{this.username}} />
   <label for="password">Password</label>
-  {{input id="password" placeholder="Enter Password" type="password" value=password}}
+  <Input id="password" placeholder="Enter Password" @type="password" @value={{this.password}} />
   <button type="submit">Login</button>
 </form>
