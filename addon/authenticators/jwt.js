@@ -34,7 +34,7 @@ const decode = str => {
   @module @triptyk/ember-simple-auth-token/authenticators/jwt
   @extends TokenAuthenticator
 */
-export default TokenAuthenticator.extend({
+export default class JwtAuthenticator extends TokenAuthenticator {
   /**
     @method init
   */
@@ -54,7 +54,7 @@ export default TokenAuthenticator.extend({
     this.refreshAccessTokenRetryAttempts = config.refreshAccessTokenRetryAttempts || 0;
     this.refreshAccessTokenRetryTimeout = config.refreshAccessTokenRetryTimeout || 1000;
     this.tokenRefreshFailInvalidateSession = config.tokenRefreshFailInvalidateSession === true ? true : false;
-  },
+  }
 
   /**
     Restores the session from a set of session properties.
@@ -118,7 +118,7 @@ export default TokenAuthenticator.extend({
         }
       }
     });
-  },
+  }
 
   /**
     Authenticates the session with the specified `credentials`.
@@ -136,7 +136,7 @@ export default TokenAuthenticator.extend({
     return this.makeRequest(this.serverTokenEndpoint, credentials, {...this.headers, ...headers}).then(response => {
       return this.handleAuthResponse(response.json);
     });
-  },
+  }
 
   /**
     Schedules a token refresh request to be sent to the backend after a calculated `wait` time has passed.
@@ -163,7 +163,7 @@ export default TokenAuthenticator.extend({
         }
       }
     }
-  },
+  }
 
   /**
     Makes a refresh token request to grab a new authenticated JWT token from the server.
@@ -190,7 +190,7 @@ export default TokenAuthenticator.extend({
       this.handleTokenRefreshFail(error.status, refreshToken, attempts);
       return Promise.reject(error);
     });
-  },
+  }
 
   /**
     Returns a nested object with the token property name.
@@ -214,7 +214,7 @@ export default TokenAuthenticator.extend({
     lastObject[refreshTokenPropertyName] = refreshToken;
 
     return data;
-  },
+  }
 
   /**
     Returns the decoded token with accessible returned values.
@@ -233,7 +233,7 @@ export default TokenAuthenticator.extend({
     } catch (error) {
       return tokenData;
     }
-  },
+  }
 
   /**
     Cancels any outstanding automatic token refreshes and returns a resolving promise.
@@ -247,7 +247,7 @@ export default TokenAuthenticator.extend({
     cancel(this._tokenExpirationTimeout);
     delete this._tokenExpirationTimeout;
     return resolve();
-  },
+  }
 
   /**
     Returns the current time as a timestamp in seconds
@@ -257,7 +257,7 @@ export default TokenAuthenticator.extend({
   */
   getCurrentTime() {
     return Math.floor((new Date()).getTime() / 1000);
-  },
+  }
 
   /**
     Handles authentication response from server, and returns session data
@@ -293,7 +293,7 @@ export default TokenAuthenticator.extend({
     }
 
     return {...response, ...tokenExpireData, tokenData: tokenData};
-  },
+  }
 
   /**
     Handles token refresh fail status. If the server response to a token refresh has a status of 401 or 403 then the token in the session will be invalidated and the sessionInvalidated provided by ember-simple-auth will be triggered.
@@ -317,7 +317,7 @@ export default TokenAuthenticator.extend({
         this.trigger('sessionDataInvalidated');
       });
     }
-  },
+  }
 
   /**
     Schedules session invalidation at the time token expires.
@@ -334,7 +334,7 @@ export default TokenAuthenticator.extend({
       delete this._tokenExpirationTimeout;
       this._tokenExpirationTimeout = later(this, this.handleAccessTokenExpiration, wait);
     }
-  },
+  }
 
   /**
     Handles access token expiration
@@ -346,4 +346,4 @@ export default TokenAuthenticator.extend({
       this.trigger('sessionDataInvalidated');
     });
   }
-});
+}

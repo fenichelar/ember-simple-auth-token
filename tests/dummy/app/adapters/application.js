@@ -1,4 +1,3 @@
-import DS from 'ember-data';
-import TokenAuthorizerMixin from '@triptyk/ember-simple-auth-token/mixins/token-authorizer';
+import RestAdapter from '@ember-data/adapter/rest';
 
-export default DS.RESTAdapter.extend(TokenAuthorizerMixin);
+export default class ApplicationAdapter extends RestAdapter {}

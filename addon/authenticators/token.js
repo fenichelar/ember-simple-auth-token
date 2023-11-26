@@ -15,7 +15,7 @@ import Base from 'ember-simple-auth/authenticators/base';
   @module @triptyk/ember-simple-auth-token/authenticators/token
   @extends Base
 */
-export default Base.extend({
+export default class TokenAuthenticator extends Base {
   /**
     @method init
   */
@@ -27,7 +27,7 @@ export default Base.extend({
     this.serverTokenEndpoint = config.serverTokenEndpoint || '/api/token-auth/';
     this.tokenPropertyName = config.tokenPropertyName || 'token';
     this.headers = config.headers || {};
-  },
+  }
 
   /**
     Restores the session from a set of session properties; __will return a resolving promise when there's a non-empty `token` in the `properties`__ and a rejecting promise otherwise.
@@ -46,7 +46,7 @@ export default Base.extend({
         return reject();
       }
     });
-  },
+  }
 
   /**
     Authenticates the session with the specified `credentials`; the credentials are `POST`ed to the [`Authenticators.Token#serverTokenEndpoint`](#SimpleAuth-Authenticators-Token-serverTokenEndpoint) and if they are valid the server returns an auth token in response. __If the credentials are valid and authentication succeeds, a promise that resolves with the server's response is returned__, otherwise a promise that rejects with the server error is returned.
@@ -60,7 +60,7 @@ export default Base.extend({
     return this.makeRequest(this.serverTokenEndpoint, credentials, {...this.headers, ...headers}).then(response => {
       return response.json;
     });
-  },
+  }
 
   /**
     Does nothing
@@ -70,7 +70,7 @@ export default Base.extend({
   */
   invalidate() {
     return resolve();
-  },
+  }
 
   /**
     @method makeRequest
@@ -113,4 +113,4 @@ export default Base.extend({
       });
     });
   }
-});
+}
