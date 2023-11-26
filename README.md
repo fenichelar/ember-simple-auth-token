@@ -4,7 +4,7 @@
 [![ember-observer-image]][ember-observer]
 [![npm-image]][npm]
 
-This is Ember addon is an extension to the Ember Simple Auth library that provides a basic token authenticator, a JSON Web Tokens token authenticator with automatic refresh capability, and an authorizer mixin. You can find more about why JSON Web Tokens are so awesome in [this article][medium-jwt].
+This is Ember addon is an extension to the Ember Simple Auth library that provides a basic token authenticator, a JSON Web Tokens token authenticator with automatic refresh capability. You can find more about why JSON Web Tokens are so awesome in [this article][medium-jwt].
 
 **Because user's credentials and tokens are exchanged between the Ember.js app and the server, you must use HTTPS for this connection!**
 
@@ -131,34 +131,6 @@ export default DS.JSONAPIAdapter.extend({
 });
 ```
 
-### Mixins
-
-Although no longer recommended, the `token-adapter` mixin or `token-authorizer` mixin can be used in order to send the token with all API requests made to the server. When using `ember-simple-auth` >= 3.0.0, use the `token-adapter` mixin. When using `ember-simple-auth` < 3.0.0, use the `token-authorizer` mixin. The mixin will add the header to each API request:
-
-```
-Authorization: Bearer <token>
-```
-
-#### Adapter Mixin
-
-```js
-// app/adapters/application.js
-import DS from 'ember-data';
-import TokenAdapterMixin from '@triptyk/ember-simple-auth-token/mixins/token-adapter';
-
-export default DS.JSONAPIAdapter.extend(TokenAdapterMixin);
-```
-
-#### Authorizer Mixin
-
-```js
-// app/adapters/application.js
-import DS from 'ember-data';
-import TokenAuthorizerMixin from '@triptyk/ember-simple-auth-token/mixins/token-authorizer';
-
-export default DS.JSONAPIAdapter.extend(TokenAuthorizerMixin);
-```
-
 ### Customization Options
 
 #### Token Authenticator
@@ -190,18 +162,6 @@ ENV['ember-simple-auth-token'] = {
   refreshAccessTokenRetryAttempts: 0, // Number of token retry attempts to make
   refreshAccessTokenRetryTimeout: 1000, // Amount of time in milliseconds to wait between token refresh retry attempts
   tokenRefreshFailInvalidateSession: false // Enables session invalidation if all token refresh retry requests fail
-};
-```
-
-#### Mixins
-
-In addition to `tokenPropertyName` from the authenticator:
-
-```js
-// config/environment.js
-ENV['ember-simple-auth-token'] = {
-  authorizationHeaderName: 'Authorization', // Header name added to each API request
-  authorizationPrefix: 'Bearer ', // Prefix added to each API request
 };
 ```
 
