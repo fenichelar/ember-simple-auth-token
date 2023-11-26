@@ -1,6 +1,5 @@
 import EmberObject from '@ember/object';
 import { getOwner } from '@ember/application';
-import fetch from 'fetch';
 import { Promise, reject, resolve } from 'rsvp';
 import { isEmpty } from '@ember/utils';
 import Base from 'ember-simple-auth/authenticators/base';
@@ -55,13 +54,12 @@ export default class TokenAuthenticator extends Base {
     @param {Object} headers Headers to send with the authentication request
     @return {Promise} Promise that resolves when an auth token is successfully acquired from the server and rejects otherwise
   */
-  authenticate(credentials, headers) {
-    return this.makeRequest(this.serverTokenEndpoint, credentials, {
+  async authenticate(credentials, headers) {
+    const response = await this.makeRequest(this.serverTokenEndpoint, credentials, {
       ...this.headers,
       ...headers,
-    }).then((response) => {
-      return response.json;
     });
+    return response.json;
   }
 
   /**
@@ -81,7 +79,7 @@ export default class TokenAuthenticator extends Base {
     @param {Object} headers Additional headers that will be sent to server
     @return {Promise} Promise that resolves when the request is successfully and rejects otherwise
   */
-  makeRequest(url, data, headers) {
+  async makeRequest(url, data, headers) {
     return fetch(url, {
       method: 'POST',
       headers: {

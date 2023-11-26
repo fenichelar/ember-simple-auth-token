@@ -2,10 +2,10 @@
 import { module, test } from 'qunit';
 import sinon from 'sinon';
 import startApp from '../../helpers/start-app';
-import * as fetchWrapper from 'fetch';
 import Token from '@triptyk/ember-simple-auth-token/authenticators/token';
 
 let App;
+let fetch;
 
 const createFakeCredentials = () => {
   return {
@@ -21,7 +21,7 @@ module('Token Authenticator', {
     App.server = sinon.fakeServer.create();
     App.server.autoRespond = true;
     App.authenticator = Token.create();
-    sinon.spy(fetchWrapper, 'default');
+    fetch = sinon.spy(window, 'fetch');
   },
 });
 
@@ -167,12 +167,12 @@ test('#authenticate sends a fetch request to the token endpoint', (assert) => {
   ]);
 
   return App.authenticator.authenticate(credentials).then(() => {
-    assert.strictEqual(fetchWrapper.default.callCount, 1);
+    assert.strictEqual(fetch.callCount, 1);
     assert.strictEqual(
-      fetchWrapper.default.getCall(0).args[0],
+      fetch.getCall(0).args[0],
       App.authenticator.serverTokenEndpoint,
     );
-    assert.deepEqual(fetchWrapper.default.getCall(0).args[1], {
+    assert.deepEqual(fetch.getCall(0).args[1], {
       method: 'POST',
       body: JSON.stringify(credentials),
       headers: {
@@ -223,12 +223,12 @@ test('#authenticate sends a fetch request to the token endpoint when `tokenPrope
   ]);
 
   return App.authenticator.authenticate(credentials).then(() => {
-    assert.strictEqual(fetchWrapper.default.callCount, 1);
+    assert.strictEqual(fetch.callCount, 1);
     assert.strictEqual(
-      fetchWrapper.default.getCall(0).args[0],
+      fetch.getCall(0).args[0],
       App.authenticator.serverTokenEndpoint,
     );
-    assert.deepEqual(fetchWrapper.default.getCall(0).args[1], {
+    assert.deepEqual(fetch.getCall(0).args[1], {
       method: 'POST',
       body: JSON.stringify(credentials),
       headers: {
@@ -262,12 +262,12 @@ test('#authenticate sends an fetch request with custom headers', (assert) => {
   ]);
 
   return App.authenticator.authenticate(credentials).then(() => {
-    assert.strictEqual(fetchWrapper.default.callCount, 1);
+    assert.strictEqual(fetch.callCount, 1);
     assert.strictEqual(
-      fetchWrapper.default.getCall(0).args[0],
+      fetch.getCall(0).args[0],
       App.authenticator.serverTokenEndpoint,
     );
-    assert.deepEqual(fetchWrapper.default.getCall(0).args[1], {
+    assert.deepEqual(fetch.getCall(0).args[1], {
       method: 'POST',
       body: JSON.stringify(credentials),
       headers: Object.assign(
@@ -304,12 +304,12 @@ test('#authenticate sends an fetch request with dynamic headers', (assert) => {
   ]);
 
   return App.authenticator.authenticate(credentials, headers).then(() => {
-    assert.strictEqual(fetchWrapper.default.callCount, 1);
+    assert.strictEqual(fetch.callCount, 1);
     assert.strictEqual(
-      fetchWrapper.default.getCall(0).args[0],
+      fetch.getCall(0).args[0],
       App.authenticator.serverTokenEndpoint,
     );
-    assert.deepEqual(fetchWrapper.default.getCall(0).args[1], {
+    assert.deepEqual(fetch.getCall(0).args[1], {
       method: 'POST',
       body: JSON.stringify(credentials),
       headers: Object.assign(

@@ -1,124 +1,21 @@
 {
-  "name": "@triptyk/ember-simple-auth-token",
+  "name": "workspace-root",
   "version": "5.3.5",
-  "description": "An authenticator and authorizer for Ember Simple Auth that is compatible with token-based authentication like JWT in Ember CLI applications.",
-  "directories": {
-    "doc": "doc",
-    "test": "tests"
-  },
-  "scripts": {
-    "build": "ember build --environment=production",
-    "lint": "concurrently \"npm:lint:*(!fix)\" --names \"lint:\"",
-    "lint:css": "stylelint \"**/*.css\"",
-    "lint:css:fix": "concurrently \"npm:lint:css -- --fix\"",
-    "lint:fix": "concurrently \"npm:lint:*:fix\" --names \"fix:\"",
-    "lint:hbs": "ember-template-lint .",
-    "lint:hbs:fix": "ember-template-lint . --fix",
-    "lint:js": "eslint . --cache",
-    "lint:js:fix": "eslint . --fix",
-    "start": "ember serve",
-    "test": "concurrently \"npm:lint\" \"npm:test:*\" --names \"lint,test:\"",
-    "test:ember": "ember test",
-    "test:ember-compatibility": "ember try:each",
-    "test:one": "ember try:one",
-    "deploy": "ember build -prod && ember github-pages:commit --message \"Deploy gh-pages from commit $(git rev-parse HEAD)\" && git push origin gh-pages:gh-pages"
-  },
-  "repository": "https://github.com/fenichelar/ember-simple-auth-token",
-  "author": {
-    "name": "Alec Fenichel"
-  },
+  "private": true,
+  "repository": "",
   "license": "MIT",
-  "dependencies": {
-    "@babel/core": "^7.23.2",
-    "ember-auto-import": "~2.7.0",
-    "ember-cli-babel": "^8.2.0",
-    "ember-cli-htmlbars": "^6.3.0",
-    "ember-fetch": "^8.1.2",
-    "ember-simple-auth": "~6.0.0"
+  "author": "",
+  "scripts": {
+    "build": "pnpm --filter @triptyk/ember-simple-auth-token build",
+    "lint": "pnpm --filter '*' lint",
+    "lint:fix": "pnpm --filter '*' lint:fix",
+    "prepare": "pnpm build",
+    "start": "concurrently 'npm:start:*' --restart-after 5000 --prefix-colors cyan,white,yellow",
+    "start:addon": "pnpm --filter @triptyk/ember-simple-auth-token start",
+    "start:test-app": "pnpm --filter test-app start",
+    "test": "pnpm --filter '*' test"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "^7.22.15",
-    "@babel/plugin-proposal-decorators": "^7.23.2",
-    "@ember/optional-features": "^2.0.0",
-    "@ember/string": "^3.1.1",
-    "@ember/test-helpers": "^3.2.0",
-    "@embroider/test-setup": "^3.0.2",
-    "@glimmer/component": "^1.1.2",
-    "@glimmer/tracking": "^1.1.2",
-    "body-parser": "^1.20.2",
-    "broccoli-asset-rev": "^3.0.0",
-    "broccoli-funnel": "^3.0.8",
-    "concurrently": "^8.2.2",
-    "ember-auto-import": "^2.6.3",
-    "ember-cli": "~5.4.1",
-    "ember-cli-app-version": "^6.0.1",
-    "ember-cli-clean-css": "^3.0.0",
-    "ember-cli-dependency-checker": "^3.3.2",
-    "ember-cli-github-pages": "^0.2.0",
-    "ember-cli-inject-live-reload": "^2.1.0",
-    "ember-cli-sri": "^2.1.1",
-    "ember-cli-terser": "^4.0.2",
-    "ember-data": "~5.3.0",
-    "ember-decorators": "^6.1.1",
-    "ember-load-initializers": "^2.1.2",
-    "ember-page-title": "^8.0.0",
-    "ember-qunit": "^8.0.1",
-    "ember-resolver": "^11.0.1",
-    "ember-sinon-qunit": "^7.4.0",
-    "ember-source": "^5.4.0",
-    "ember-source-channel-url": "^3.0.0",
-    "ember-template-lint": "^5.11.2",
-    "ember-try": "^3.0.0",
-    "eslint": "^8.52.0",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-ember": "^11.11.1",
-    "eslint-plugin-n": "^16.2.0",
-    "eslint-plugin-prettier": "^5.0.1",
-    "eslint-plugin-qunit": "^8.0.1",
-    "express": "^4.18.2",
-    "glob": "^10.3.10",
-    "jsonwebtoken": "^9.0.2",
-    "loader.js": "^4.7.0",
-    "morgan": "^1.9.0",
-    "msw": "^2.0.9",
-    "prettier": "^3.0.3",
-    "qunit": "^2.20.0",
-    "qunit-dom": "^3.0.0",
-    "sinon": "^17.0.1",
-    "stylelint": "^15.11.0",
-    "stylelint-config-standard": "^34.0.0",
-    "stylelint-prettier": "^4.0.2",
-    "webpack": "^5.89.0"
-  },
-  "fastbootDependencies": [
-    "buffer",
-    "node-fetch"
-  ],
-  "keywords": [
-    "ember-addon",
-    "token",
-    "jwt",
-    "auth",
-    "authentication",
-    "authorization"
-  ],
-  "peerDependencies": {
-    "ember-source": ">= 4.0.0"
-  },
-  "engines": {
-    "node": ">= 18"
-  },
-  "ember": {
-    "edition": "octane"
-  },
-  "ember-addon": {
-    "configPath": "tests/dummy/config",
-    "demoURL": "https://fenichelar.github.io/@triptyk/ember-simple-auth-token/",
-    "versionCompatibility": {
-      "ember": ">=2.16.0 <=3.28.0"
-    }
-  },
-  "volta": {
-    "node": "18.18.2"
+    "concurrently": "^8.2.2"
   }
 }
