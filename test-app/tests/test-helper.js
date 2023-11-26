@@ -1,10 +1,10 @@
-import Application from 'test-app/app';
-import config from 'test-app/config/environment';
-import * as QUnit from 'qunit';
+import Application from '../app';
+import config from '../config/environment';
 import { setApplication } from '@ember/test-helpers';
-import { setup } from 'qunit-dom';
 import { start } from 'ember-qunit';
 import setupSinon from 'ember-sinon-qunit';
+import * as QUnit from 'qunit';
+import { setup } from 'qunit-dom';
 
 setApplication(Application.create(config.APP));
 

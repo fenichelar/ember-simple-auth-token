@@ -3,6 +3,8 @@ import { module, test } from 'qunit';
 import sinon from 'sinon';
 import startApp from '../../helpers/start-app';
 import JWT from '@triptyk/ember-simple-auth-token/authenticators/jwt';
+import { http } from 'msw';
+import { setupWorker } from 'msw/browser';
 
 const createFakeCredentials = () => {
   return {
@@ -26,12 +28,10 @@ const getConvertedTime = (time) => {
 module('JWT Authenticator', (hooks) => {
   let App;
   let fetch;
+  let server;
 
   hooks.beforeEach(async function () {
     App = startApp();
-    App.server = sinon.fakeServer.create();
-    App.server.autoRespond = true;
-    App.server.respondImmediately = true;
     App.authenticator = JWT.create();
     // eslint-disable-next-line no-undef
     fetch = sinon.spy(window, 'fetch');
@@ -40,9 +40,29 @@ module('JWT Authenticator', (hooks) => {
     sinon.spy(App.authenticator, 'scheduleAccessTokenRefresh');
   });
 
+  function startMockServer(method, url, [status, headers, response]) {
+    const handler = http[method.toLowerCase()](url, () => {
+      return new Response(response, {
+        status,
+        headers,
+      });
+    });
+
+    if (server) {
+      return server.use(handler);
+    }
+    server = setupWorker(handler);
+
+    server.start();
+  }
+
   hooks.afterEach(async function () {
-    App.server.restore();
     fetch.restore();
+    if (server) {
+      server.resetHandlers();
+      server.stop();
+      server = undefined;
+    }
   });
 
   test('#restore resolves when the data includes `token` and `expiresAt`', (assert) => {
@@ -53,9 +73,6 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.tokenExpireName]: expiresAt,
     };
     const token = createFakeToken(tokenData);
-
-
-
 
     const refreshToken = createFakeRefreshToken();
     const data = {
@@ -68,17 +85,13 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    App.server.respondWith(
-      'POST',
-      App.authenticator.serverTokenRefreshEndpoint,
-      [
-        201,
-        {
-          'Content-Type': 'application/json',
-        },
-        JSON.stringify(response),
-      ],
-    );
+    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+      201,
+      {
+        'Content-Type': 'application/json',
+      },
+      JSON.stringify(response),
+    ]);
 
     return App.authenticator.restore(data).then((content) => {
       assert.deepEqual(content, data);
@@ -98,17 +111,13 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    App.server.respondWith(
-      'POST',
-      App.authenticator.serverTokenRefreshEndpoint,
-      [
-        201,
-        {
-          'Content-Type': 'application/json',
-        },
-        JSON.stringify(response),
-      ],
-    );
+    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+      201,
+      {
+        'Content-Type': 'application/json',
+      },
+      JSON.stringify(response),
+    ]);
 
     return App.authenticator.restore(data).then((content) => {
       assert.deepEqual(content, data);
@@ -136,17 +145,13 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    App.server.respondWith(
-      'POST',
-      App.authenticator.serverTokenRefreshEndpoint,
-      [
-        201,
-        {
-          'Content-Type': 'application/json',
-        },
-        JSON.stringify(response),
-      ],
-    );
+    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+      201,
+      {
+        'Content-Type': 'application/json',
+      },
+      JSON.stringify(response),
+    ]);
 
     const content = await App.authenticator.restore(data);
 
@@ -173,17 +178,13 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    App.server.respondWith(
-      'POST',
-      App.authenticator.serverTokenRefreshEndpoint,
-      [
-        201,
-        {
-          'Content-Type': 'application/json',
-        },
-        JSON.stringify(response),
-      ],
-    );
+    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+      201,
+      {
+        'Content-Type': 'application/json',
+      },
+      JSON.stringify(response),
+    ]);
 
     return App.authenticator.restore(data).catch(() => {
       assert.ok(true);
@@ -218,17 +219,13 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    App.server.respondWith(
-      'POST',
-      App.authenticator.serverTokenRefreshEndpoint,
-      [
-        201,
-        {
-          'Content-Type': 'application/json',
-        },
-        JSON.stringify(response),
-      ],
-    );
+    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+      201,
+      {
+        'Content-Type': 'application/json',
+      },
+      JSON.stringify(response),
+    ]);
 
     return App.authenticator.restore(data).then((content) => {
       assert.deepEqual(content, data);
@@ -250,17 +247,13 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    App.server.respondWith(
-      'POST',
-      App.authenticator.serverTokenRefreshEndpoint,
-      [
-        201,
-        {
-          'Content-Type': 'application/json',
-        },
-        JSON.stringify(response),
-      ],
-    );
+    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+      201,
+      {
+        'Content-Type': 'application/json',
+      },
+      JSON.stringify(response),
+    ]);
 
     return App.authenticator.restore(data).catch(() => {
       assert.ok(true);
@@ -286,20 +279,16 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    App.server.respondWith(
-      'POST',
-      App.authenticator.serverTokenRefreshEndpoint,
-      [
-        201,
-        {
-          'Content-Type': 'application/json',
-        },
-        JSON.stringify(response),
-      ],
-    );
+    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+      201,
+      {
+        'Content-Type': 'application/json',
+      },
+      JSON.stringify(response),
+    ]);
 
     return App.authenticator.restore(data).then(() => {
-      assert.strictEqual(
+      assert.deepEqual(
         App.authenticator.scheduleAccessTokenRefresh.callCount,
         1,
       );
@@ -327,20 +316,16 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    App.server.respondWith(
-      'POST',
-      App.authenticator.serverTokenRefreshEndpoint,
-      [
-        201,
-        {
-          'Content-Type': 'application/json',
-        },
-        JSON.stringify(response),
-      ],
-    );
+    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+      201,
+      {
+        'Content-Type': 'application/json',
+      },
+      JSON.stringify(response),
+    ]);
 
     return App.authenticator.restore(data).then(() => {
-      assert.strictEqual(
+      assert.deepEqual(
         App.authenticator.scheduleAccessTokenRefresh.callCount,
         0,
       );
@@ -366,20 +351,16 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    App.server.respondWith(
-      'POST',
-      App.authenticator.serverTokenRefreshEndpoint,
-      [
-        201,
-        {
-          'Content-Type': 'application/json',
-        },
-        JSON.stringify(response),
-      ],
-    );
+    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+      201,
+      {
+        'Content-Type': 'application/json',
+      },
+      JSON.stringify(response),
+    ]);
 
     return App.authenticator.restore(data).then(() => {
-      assert.strictEqual(App.authenticator.refreshAccessToken.callCount, 1);
+      assert.deepEqual(App.authenticator.refreshAccessToken.callCount, 1);
     });
   });
 
@@ -404,20 +385,16 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    App.server.respondWith(
-      'POST',
-      App.authenticator.serverTokenRefreshEndpoint,
-      [
-        201,
-        {
-          'Content-Type': 'application/json',
-        },
-        JSON.stringify(response),
-      ],
-    );
+    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+      201,
+      {
+        'Content-Type': 'application/json',
+      },
+      JSON.stringify(response),
+    ]);
 
     return App.authenticator.restore(data).then(() => {
-      assert.strictEqual(
+      assert.deepEqual(
         App.authenticator.scheduleAccessTokenRefresh.callCount,
         1,
       );
@@ -445,20 +422,16 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    App.server.respondWith(
-      'POST',
-      App.authenticator.serverTokenRefreshEndpoint,
-      [
-        201,
-        {
-          'Content-Type': 'application/json',
-        },
-        JSON.stringify(response),
-      ],
-    );
+    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+      201,
+      {
+        'Content-Type': 'application/json',
+      },
+      JSON.stringify(response),
+    ]);
 
     return App.authenticator.restore(data).catch(() => {
-      assert.strictEqual(App.authenticator.refreshAccessToken.callCount, 1);
+      assert.deepEqual(App.authenticator.refreshAccessToken.callCount, 1);
     });
   });
 
@@ -477,24 +450,20 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    App.server.respondWith('POST', App.authenticator.serverTokenEndpoint, [
+    startMockServer('POST', App.authenticator.serverTokenEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
       },
       JSON.stringify(response),
     ]);
-    App.server.respondWith(
-      'POST',
-      App.authenticator.serverTokenRefreshEndpoint,
-      [
-        201,
-        {
-          'Content-Type': 'application/json',
-        },
-        JSON.stringify(refreshResponse),
-      ],
-    );
+    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+      201,
+      {
+        'Content-Type': 'application/json',
+      },
+      JSON.stringify(refreshResponse),
+    ]);
 
     return App.authenticator.authenticate(credentials).then((data) => {
       delete data[App.authenticator.tokenExpireName];
@@ -518,32 +487,28 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    App.server.respondWith('POST', App.authenticator.serverTokenEndpoint, [
+    startMockServer('POST', App.authenticator.serverTokenEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
       },
       JSON.stringify(response),
     ]);
-    App.server.respondWith(
-      'POST',
-      App.authenticator.serverTokenRefreshEndpoint,
-      [
-        201,
-        {
-          'Content-Type': 'application/json',
-        },
-        JSON.stringify(refreshResponse),
-      ],
-    );
+    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+      201,
+      {
+        'Content-Type': 'application/json',
+      },
+      JSON.stringify(refreshResponse),
+    ]);
 
     return App.authenticator.authenticate(credentials).then(() => {
-      assert.strictEqual(fetch.callCount, 1);
-      assert.strictEqual(
+      assert.deepEqual(fetch.callCount, 1);
+      assert.deepEqual(
         window.fetch.getCall(0).args[0],
         App.authenticator.serverTokenEndpoint,
       );
-      assert.deepEqualstrictEqual(fetch.getCall(0).args[1], {
+      assert.deepEqual(fetch.getCall(0).args[1], {
         method: 'POST',
         body: JSON.stringify(credentials),
         headers: {
@@ -579,32 +544,28 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    App.server.respondWith('POST', App.authenticator.serverTokenEndpoint, [
+    startMockServer('POST', App.authenticator.serverTokenEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
       },
       JSON.stringify(response),
     ]);
-    App.server.respondWith(
-      'POST',
-      App.authenticator.serverTokenRefreshEndpoint,
-      [
-        201,
-        {
-          'Content-Type': 'application/json',
-        },
-        JSON.stringify(refreshResponse),
-      ],
-    );
+    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+      201,
+      {
+        'Content-Type': 'application/json',
+      },
+      JSON.stringify(refreshResponse),
+    ]);
 
     return App.authenticator.authenticate(credentials).then(() => {
-      assert.strictEqual(fetch.callCount, 1);
-      assert.strictEqual(
+      assert.deepEqual(fetch.callCount, 1);
+      assert.deepEqual(
         window.fetch.getCall(0).args[0],
         App.authenticator.serverTokenEndpoint,
       );
-      assert.deepEqualstrictEqual(fetch.getCall(0).args[1], {
+      assert.deepEqual(fetch.getCall(0).args[1], {
         method: 'POST',
         body: JSON.stringify(credentials),
         headers: {
@@ -636,32 +597,28 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    App.server.respondWith('POST', App.authenticator.serverTokenEndpoint, [
+    startMockServer('POST', App.authenticator.serverTokenEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
       },
       JSON.stringify(response),
     ]);
-    App.server.respondWith(
-      'POST',
-      App.authenticator.serverTokenRefreshEndpoint,
-      [
-        201,
-        {
-          'Content-Type': 'application/json',
-        },
-        JSON.stringify(refreshResponse),
-      ],
-    );
+    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+      201,
+      {
+        'Content-Type': 'application/json',
+      },
+      JSON.stringify(refreshResponse),
+    ]);
 
     return App.authenticator.authenticate(credentials).then(() => {
-      assert.strictEqual(fetch.callCount, 1);
-      assert.strictEqual(
+      assert.deepEqual(fetch.callCount, 1);
+      assert.deepEqual(
         window.fetch.getCall(0).args[0],
         App.authenticator.serverTokenEndpoint,
       );
-      assert.deepEqualstrictEqual(fetch.getCall(0).args[1], {
+      assert.deepEqual(fetch.getCall(0).args[1], {
         method: 'POST',
         body: JSON.stringify(credentials),
         headers: Object.assign(
@@ -696,32 +653,28 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    App.server.respondWith('POST', App.authenticator.serverTokenEndpoint, [
+    startMockServer('POST', App.authenticator.serverTokenEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
       },
       JSON.stringify(response),
     ]);
-    App.server.respondWith(
-      'POST',
-      App.authenticator.serverTokenRefreshEndpoint,
-      [
-        201,
-        {
-          'Content-Type': 'application/json',
-        },
-        JSON.stringify(refreshResponse),
-      ],
-    );
+    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+      201,
+      {
+        'Content-Type': 'application/json',
+      },
+      JSON.stringify(refreshResponse),
+    ]);
 
     return App.authenticator.authenticate(credentials, headers).then(() => {
-      assert.strictEqual(fetch.callCount, 1);
-      assert.strictEqual(
+      assert.deepEqual(fetch.callCount, 1);
+      assert.deepEqual(
         window.fetch.getCall(0).args[0],
         App.authenticator.serverTokenEndpoint,
       );
-      assert.deepEqualstrictEqual(fetch.getCall(0).args[1], {
+      assert.deepEqual(fetch.getCall(0).args[1], {
         method: 'POST',
         body: JSON.stringify(credentials),
         headers: Object.assign(
@@ -740,7 +693,7 @@ module('JWT Authenticator', (hooks) => {
 
     const credentials = createFakeCredentials();
 
-    App.server.respondWith('POST', App.authenticator.serverTokenEndpoint, [
+    startMockServer('POST', App.authenticator.serverTokenEndpoint, [
       400,
       {
         'Content-Type': 'application/json',
@@ -749,7 +702,7 @@ module('JWT Authenticator', (hooks) => {
     ]);
 
     return App.authenticator.authenticate(credentials).catch((error) => {
-      assert.strictEqual(error.status, 400);
+      assert.deepEqual(error.status, 400);
     });
   });
 
@@ -772,27 +725,23 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    App.server.respondWith('POST', App.authenticator.serverTokenEndpoint, [
+    startMockServer('POST', App.authenticator.serverTokenEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
       },
       JSON.stringify(response),
     ]);
-    App.server.respondWith(
-      'POST',
-      App.authenticator.serverTokenRefreshEndpoint,
-      [
-        201,
-        {
-          'Content-Type': 'application/json',
-        },
-        JSON.stringify(refreshResponse),
-      ],
-    );
+    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+      201,
+      {
+        'Content-Type': 'application/json',
+      },
+      JSON.stringify(refreshResponse),
+    ]);
 
     return App.authenticator.authenticate(credentials).then(() => {
-      assert.strictEqual(
+      assert.deepEqual(
         App.authenticator.scheduleAccessTokenRefresh.callCount,
         1,
       );
@@ -820,27 +769,23 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    App.server.respondWith('POST', App.authenticator.serverTokenEndpoint, [
+    startMockServer('POST', App.authenticator.serverTokenEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
       },
       JSON.stringify(response),
     ]);
-    App.server.respondWith(
-      'POST',
-      App.authenticator.serverTokenRefreshEndpoint,
-      [
-        201,
-        {
-          'Content-Type': 'application/json',
-        },
-        JSON.stringify(refreshResponse),
-      ],
-    );
+    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+      201,
+      {
+        'Content-Type': 'application/json',
+      },
+      JSON.stringify(refreshResponse),
+    ]);
 
     return App.authenticator.authenticate(credentials).then(() => {
-      assert.strictEqual(
+      assert.deepEqual(
         App.authenticator.scheduleAccessTokenRefresh.callCount,
         0,
       );
@@ -866,27 +811,23 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    App.server.respondWith('POST', App.authenticator.serverTokenEndpoint, [
+    startMockServer('POST', App.authenticator.serverTokenEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
       },
       JSON.stringify(response),
     ]);
-    App.server.respondWith(
-      'POST',
-      App.authenticator.serverTokenRefreshEndpoint,
-      [
-        201,
-        {
-          'Content-Type': 'application/json',
-        },
-        JSON.stringify(refreshResponse),
-      ],
-    );
+    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+      201,
+      {
+        'Content-Type': 'application/json',
+      },
+      JSON.stringify(refreshResponse),
+    ]);
 
     return App.authenticator.authenticate(credentials).then(() => {
-      assert.strictEqual(App.authenticator.refreshAccessToken.callCount, 0);
+      assert.deepEqual(App.authenticator.refreshAccessToken.callCount, 0);
     });
   });
 
@@ -911,27 +852,23 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    App.server.respondWith('POST', App.authenticator.serverTokenEndpoint, [
+    startMockServer('POST', App.authenticator.serverTokenEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
       },
       JSON.stringify(response),
     ]);
-    App.server.respondWith(
-      'POST',
-      App.authenticator.serverTokenRefreshEndpoint,
-      [
-        201,
-        {
-          'Content-Type': 'application/json',
-        },
-        JSON.stringify(refreshResponse),
-      ],
-    );
+    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+      201,
+      {
+        'Content-Type': 'application/json',
+      },
+      JSON.stringify(refreshResponse),
+    ]);
 
     return App.authenticator.authenticate(credentials).then(() => {
-      assert.strictEqual(
+      assert.deepEqual(
         App.authenticator.scheduleAccessTokenRefresh.callCount,
         1,
       );
@@ -948,25 +885,21 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    App.server.respondWith(
-      'POST',
-      App.authenticator.serverTokenRefreshEndpoint,
-      [
-        201,
-        {
-          'Content-Type': 'application/json',
-        },
-        JSON.stringify(response),
-      ],
-    );
+    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+      201,
+      {
+        'Content-Type': 'application/json',
+      },
+      JSON.stringify(response),
+    ]);
 
     return App.authenticator.refreshAccessToken(refreshToken).then(() => {
-      assert.strictEqual(fetch.callCount, 1);
-      assert.strictEqual(
+      assert.deepEqual(fetch.callCount, 1);
+      assert.deepEqual(
         window.fetch.getCall(0).args[0],
         App.authenticator.serverTokenRefreshEndpoint,
       );
-      assert.deepEqualstrictEqual(fetch.getCall(0).args[1], {
+      assert.deepEqual(fetch.getCall(0).args[1], {
         method: 'POST',
         body: JSON.stringify({
           [App.authenticator.refreshTokenPropertyName]: refreshToken,
@@ -995,25 +928,21 @@ module('JWT Authenticator', (hooks) => {
       },
     };
 
-    App.server.respondWith(
-      'POST',
-      App.authenticator.serverTokenRefreshEndpoint,
-      [
-        201,
-        {
-          'Content-Type': 'application/json',
-        },
-        JSON.stringify(response),
-      ],
-    );
+    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+      201,
+      {
+        'Content-Type': 'application/json',
+      },
+      JSON.stringify(response),
+    ]);
 
     return App.authenticator.refreshAccessToken(refreshToken).then(() => {
-      assert.strictEqual(fetch.callCount, 1);
-      assert.strictEqual(
+      assert.deepEqual(fetch.callCount, 1);
+      assert.deepEqual(
         window.fetch.getCall(0).args[0],
         App.authenticator.serverTokenRefreshEndpoint,
       );
-      assert.deepEqualstrictEqual(fetch.getCall(0).args[1], {
+      assert.deepEqual(fetch.getCall(0).args[1], {
         method: 'POST',
         body: JSON.stringify({
           auth: {
@@ -1046,25 +975,21 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    App.server.respondWith(
-      'POST',
-      App.authenticator.serverTokenRefreshEndpoint,
-      [
-        201,
-        {
-          'Content-Type': 'application/json',
-        },
-        JSON.stringify(response),
-      ],
-    );
+    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+      201,
+      {
+        'Content-Type': 'application/json',
+      },
+      JSON.stringify(response),
+    ]);
 
     return App.authenticator.refreshAccessToken(refreshToken).then(() => {
-      assert.strictEqual(fetch.callCount, 1);
-      assert.strictEqual(
+      assert.deepEqual(fetch.callCount, 1);
+      assert.deepEqual(
         window.fetch.getCall(0).args[0],
         App.authenticator.serverTokenRefreshEndpoint,
       );
-      assert.deepEqualstrictEqual(fetch.getCall(0).args[1], {
+      assert.deepEqual(fetch.getCall(0).args[1], {
         method: 'POST',
         body: JSON.stringify({
           [App.authenticator.refreshTokenPropertyName]: refreshToken,
@@ -1094,17 +1019,13 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    App.server.respondWith(
-      'POST',
-      App.authenticator.serverTokenRefreshEndpoint,
-      [
-        201,
-        {
-          'Content-Type': 'application/json',
-        },
-        JSON.stringify(response),
-      ],
-    );
+    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+      201,
+      {
+        'Content-Type': 'application/json',
+      },
+      JSON.stringify(response),
+    ]);
 
     return App.authenticator.refreshAccessToken(refreshToken).then((data) => {
       assert.ok(data[App.authenticator.tokenExpireName]);
@@ -1118,20 +1039,16 @@ module('JWT Authenticator', (hooks) => {
 
     const refreshToken = createFakeRefreshToken();
 
-    App.server.respondWith(
-      'POST',
-      App.authenticator.serverTokenRefreshEndpoint,
-      [
-        401,
-        {
-          'Content-Type': 'application/json',
-        },
-        JSON.stringify({}),
-      ],
-    );
+    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+      401,
+      {
+        'Content-Type': 'application/json',
+      },
+      JSON.stringify({}),
+    ]);
 
     return App.authenticator.refreshAccessToken(refreshToken).catch(() => {
-      assert.strictEqual(App.authenticator.invalidate.callCount, 1);
+      assert.deepEqual(App.authenticator.invalidate.callCount, 1);
     });
   });
 
@@ -1140,20 +1057,16 @@ module('JWT Authenticator', (hooks) => {
 
     const refreshToken = createFakeRefreshToken();
 
-    App.server.respondWith(
-      'POST',
-      App.authenticator.serverTokenRefreshEndpoint,
-      [
-        403,
-        {
-          'Content-Type': 'application/json',
-        },
-        JSON.stringify({}),
-      ],
-    );
+    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+      403,
+      {
+        'Content-Type': 'application/json',
+      },
+      JSON.stringify({}),
+    ]);
 
     return App.authenticator.refreshAccessToken(refreshToken).catch(() => {
-      assert.strictEqual(App.authenticator.invalidate.callCount, 1);
+      assert.deepEqual(App.authenticator.invalidate.callCount, 1);
     });
   });
 
@@ -1162,20 +1075,16 @@ module('JWT Authenticator', (hooks) => {
 
     const refreshToken = createFakeRefreshToken();
 
-    App.server.respondWith(
-      'POST',
-      App.authenticator.serverTokenRefreshEndpoint,
-      [
-        500,
-        {
-          'Content-Type': 'application/json',
-        },
-        JSON.stringify({}),
-      ],
-    );
+    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+      500,
+      {
+        'Content-Type': 'application/json',
+      },
+      JSON.stringify({}),
+    ]);
 
     return App.authenticator.refreshAccessToken(refreshToken).catch(() => {
-      assert.strictEqual(App.authenticator.invalidate.callCount, 0);
+      assert.deepEqual(App.authenticator.invalidate.callCount, 0);
     });
   });
 
@@ -1194,7 +1103,7 @@ module('JWT Authenticator', (hooks) => {
       App.authenticator.getTokenData(objectToken),
       objectTokenData,
     );
-    assert.strictEqual(
+    assert.deepEqual(
       App.authenticator.getTokenData(stringToken),
       stringTokenData,
     );
@@ -1207,6 +1116,6 @@ module('JWT Authenticator', (hooks) => {
       'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE0NTQxNzM1NzEsImRhdGEiOnsiYXV0aGVudGljYXRlZCI6dHJ1ZSwidXNlciI6eyJpZCI6IjdhMWRkYzJmLWI5MTAtNDY2Yi04MDhhLTUxOTUyOTkwZjUyNyIsIm5hbWUiOiJUaG9yYmrDuHJuIEhlcm1hbnNlbiIsIm1vYmlsZSI6IjQwNDUxMzg5IiwiZW1haWwiOiJ0aEBza2FsYXIubm8iLCJsb2NhbGUiOiJuYiIsInNpZ25faW5fY291bnQiOjI1fX19.se8PT5e1G1_xhPTQf_16BIv0Q9uEjQxLGE3iTJwhAec';
 
     const data = App.authenticator.getTokenData(token);
-    assert.strictEqual(data.data.user.name, 'Thorbjørn Hermansen');
+    assert.deepEqual(data.data.user.name, 'Thorbjørn Hermansen');
   });
 });

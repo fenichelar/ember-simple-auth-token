@@ -3,9 +3,8 @@ import { module, test } from 'qunit';
 import sinon from 'sinon';
 import startApp from '../../helpers/start-app';
 import Token from '@triptyk/ember-simple-auth-token/authenticators/token';
-
-let App;
-let fetch;
+import { http, HttpResponse } from 'msw';
+import { setupWorker } from 'msw/browser';
 
 const createFakeCredentials = () => {
   return {
@@ -14,337 +13,355 @@ const createFakeCredentials = () => {
   };
 };
 
-module('Token Authenticator', {
-  beforeEach: () => {
+module('Token Authenticator', (hooks) => {
+  let App;
+  let fetch;
+  let server;
+
+  hooks.beforeEach(() => {
     App = startApp();
-    App.xhr = sinon.useFakeXMLHttpRequest();
-    App.server = sinon.fakeServer.create();
-    App.server.autoRespond = true;
     App.authenticator = Token.create();
     fetch = sinon.spy(window, 'fetch');
-  },
-});
+  });
 
-test('#makeRequest successfully resolves with the correct data', (assert) => {
-  assert.expect(1);
+  hooks.afterEach(() => {
+    fetch.restore();
+    if (server) {
+      server.resetHandlers();
+      server.stop();
+      server = undefined;
+    }
+  });
 
-  const response = {
-    testing: '123',
-  };
-  const credentials = createFakeCredentials();
+  function startMockServer(method, url, [status, headers, response]) {
+    const handler = http[method.toLowerCase()](url, () => {
+      if (headers['Content-Type'] === 'text/html') {
+        return new HttpResponse(response, {
+          status,
+          headers,
+        });
+      }
 
-  App.server.respondWith('POST', '/endpoint', [
-    201,
-    {
-      'Content-Type': 'application/json',
-    },
-    JSON.stringify(response),
-  ]);
+      return HttpResponse.json(JSON.parse(response), {
+        status,
+        headers,
+      });
+    });
 
-  return App.authenticator
-    .makeRequest('/endpoint', credentials)
-    .then((data) => {
-      assert.deepEqual(
-        {
+    if (server) {
+      return server.use(handler);
+    }
+    server = setupWorker(handler);
+
+    server.start();
+  }
+
+  test('#makeRequest successfully resolves with the correct data', async (assert) => {
+    assert.expect(1);
+
+    const response = {
+      testing: '123',
+    };
+    const credentials = createFakeCredentials();
+
+    startMockServer('POST', '/endpoint', [
+      201,
+      {
+        'Content-Type': 'application/json',
+      },
+      JSON.stringify(response),
+    ]);
+
+    await App.authenticator
+      .makeRequest('/endpoint', credentials)
+      .then((data) => {
+        assert.deepEqual(JSON.parse(JSON.stringify(data)), {
           statusText: 'Created',
           status: 201,
-          headers: {
-            map: {
-              'content-type': 'application/json',
-            },
-          },
+          headers: {},
           text: JSON.stringify(response),
           json: response,
-        },
-        JSON.parse(JSON.stringify(data)),
-      );
-    });
-});
-
-test('#makeRequest successfully rejects with the correct data on JSON error', (assert) => {
-  assert.expect(1);
-
-  const response = {
-    testing: '123',
-  };
-  const credentials = createFakeCredentials();
-
-  App.server.respondWith('POST', '/endpoint', [
-    403,
-    {
-      'Content-Type': 'application/json',
-    },
-    JSON.stringify(response),
-  ]);
-
-  return App.authenticator
-    .makeRequest('/endpoint', credentials)
-    .catch((data) => {
-      assert.deepEqual(
-        {
-          statusText: 'Forbidden',
-          status: 403,
-          headers: {
-            map: {
-              'content-type': 'application/json',
-            },
-          },
-          text: JSON.stringify(response),
-          json: response,
-        },
-        JSON.parse(JSON.stringify(data)),
-      );
-    });
-});
-
-test('#makeRequest successfully rejects with the correct data on HTML error', (assert) => {
-  assert.expect(1);
-
-  const response = '<h1>Error</h1>';
-  const credentials = createFakeCredentials();
-
-  App.server.respondWith('POST', '/endpoint', [
-    403,
-    {
-      'Content-Type': 'text/html',
-    },
-    response,
-  ]);
-
-  return App.authenticator
-    .makeRequest('/endpoint', credentials)
-    .catch((data) => {
-      assert.deepEqual(
-        {
-          statusText: 'Forbidden',
-          status: 403,
-          headers: {
-            map: {
-              'content-type': 'text/html',
-            },
-          },
-          text: response,
-        },
-        JSON.parse(JSON.stringify(data)),
-      );
-    });
-});
-
-test('#restore resolves with the correct data', (assert) => {
-  assert.expect(1);
-
-  const response = {
-    [App.authenticator.tokenPropertyName]: 'secret token!',
-  };
-
-  App.server.respondWith('POST', App.authenticator.serverTokenEndpoint, [
-    201,
-    {
-      'Content-Type': 'application/json',
-    },
-    JSON.stringify(response),
-  ]);
-
-  return App.authenticator.restore(response).then((content) => {
-    assert.deepEqual(content, response);
+        });
+      });
   });
-});
 
-test('#authenticate sends a fetch request to the token endpoint', (assert) => {
-  assert.expect(3);
+  test('#makeRequest successfully rejects with the correct data on JSON error', (assert) => {
+    assert.expect(1);
 
-  const response = {
-    [App.authenticator.tokenPropertyName]: 'secret token!',
-  };
-  const credentials = createFakeCredentials();
+    const response = {
+      testing: '123',
+    };
+    const credentials = createFakeCredentials();
 
-  App.server.respondWith('POST', App.authenticator.serverTokenEndpoint, [
-    201,
-    {
-      'Content-Type': 'application/json',
-    },
-    JSON.stringify(response),
-  ]);
-
-  return App.authenticator.authenticate(credentials).then(() => {
-    assert.strictEqual(fetch.callCount, 1);
-    assert.strictEqual(
-      fetch.getCall(0).args[0],
-      App.authenticator.serverTokenEndpoint,
-    );
-    assert.deepEqual(fetch.getCall(0).args[1], {
-      method: 'POST',
-      body: JSON.stringify(credentials),
-      headers: {
-        Accept: 'application/json',
+    startMockServer('POST', '/endpoint', [
+      403,
+      {
         'Content-Type': 'application/json',
       },
-    });
+      JSON.stringify(response),
+    ]);
+
+    return App.authenticator
+      .makeRequest('/endpoint', credentials)
+      .catch((data) => {
+        assert.deepEqual(
+          {
+            statusText: 'Forbidden',
+            status: 403,
+            headers: {},
+            text: JSON.stringify(response),
+            json: response,
+          },
+          JSON.parse(JSON.stringify(data)),
+        );
+      });
   });
-});
 
-test('#authenticate successfully resolves with the correct data', (assert) => {
-  assert.expect(1);
+  test('#makeRequest successfully rejects with the correct data on HTML error', (assert) => {
+    assert.expect(1);
 
-  const response = {
-    [App.authenticator.tokenPropertyName]: 'secret token!',
-  };
-  const credentials = createFakeCredentials();
+    const response = '<h1>Error</h1>';
+    const credentials = createFakeCredentials();
 
-  App.server.respondWith('POST', App.authenticator.serverTokenEndpoint, [
-    201,
-    {
-      'Content-Type': 'application/json',
-    },
-    JSON.stringify(response),
-  ]);
+    startMockServer('POST', '/endpoint', [
+      403,
+      {
+        'Content-Type': 'text/html',
+      },
+      response,
+    ]);
 
-  return App.authenticator.authenticate(credentials).then((data) => {
-    assert.deepEqual(data, response);
+    return App.authenticator
+      .makeRequest('/endpoint', credentials)
+      .catch((data) => {
+        assert.deepEqual(
+          {
+            statusText: 'Forbidden',
+            status: 403,
+            headers: {},
+            text: response,
+          },
+          JSON.parse(JSON.stringify(data)),
+        );
+      });
   });
-});
 
-test('#authenticate sends a fetch request to the token endpoint when `tokenPropertyName` is a nested object', (assert) => {
-  assert.expect(3);
+  test('#restore resolves with the correct data', (assert) => {
+    assert.expect(1);
 
-  App.authenticator.tokenPropertyName = 'auth.nested.token';
+    const response = {
+      [App.authenticator.tokenPropertyName]: 'secret token!',
+    };
 
-  const response = {
-    [App.authenticator.tokenPropertyName]: 'secret token!',
-  };
-  const credentials = createFakeCredentials();
-
-  App.server.respondWith('POST', App.authenticator.serverTokenEndpoint, [
-    201,
-    {
-      'Content-Type': 'application/json',
-    },
-    JSON.stringify(response),
-  ]);
-
-  return App.authenticator.authenticate(credentials).then(() => {
-    assert.strictEqual(fetch.callCount, 1);
-    assert.strictEqual(
-      fetch.getCall(0).args[0],
-      App.authenticator.serverTokenEndpoint,
-    );
-    assert.deepEqual(fetch.getCall(0).args[1], {
-      method: 'POST',
-      body: JSON.stringify(credentials),
-      headers: {
-        Accept: 'application/json',
+    startMockServer('POST', App.authenticator.serverTokenEndpoint, [
+      201,
+      {
         'Content-Type': 'application/json',
       },
+      JSON.stringify(response),
+    ]);
+
+    return App.authenticator.restore(response).then((content) => {
+      assert.deepEqual(content, response);
     });
   });
-});
 
-test('#authenticate sends an fetch request with custom headers', (assert) => {
-  assert.expect(3);
+  test('#authenticate sends a fetch request to the token endpoint', (assert) => {
+    assert.expect(3);
 
-  const response = {
-    [App.authenticator.tokenPropertyName]: 'secret token!',
-  };
-  const credentials = createFakeCredentials();
+    const response = {
+      [App.authenticator.tokenPropertyName]: 'secret token!',
+    };
+    const credentials = createFakeCredentials();
 
-  App.authenticator.headers = {
-    'X-API-KEY': '123-abc',
-    'X-ANOTHER-HEADER': 0,
-    Accept: 'application/vnd.api+json',
-  };
+    startMockServer('POST', App.authenticator.serverTokenEndpoint, [
+      201,
+      {
+        'Content-Type': 'application/json',
+      },
+      JSON.stringify(response),
+    ]);
 
-  App.server.respondWith('POST', App.authenticator.serverTokenEndpoint, [
-    201,
-    {
-      'Content-Type': 'application/json',
-    },
-    JSON.stringify(response),
-  ]);
-
-  return App.authenticator.authenticate(credentials).then(() => {
-    assert.strictEqual(fetch.callCount, 1);
-    assert.strictEqual(
-      fetch.getCall(0).args[0],
-      App.authenticator.serverTokenEndpoint,
-    );
-    assert.deepEqual(fetch.getCall(0).args[1], {
-      method: 'POST',
-      body: JSON.stringify(credentials),
-      headers: Object.assign(
-        {
+    return App.authenticator.authenticate(credentials).then(() => {
+      assert.deepEqual(fetch.callCount, 1);
+      assert.deepEqual(
+        fetch.getCall(0).args[0],
+        App.authenticator.serverTokenEndpoint,
+      );
+      assert.deepEqual(fetch.getCall(0).args[1], {
+        method: 'POST',
+        body: JSON.stringify(credentials),
+        headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
         },
-        App.authenticator.headers,
-      ),
+      });
     });
   });
-});
 
-test('#authenticate sends an fetch request with dynamic headers', (assert) => {
-  assert.expect(3);
+  test('#authenticate successfully resolves with the correct data', (assert) => {
+    assert.expect(1);
 
-  const response = {
-    [App.authenticator.tokenPropertyName]: 'secret token!',
-  };
-  const credentials = createFakeCredentials();
+    const response = {
+      [App.authenticator.tokenPropertyName]: 'secret token!',
+    };
+    const credentials = createFakeCredentials();
 
-  const headers = {
-    'X-API-KEY': '123-abc',
-    'X-ANOTHER-HEADER': 0,
-    Accept: 'application/vnd.api+json',
-  };
+    startMockServer('POST', App.authenticator.serverTokenEndpoint, [
+      201,
+      {
+        'Content-Type': 'application/json',
+      },
+      JSON.stringify(response),
+    ]);
 
-  App.server.respondWith('POST', App.authenticator.serverTokenEndpoint, [
-    201,
-    {
-      'Content-Type': 'application/json',
-    },
-    JSON.stringify(response),
-  ]);
+    return App.authenticator.authenticate(credentials).then((data) => {
+      assert.deepEqual(data, response);
+    });
+  });
 
-  return App.authenticator.authenticate(credentials, headers).then(() => {
-    assert.strictEqual(fetch.callCount, 1);
-    assert.strictEqual(
-      fetch.getCall(0).args[0],
-      App.authenticator.serverTokenEndpoint,
-    );
-    assert.deepEqual(fetch.getCall(0).args[1], {
-      method: 'POST',
-      body: JSON.stringify(credentials),
-      headers: Object.assign(
-        {
+  test('#authenticate sends a fetch request to the token endpoint when `tokenPropertyName` is a nested object', (assert) => {
+    assert.expect(3);
+
+    App.authenticator.tokenPropertyName = 'auth.nested.token';
+
+    const response = {
+      [App.authenticator.tokenPropertyName]: 'secret token!',
+    };
+    const credentials = createFakeCredentials();
+
+    startMockServer('POST', App.authenticator.serverTokenEndpoint, [
+      201,
+      {
+        'Content-Type': 'application/json',
+      },
+      JSON.stringify(response),
+    ]);
+
+    return App.authenticator.authenticate(credentials).then(() => {
+      assert.deepEqual(fetch.callCount, 1);
+      assert.deepEqual(
+        fetch.getCall(0).args[0],
+        App.authenticator.serverTokenEndpoint,
+      );
+      assert.deepEqual(fetch.getCall(0).args[1], {
+        method: 'POST',
+        body: JSON.stringify(credentials),
+        headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
         },
-        headers,
-      ),
+      });
     });
   });
-});
 
-test('#authenticate rejects with the correct error', (assert) => {
-  assert.expect(1);
+  test('#authenticate sends an fetch request with custom headers', (assert) => {
+    assert.expect(3);
 
-  const credentials = createFakeCredentials();
+    const response = {
+      [App.authenticator.tokenPropertyName]: 'secret token!',
+    };
+    const credentials = createFakeCredentials();
 
-  App.server.respondWith('POST', App.authenticator.serverTokenEndpoint, [
-    400,
-    {
-      'Content-Type': 'application/json',
-    },
-    JSON.stringify({}),
-  ]);
+    App.authenticator.headers = {
+      'X-API-KEY': '123-abc',
+      'X-ANOTHER-HEADER': 0,
+      Accept: 'application/vnd.api+json',
+    };
 
-  return App.authenticator.authenticate(credentials).catch((error) => {
-    assert.strictEqual(error.status, 400);
+    startMockServer('POST', App.authenticator.serverTokenEndpoint, [
+      201,
+      {
+        'Content-Type': 'application/json',
+      },
+      JSON.stringify(response),
+    ]);
+
+    return App.authenticator.authenticate(credentials).then(() => {
+      assert.deepEqual(fetch.callCount, 1);
+      assert.deepEqual(
+        fetch.getCall(0).args[0],
+        App.authenticator.serverTokenEndpoint,
+      );
+      assert.deepEqual(fetch.getCall(0).args[1], {
+        method: 'POST',
+        body: JSON.stringify(credentials),
+        headers: Object.assign(
+          {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          App.authenticator.headers,
+        ),
+      });
+    });
   });
-});
 
-test('#invalidate returns a resolving promise', (assert) => {
-  assert.expect(1);
+  test('#authenticate sends an fetch request with dynamic headers', (assert) => {
+    assert.expect(3);
 
-  return App.authenticator.invalidate().then(() => {
-    assert.ok(true);
+    const response = {
+      [App.authenticator.tokenPropertyName]: 'secret token!',
+    };
+    const credentials = createFakeCredentials();
+
+    const headers = {
+      'X-API-KEY': '123-abc',
+      'X-ANOTHER-HEADER': 0,
+      Accept: 'application/vnd.api+json',
+    };
+
+    startMockServer('POST', App.authenticator.serverTokenEndpoint, [
+      201,
+      {
+        'Content-Type': 'application/json',
+      },
+      JSON.stringify(response),
+    ]);
+
+    return App.authenticator.authenticate(credentials, headers).then(() => {
+      assert.deepEqual(fetch.callCount, 1);
+      assert.deepEqual(
+        fetch.getCall(0).args[0],
+        App.authenticator.serverTokenEndpoint,
+      );
+      assert.deepEqual(fetch.getCall(0).args[1], {
+        method: 'POST',
+        body: JSON.stringify(credentials),
+        headers: Object.assign(
+          {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          headers,
+        ),
+      });
+    });
+  });
+
+  test('#authenticate rejects with the correct error', (assert) => {
+    assert.expect(1);
+
+    const credentials = createFakeCredentials();
+
+    startMockServer('POST', App.authenticator.serverTokenEndpoint, [
+      400,
+      {
+        'Content-Type': 'application/json',
+      },
+      JSON.stringify({}),
+    ]);
+
+    return App.authenticator.authenticate(credentials).catch((error) => {
+      assert.deepEqual(error.status, 400);
+    });
+  });
+
+  test('#invalidate returns a resolving promise', (assert) => {
+    assert.expect(1);
+
+    return App.authenticator.invalidate().then(() => {
+      assert.ok(true);
+    });
   });
 });
