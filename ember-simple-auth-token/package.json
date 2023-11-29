@@ -69,7 +69,9 @@
     "edition": "octane"
   },
   "ember-addon": {
-    "app-js": {},
+    "app-js": {
+      "./initializers/simple-auth-token.js": "./dist/_app_/initializers/simple-auth-token.js"
+    },
     "main": "addon-main.cjs",
     "type": "addon",
     "version": 2
