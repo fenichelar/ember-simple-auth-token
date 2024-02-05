@@ -17,5 +17,10 @@
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "ember-cli-fastboot@4.1.2": "patches/ember-cli-fastboot@4.1.2.patch"
+    }
   }
 }

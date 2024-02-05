@@ -1,0 +1,13 @@
+diff --git a/vendor/experimental-render-mode-rehydrate.js b/vendor/experimental-render-mode-rehydrate.js
+index 721109b9a2403bab6c5d82cd24a7099567bc31b8..fcdde4b3f73846a4b382bf9e77fac2f57514745f 100644
+--- a/vendor/experimental-render-mode-rehydrate.js
++++ b/vendor/experimental-render-mode-rehydrate.js
+@@ -1,7 +1,7 @@
+ (function() {
+   if (typeof FastBoot === 'undefined') {
+     var current = document.getElementById('fastboot-body-start');
+-    var _Ember = require.has('ember') ? require('ember').default : Ember;
++    var _Ember = require.has('ember') ? require('ember').default : globalThis.Ember;
+ 
+     if (
+       current &&
