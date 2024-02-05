@@ -6,6 +6,7 @@ export default function startApp(attrs) {
   let attributes = Object.assign({}, config.APP);
   attributes = Object.assign(attributes, attrs); // use defaults, but you can override;
 
+  // eslint-disable-next-line ember/no-runloop
   return run(() => {
     const application = Application.create(attributes);
     application.setupForTesting();
