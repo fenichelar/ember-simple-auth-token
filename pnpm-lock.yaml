@@ -48,12 +48,21 @@ importers:
       concurrently:
         specifier: ^8.2.2
         version: 8.2.2
+      ember-source:
+        specifier: ~5.6.0
+        version: 5.6.0(@babel/core@7.23.9)(@glimmer/component@1.1.2)(rsvp@4.8.5)(webpack@5.90.1)
       rollup:
         specifier: ^4.9.6
         version: 4.9.6
       rollup-plugin-copy:
         specifier: ^3.5.0
         version: 3.5.0
+      rsvp:
+        specifier: 4.8.5
+        version: 4.8.5
+      webpack:
+        specifier: ^5.90.1
+        version: 5.90.1
 
   test-app:
     devDependencies:

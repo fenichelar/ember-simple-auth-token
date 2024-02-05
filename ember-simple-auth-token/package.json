@@ -44,8 +44,11 @@
     "@rollup/plugin-babel": "^6.0.4",
     "babel-plugin-ember-template-compilation": "^2.2.1",
     "concurrently": "^8.2.2",
+    "ember-source": "~5.6.0",
     "rollup": "^4.9.6",
-    "rollup-plugin-copy": "^3.5.0"
+    "rollup-plugin-copy": "^3.5.0",
+    "rsvp": "4.8.5",
+    "webpack": "^5.90.1"
   },
   "fastbootDependencies": [
     "buffer",
@@ -60,7 +63,7 @@
     "authorization"
   ],
   "peerDependencies": {
-    "ember-source": ">= 4.0.0"
+    "ember-source": ">= 4.8.0"
   },
   "engines": {
     "node": ">= 18"
