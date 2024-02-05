@@ -53,7 +53,7 @@ module('Token Authenticator', (hooks) => {
     }
     server = setupWorker(handler);
 
-    server.start();
+    return server.start();
   }
 
   test('#makeRequest successfully resolves with the correct data', async (assert) => {
@@ -64,7 +64,7 @@ module('Token Authenticator', (hooks) => {
     };
     const credentials = createFakeCredentials();
 
-    startMockServer('POST', '/endpoint', [
+    await startMockServer('POST', '/endpoint', [
       201,
       {
         'Content-Type': 'application/json',
@@ -85,7 +85,7 @@ module('Token Authenticator', (hooks) => {
       });
   });
 
-  test('#makeRequest successfully rejects with the correct data on JSON error', (assert) => {
+  test('#makeRequest successfully rejects with the correct data on JSON error', async (assert) => {
     assert.expect(1);
 
     const response = {
@@ -93,7 +93,7 @@ module('Token Authenticator', (hooks) => {
     };
     const credentials = createFakeCredentials();
 
-    startMockServer('POST', '/endpoint', [
+    await startMockServer('POST', '/endpoint', [
       403,
       {
         'Content-Type': 'application/json',
@@ -117,13 +117,13 @@ module('Token Authenticator', (hooks) => {
       });
   });
 
-  test('#makeRequest successfully rejects with the correct data on HTML error', (assert) => {
+  test('#makeRequest successfully rejects with the correct data on HTML error', async (assert) => {
     assert.expect(1);
 
     const response = '<h1>Error</h1>';
     const credentials = createFakeCredentials();
 
-    startMockServer('POST', '/endpoint', [
+    await startMockServer('POST', '/endpoint', [
       403,
       {
         'Content-Type': 'text/html',
@@ -146,14 +146,14 @@ module('Token Authenticator', (hooks) => {
       });
   });
 
-  test('#restore resolves with the correct data', (assert) => {
+  test('#restore resolves with the correct data', async (assert) => {
     assert.expect(1);
 
     const response = {
       [App.authenticator.tokenPropertyName]: 'secret token!',
     };
 
-    startMockServer('POST', App.authenticator.serverTokenEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
@@ -166,7 +166,7 @@ module('Token Authenticator', (hooks) => {
     });
   });
 
-  test('#authenticate sends a fetch request to the token endpoint', (assert) => {
+  test('#authenticate sends a fetch request to the token endpoint', async (assert) => {
     assert.expect(3);
 
     const response = {
@@ -174,7 +174,7 @@ module('Token Authenticator', (hooks) => {
     };
     const credentials = createFakeCredentials();
 
-    startMockServer('POST', App.authenticator.serverTokenEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
@@ -199,7 +199,7 @@ module('Token Authenticator', (hooks) => {
     });
   });
 
-  test('#authenticate successfully resolves with the correct data', (assert) => {
+  test('#authenticate successfully resolves with the correct data', async (assert) => {
     assert.expect(1);
 
     const response = {
@@ -207,7 +207,7 @@ module('Token Authenticator', (hooks) => {
     };
     const credentials = createFakeCredentials();
 
-    startMockServer('POST', App.authenticator.serverTokenEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
@@ -220,7 +220,7 @@ module('Token Authenticator', (hooks) => {
     });
   });
 
-  test('#authenticate sends a fetch request to the token endpoint when `tokenPropertyName` is a nested object', (assert) => {
+  test('#authenticate sends a fetch request to the token endpoint when `tokenPropertyName` is a nested object', async (assert) => {
     assert.expect(3);
 
     App.authenticator.tokenPropertyName = 'auth.nested.token';
@@ -230,7 +230,7 @@ module('Token Authenticator', (hooks) => {
     };
     const credentials = createFakeCredentials();
 
-    startMockServer('POST', App.authenticator.serverTokenEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
@@ -255,7 +255,7 @@ module('Token Authenticator', (hooks) => {
     });
   });
 
-  test('#authenticate sends an fetch request with custom headers', (assert) => {
+  test('#authenticate sends an fetch request with custom headers', async (assert) => {
     assert.expect(3);
 
     const response = {
@@ -269,7 +269,7 @@ module('Token Authenticator', (hooks) => {
       Accept: 'application/vnd.api+json',
     };
 
-    startMockServer('POST', App.authenticator.serverTokenEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
@@ -297,7 +297,7 @@ module('Token Authenticator', (hooks) => {
     });
   });
 
-  test('#authenticate sends an fetch request with dynamic headers', (assert) => {
+  test('#authenticate sends an fetch request with dynamic headers', async (assert) => {
     assert.expect(3);
 
     const response = {
@@ -311,7 +311,7 @@ module('Token Authenticator', (hooks) => {
       Accept: 'application/vnd.api+json',
     };
 
-    startMockServer('POST', App.authenticator.serverTokenEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
@@ -339,12 +339,12 @@ module('Token Authenticator', (hooks) => {
     });
   });
 
-  test('#authenticate rejects with the correct error', (assert) => {
+  test('#authenticate rejects with the correct error', async (assert) => {
     assert.expect(1);
 
     const credentials = createFakeCredentials();
 
-    startMockServer('POST', App.authenticator.serverTokenEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenEndpoint, [
       400,
       {
         'Content-Type': 'application/json',

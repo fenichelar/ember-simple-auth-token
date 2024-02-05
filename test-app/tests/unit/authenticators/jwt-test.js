@@ -53,7 +53,7 @@ module('JWT Authenticator', (hooks) => {
     }
     server = setupWorker(handler);
 
-    server.start();
+    return server.start();
   }
 
   hooks.afterEach(async function () {
@@ -65,7 +65,7 @@ module('JWT Authenticator', (hooks) => {
     }
   });
 
-  test('#restore resolves when the data includes `token` and `expiresAt`', (assert) => {
+  test('#restore resolves when the data includes `token` and `expiresAt`', async (assert) => {
     assert.expect(1);
     const currentTime = getConvertedTime(Date.now());
     const expiresAt = currentTime + 60;
@@ -85,7 +85,7 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
@@ -98,7 +98,7 @@ module('JWT Authenticator', (hooks) => {
     });
   });
 
-  test('#restore resolves when the data includes `token` and excludes `expiresAt`', (assert) => {
+  test('#restore resolves when the data includes `token` and excludes `expiresAt`', async (assert) => {
     assert.expect(1);
 
     const token = createFakeToken();
@@ -111,7 +111,7 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
@@ -145,7 +145,7 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
@@ -158,7 +158,7 @@ module('JWT Authenticator', (hooks) => {
     assert.deepEqual(content, data);
   });
 
-  test('#restore rejects when the data includes `token` and `expiresAt`, the token is expired, and `refreshAccessTokens` is false', (assert) => {
+  test('#restore rejects when the data includes `token` and `expiresAt`, the token is expired, and `refreshAccessTokens` is false', async (assert) => {
     assert.expect(1);
 
     App.authenticator.refreshAccessTokens = false;
@@ -178,7 +178,7 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
@@ -191,7 +191,7 @@ module('JWT Authenticator', (hooks) => {
     });
   });
 
-  test('#restore resolves when the data includes `token` and `expiresAt` and `tokenPropertyName` is a nested object', (assert) => {
+  test('#restore resolves when the data includes `token` and `expiresAt` and `tokenPropertyName` is a nested object', async (assert) => {
     assert.expect(1);
 
     App.authenticator.tokenPropertyName = 'auth.nested.token';
@@ -219,7 +219,7 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
@@ -232,7 +232,7 @@ module('JWT Authenticator', (hooks) => {
     });
   });
 
-  test('#restore rejects when `token` is excluded', (assert) => {
+  test('#restore rejects when `token` is excluded', async (assert) => {
     assert.expect(1);
 
     const currentTime = getConvertedTime(Date.now());
@@ -247,7 +247,7 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
@@ -260,7 +260,7 @@ module('JWT Authenticator', (hooks) => {
     });
   });
 
-  test('#restore schedules a token refresh when `refreshAccessTokens` is true', (assert) => {
+  test('#restore schedules a token refresh when `refreshAccessTokens` is true', async (assert) => {
     assert.expect(1);
 
     const currentTime = getConvertedTime(Date.now());
@@ -279,7 +279,7 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
@@ -295,7 +295,7 @@ module('JWT Authenticator', (hooks) => {
     });
   });
 
-  test('#restore does not schedule a token refresh when `refreshAccessTokens` is false', (assert) => {
+  test('#restore does not schedule a token refresh when `refreshAccessTokens` is false', async (assert) => {
     assert.expect(1);
 
     App.authenticator.refreshAccessTokens = false;
@@ -316,7 +316,7 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
@@ -332,7 +332,7 @@ module('JWT Authenticator', (hooks) => {
     });
   });
 
-  test('#restore immediately refreshes the token when the token is expired', (assert) => {
+  test('#restore immediately refreshes the token when the token is expired', async (assert) => {
     assert.expect(1);
 
     const currentTime = getConvertedTime(Date.now());
@@ -351,7 +351,7 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
@@ -364,7 +364,7 @@ module('JWT Authenticator', (hooks) => {
     });
   });
 
-  test('#restore schedules a token refresh when the token is farther than the `refreshLeeway` to expiration', (assert) => {
+  test('#restore schedules a token refresh when the token is farther than the `refreshLeeway` to expiration', async (assert) => {
     assert.expect(1);
 
     App.authenticator.refreshLeeway = 30;
@@ -385,7 +385,7 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
@@ -401,7 +401,7 @@ module('JWT Authenticator', (hooks) => {
     });
   });
 
-  test('#restore immediately refreshes the token when the token is closer than the `refreshLeeway` to expiration', (assert) => {
+  test('#restore immediately refreshes the token when the token is closer than the `refreshLeeway` to expiration', async (assert) => {
     assert.expect(1);
 
     App.authenticator.refreshLeeway = 120;
@@ -422,7 +422,7 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
@@ -435,7 +435,7 @@ module('JWT Authenticator', (hooks) => {
     });
   });
 
-  test('#authenticate successfully resolves with the correct data', (assert) => {
+  test('#authenticate successfully resolves with the correct data', async (assert) => {
     assert.expect(1);
 
     const token = createFakeToken();
@@ -450,14 +450,14 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    startMockServer('POST', App.authenticator.serverTokenEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
       },
       JSON.stringify(response),
     ]);
-    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
@@ -472,7 +472,7 @@ module('JWT Authenticator', (hooks) => {
     });
   });
 
-  test('#authenticate sends a fetch request to the token endpoint', (assert) => {
+  test('#authenticate sends a fetch request to the token endpoint', async (assert) => {
     assert.expect(3);
 
     const token = createFakeToken();
@@ -487,14 +487,14 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    startMockServer('POST', App.authenticator.serverTokenEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
       },
       JSON.stringify(response),
     ]);
-    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
@@ -519,7 +519,7 @@ module('JWT Authenticator', (hooks) => {
     });
   });
 
-  test('#authenticate sends a fetch request to the token endpoint when `tokenPropertyName` is a nested object', (assert) => {
+  test('#authenticate sends a fetch request to the token endpoint when `tokenPropertyName` is a nested object', async (assert) => {
     assert.expect(3);
 
     App.authenticator.tokenPropertyName = 'auth.nested.token';
@@ -544,14 +544,14 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    startMockServer('POST', App.authenticator.serverTokenEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
       },
       JSON.stringify(response),
     ]);
-    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
@@ -576,7 +576,7 @@ module('JWT Authenticator', (hooks) => {
     });
   });
 
-  test('#authenticate sends an fetch request with custom headers', (assert) => {
+  test('#authenticate sends an fetch request with custom headers', async (assert) => {
     assert.expect(3);
 
     App.authenticator.headers = {
@@ -597,14 +597,14 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    startMockServer('POST', App.authenticator.serverTokenEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
       },
       JSON.stringify(response),
     ]);
-    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
@@ -632,7 +632,7 @@ module('JWT Authenticator', (hooks) => {
     });
   });
 
-  test('#authenticate sends an fetch request with dynamic headers', (assert) => {
+  test('#authenticate sends an fetch request with dynamic headers', async (assert) => {
     assert.expect(3);
 
     const headers = {
@@ -653,14 +653,14 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    startMockServer('POST', App.authenticator.serverTokenEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
       },
       JSON.stringify(response),
     ]);
-    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
@@ -688,12 +688,12 @@ module('JWT Authenticator', (hooks) => {
     });
   });
 
-  test('#authenticate rejects with the correct error', (assert) => {
+  test('#authenticate rejects with the correct error', async (assert) => {
     assert.expect(1);
 
     const credentials = createFakeCredentials();
 
-    startMockServer('POST', App.authenticator.serverTokenEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenEndpoint, [
       400,
       {
         'Content-Type': 'application/json',
@@ -706,7 +706,7 @@ module('JWT Authenticator', (hooks) => {
     });
   });
 
-  test('#authenticate schedules a token refresh when `refreshAccessTokens` is true', (assert) => {
+  test('#authenticate schedules a token refresh when `refreshAccessTokens` is true', async (assert) => {
     assert.expect(1);
 
     const currentTime = getConvertedTime(Date.now());
@@ -725,14 +725,14 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    startMockServer('POST', App.authenticator.serverTokenEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
       },
       JSON.stringify(response),
     ]);
-    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
@@ -748,7 +748,7 @@ module('JWT Authenticator', (hooks) => {
     });
   });
 
-  test('#authenticate does not schedule a token refresh when `refreshAccessTokens` is false', (assert) => {
+  test('#authenticate does not schedule a token refresh when `refreshAccessTokens` is false', async (assert) => {
     assert.expect(1);
 
     App.authenticator.refreshAccessTokens = false;
@@ -769,14 +769,14 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    startMockServer('POST', App.authenticator.serverTokenEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
       },
       JSON.stringify(response),
     ]);
-    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
@@ -792,7 +792,7 @@ module('JWT Authenticator', (hooks) => {
     });
   });
 
-  test('#authenticate immediately refreshes the token when the token is expired', (assert) => {
+  test('#authenticate immediately refreshes the token when the token is expired', async (assert) => {
     assert.expect(1);
 
     const currentTime = getConvertedTime(Date.now());
@@ -811,14 +811,14 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    startMockServer('POST', App.authenticator.serverTokenEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
       },
       JSON.stringify(response),
     ]);
-    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
@@ -831,7 +831,7 @@ module('JWT Authenticator', (hooks) => {
     });
   });
 
-  test('#authenticate schedules a token refresh when the token is farther than the `refreshLeeway` to expiration', (assert) => {
+  test('#authenticate schedules a token refresh when the token is farther than the `refreshLeeway` to expiration', async (assert) => {
     assert.expect(1);
 
     App.authenticator.refreshLeeway = 30;
@@ -852,14 +852,14 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    startMockServer('POST', App.authenticator.serverTokenEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
       },
       JSON.stringify(response),
     ]);
-    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
@@ -875,7 +875,7 @@ module('JWT Authenticator', (hooks) => {
     });
   });
 
-  test('#refreshAccessToken sends an fetch request to the refresh token endpoint', (assert) => {
+  test('#refreshAccessToken sends an fetch request to the refresh token endpoint', async (assert) => {
     assert.expect(3);
 
     const token = createFakeToken();
@@ -885,7 +885,7 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
@@ -912,7 +912,7 @@ module('JWT Authenticator', (hooks) => {
     });
   });
 
-  test('#refreshAccessToken sends an fetch request to the refresh token endpoint when `refreshTokenPropertyName` is a nested object', (assert) => {
+  test('#refreshAccessToken sends an fetch request to the refresh token endpoint when `refreshTokenPropertyName` is a nested object', async (assert) => {
     assert.expect(3);
 
     App.authenticator.refreshTokenPropertyName = 'auth.nested.refreshToken';
@@ -928,7 +928,7 @@ module('JWT Authenticator', (hooks) => {
       },
     };
 
-    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
@@ -959,7 +959,7 @@ module('JWT Authenticator', (hooks) => {
     });
   });
 
-  test('#refreshAccessToken sends an fetch request with custom headers', (assert) => {
+  test('#refreshAccessToken sends an fetch request with custom headers', async (assert) => {
     assert.expect(3);
 
     App.authenticator.headers = {
@@ -975,7 +975,7 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
@@ -1005,7 +1005,7 @@ module('JWT Authenticator', (hooks) => {
     });
   });
 
-  test('#refreshAccessToken triggers the `sessionDataUpdated` event on successful request', (assert) => {
+  test('#refreshAccessToken triggers the `sessionDataUpdated` event on successful request', async (assert) => {
     assert.expect(3);
 
     const currentTime = getConvertedTime(Date.now());
@@ -1019,7 +1019,7 @@ module('JWT Authenticator', (hooks) => {
       [App.authenticator.refreshTokenPropertyName]: refreshToken,
     };
 
-    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
       201,
       {
         'Content-Type': 'application/json',
@@ -1034,12 +1034,12 @@ module('JWT Authenticator', (hooks) => {
     });
   });
 
-  test('#refreshAccessToken invalidates session when the server responds with 401', (assert) => {
+  test('#refreshAccessToken invalidates session when the server responds with 401', async (assert) => {
     assert.expect(1);
 
     const refreshToken = createFakeRefreshToken();
 
-    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
       401,
       {
         'Content-Type': 'application/json',
@@ -1052,12 +1052,12 @@ module('JWT Authenticator', (hooks) => {
     });
   });
 
-  test('#refreshAccessToken invalidates session when the server responds with 403', (assert) => {
+  test('#refreshAccessToken invalidates session when the server responds with 403', async (assert) => {
     assert.expect(1);
 
     const refreshToken = createFakeRefreshToken();
 
-    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
       403,
       {
         'Content-Type': 'application/json',
@@ -1070,12 +1070,12 @@ module('JWT Authenticator', (hooks) => {
     });
   });
 
-  test('#refreshAccessToken does not invalidate session when the server responds with 500', (assert) => {
+  test('#refreshAccessToken does not invalidate session when the server responds with 500', async (assert) => {
     assert.expect(1);
 
     const refreshToken = createFakeRefreshToken();
 
-    startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
+    await startMockServer('POST', App.authenticator.serverTokenRefreshEndpoint, [
       500,
       {
         'Content-Type': 'application/json',

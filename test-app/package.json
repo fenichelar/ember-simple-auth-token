@@ -28,8 +28,9 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "@babel/core": "7",
     "@babel/eslint-parser": "^7.23.10",
-    "@babel/plugin-proposal-decorators": "^7.23.7",
+    "@babel/plugin-proposal-decorators": "^7.23.9",
     "@ember/optional-features": "^2.0.0",
     "@ember/string": "^3.1.1",
     "@ember/test-helpers": "^3.2.1",
@@ -37,6 +38,7 @@
     "@glimmer/component": "^1.1.2",
     "@glimmer/tracking": "^1.1.2",
     "@triptyk/ember-simple-auth-token": "6.0.0-beta.1",
+    "@typescript-eslint/parser": "^6.15.0",
     "body-parser": "^1.20.2",
     "broccoli-asset-rev": "^3.0.0",
     "broccoli-funnel": "^3.0.8",
@@ -74,14 +76,16 @@
     "jsonwebtoken": "^9.0.2",
     "loader.js": "^4.7.0",
     "morgan": "^1.9.0",
-    "msw": "^2.0.9",
+    "msw": "^2.1.6",
     "prettier": "^3.2.4",
     "qunit": "^2.20.0",
     "qunit-dom": "^3.0.0",
+    "rsvp": "^4.8.5",
     "sinon": "^17.0.1",
     "stylelint": "^16.2.1",
     "stylelint-config-standard": "^36.0.0",
     "stylelint-prettier": "^5.0.0",
+    "typescript": "^5.3.3",
     "webpack": "^5.90.1"
   },
   "fastbootDependencies": [
@@ -95,9 +99,6 @@
     "authentication",
     "authorization"
   ],
-  "peerDependencies": {
-    "ember-source": ">= 4.0.0"
-  },
   "engines": {
     "node": ">= 18"
   },
