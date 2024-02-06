@@ -8,6 +8,13 @@ This is Ember addon is an extension to the Ember Simple Auth library that provid
 
 **Because user's credentials and tokens are exchanged between the Ember.js app and the server, you must use HTTPS for this connection!**
 
+## Compatibility
+
+- Ember.js 4.8 or above
+- Ember CLI 4.8 or above
+- Node.js 18 or above
+- ember-simple-auth 6 or above
+
 ## Demo
 
 A demo is available [here][demo].
@@ -50,21 +57,19 @@ Router.map(function() {
 
 ```js
 // app/controllers/login.js
-import Controller from '@ember/controller';
-import { inject } from '@ember/service';
+export default class LoginController extends Controller {
+  @service session;
+  username = 'admin';
+  password = 'abc123';
 
-export default Controller.extend({
-  session: inject('session'),
+  @action
+  authenticate() {
+    const credentials = { username: this.username, password: this.password };
+    const authenticator = 'authenticator:jwt';
 
-  actions: {
-    authenticate: function() {
-      const credentials = this.getProperties('username', 'password');
-      const authenticator = 'authenticator:token'; // or 'authenticator:jwt'
-
-      this.session.authenticate(authenticator, credentials);
-    }
+    this.session.authenticate(authenticator, credentials);
   }
-});
+}
 ```
 
 #### JSON Web Token Authenticator
