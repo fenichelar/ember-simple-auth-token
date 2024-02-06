@@ -6,6 +6,9 @@ module.exports = function (environment) {
     environment,
     rootURL: '/',
     locationType: 'history',
+    fastboot: {
+      hostWhitelist: [/^localhost:\d+$/, /^127\.0\.0\.1:\d+$/],
+    },
     EmberENV: {
       EXTEND_PROTOTYPES: false,
       FEATURES: {
@@ -37,10 +40,12 @@ module.exports = function (environment) {
     // ENV.APP.LOG_TRANSITIONS_INTERNAL = true;
     // ENV.APP.LOG_VIEW_LOOKUPS = true;
 
+    ENV.API_URL = 'http://localhost:3000';
+
     ENV['ember-simple-auth-token'] = {
       refreshTokenPropertyName: 'token',
-      serverTokenEndpoint: '/api/token-auth/',
-      serverTokenRefreshEndpoint: '/api/token-refresh/',
+      serverTokenEndpoint: `${ENV.API_URL}/api/token-auth/`,
+      serverTokenRefreshEndpoint: `${ENV.API_URL}/api/token-refresh/`,
       refreshLeeway: 5,
     };
   }

@@ -50,10 +50,6 @@
     "rsvp": "4.8.5",
     "webpack": "^5.90.1"
   },
-  "fastbootDependencies": [
-    "buffer",
-    "node-fetch"
-  ],
   "keywords": [
     "ember-addon",
     "token",
