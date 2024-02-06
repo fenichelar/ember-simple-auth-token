@@ -59,6 +59,9 @@ jobs:
           version: 8
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
+      - name: Install playwright browsers
+        working-directory: test-app
+        run: pnpx playwright install --with-deps
       - name: Run Tests
         working-directory: test-app
         run: pnpm ember try:one ${{ matrix.try-scenario }}
