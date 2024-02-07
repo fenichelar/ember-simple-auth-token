@@ -25,11 +25,8 @@ Ember Simple Auth Token can be installed with [Ember CLI][ember-cli] by running:
 
 ```
 ember install ember-simple-auth-token
+ember install ember-simple-auth
 ```
-
-If using FastBoot, `ember-fetch` must be installed as a direct dependency and `node-fetch` must be added to your `fastbootDependencies`. If using FastBoot and the JWT authenticator, `node-fetch` and `buffer` must be added to you `fastbootDependencies`.
-
-`ember-simple-auth-token` will automatically install a compatible version of `ember-simple-auth`. If you want to manually install `ember-simple-auth`, you must ensure to install a version that is supported by `ember-simple-auth-token`.
 
 ## Setup
 
@@ -110,30 +107,31 @@ In order to send the token with all API requests made to the server, set the hea
 
 ```js
 // app/adapters/application.js
-import DS from 'ember-data';
-import { inject } from '@ember/service';
+import JSONAPIAdapter from '@ember-data/adapter/json-api';
+import { service } from '@ember/service';
 import { computed } from '@ember/object';
 
-export default DS.JSONAPIAdapter.extend({
-  session: inject('session'),
+export default class ApplicationAdapter extends JSONAPIAdapter {
+  @service declare session;
 
-  headers: computed('session.isAuthenticated', 'session.data.authenticated.token', function() {
+  get headers() {
+    const headers = {
+      Authorization: '',
+    };
     if (this.session.isAuthenticated) {
-      return {
-        Authorization: `Bearer ${this.session.data.authenticated.token}`,
-      };
-    } else {
-      return {};
+      headers['Authorization'] =
+        `Bearer ${this.session.data.authenticated.accessToken}`;
     }
-  }),
+    return headers;
+  }
 
-  handleResponse(status) {
+  handleResponse(status, headers, payload, requestData) {
     if (status === 401 && this.session.isAuthenticated) {
       this.session.invalidate();
     }
-    return this._super(...arguments);
+    return super.handleResponse(status, headers, payload, requestData);
   },
-});
+};
 ```
 
 ### Customization Options
