@@ -6,5 +6,5 @@ test('Renders page in fastboot mode', async ({ page }) => {
 
   // Expect a title "to contain" a substring.
   await expect(page).toHaveTitle(/Dummy/);
-  await expect(page.locator("h2")).toHaveText("Welcome to Ember");
+  await expect(page.locator('h2')).toHaveText('Welcome to Ember');
 });

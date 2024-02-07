@@ -35,6 +35,8 @@ module.exports = {
         './testem.js',
         './blueprints/*/index.js',
         './config/**/*.js',
+        'playwright.config.js',
+        'e2e/**/*.js',
         './tests/dummy/config/**/*.js',
       ],
       parserOptions: {

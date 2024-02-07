@@ -55,10 +55,14 @@ export default class TokenAuthenticator extends Base {
     @return {Promise} Promise that resolves when an auth token is successfully acquired from the server and rejects otherwise
   */
   async authenticate(credentials, headers) {
-    const response = await this.makeRequest(this.serverTokenEndpoint, credentials, {
-      ...this.headers,
-      ...headers,
-    });
+    const response = await this.makeRequest(
+      this.serverTokenEndpoint,
+      credentials,
+      {
+        ...this.headers,
+        ...headers,
+      },
+    );
     return response.json;
   }
 

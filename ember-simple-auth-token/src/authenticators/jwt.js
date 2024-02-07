@@ -2,7 +2,7 @@ import { get } from '@ember/object';
 import { getOwner } from '@ember/application';
 import { Promise, resolve } from 'rsvp';
 import { isEmpty } from '@ember/utils';
-import { cancel, later } from '@ember/runloop';
+import { runTask, cancelTask } from 'ember-lifeline';
 import TokenAuthenticator from './token';
 
 const decode = (str) => {
@@ -168,13 +168,11 @@ export default class JwtAuthenticator extends TokenAuthenticator {
 
       if (!isEmpty(refreshToken) && !isEmpty(expiresAt)) {
         if (wait > 0) {
-          cancel(this._refreshTokenTimeout);
+          cancelTask(this, this._refreshTokenTimeout);
           delete this._refreshTokenTimeout;
-          this._refreshTokenTimeout = later(
+          this._refreshTokenTimeout = runTask(
             this,
-            this.refreshAccessToken,
-            refreshToken,
-            0,
+            () => this.refreshAccessToken(refreshToken, 0),
             wait,
           );
         } else if (expiresAt > now) {
@@ -270,9 +268,9 @@ export default class JwtAuthenticator extends TokenAuthenticator {
     @return {Promise} Resolving promise
   */
   invalidate() {
-    cancel(this._refreshTokenTimeout);
+    cancelTask(this, this._refreshTokenTimeout);
     delete this._refreshTokenTimeout;
-    cancel(this._tokenExpirationTimeout);
+    cancelTask(this, this._tokenExpirationTimeout);
     delete this._tokenExpirationTimeout;
     return resolve();
   }
@@ -343,13 +341,11 @@ export default class JwtAuthenticator extends TokenAuthenticator {
         this.trigger('sessionDataInvalidated');
       });
     } else if (attempts++ < this.refreshAccessTokenRetryAttempts) {
-      cancel(this._refreshTokenTimeout);
+      cancelTask(this, this._refreshTokenTimeout);
       delete this._refreshTokenTimeout;
-      this._refreshTokenTimeout = later(
+      this._refreshTokenTimeout = runTask(
         this,
-        this.refreshAccessToken,
-        refreshToken,
-        attempts,
+        () => this.refreshAccessToken(refreshToken, attempts),
         this.refreshAccessTokenRetryTimeout,
       );
     } else if (this.tokenRefreshFailInvalidateSession) {
@@ -370,11 +366,11 @@ export default class JwtAuthenticator extends TokenAuthenticator {
     const wait = Math.max((expiresAt - now) * 1000, 0);
 
     if (!isEmpty(expiresAt)) {
-      cancel(this._tokenExpirationTimeout);
+      cancelTask(this, this._tokenExpirationTimeout);
       delete this._tokenExpirationTimeout;
-      this._tokenExpirationTimeout = later(
+      this._tokenExpirationTimeout = runTask(
         this,
-        this.handleAccessTokenExpiration,
+        () => this.handleAccessTokenExpiration(),
         wait,
       );
     }

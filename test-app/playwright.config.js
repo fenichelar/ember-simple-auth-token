@@ -36,7 +36,7 @@ module.exports = defineConfig({
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
-    }
+    },
 
     /* Test against mobile viewports. */
     // {
@@ -66,4 +66,3 @@ module.exports = defineConfig({
     reuseExistingServer: !process.env.CI,
   },
 });
-

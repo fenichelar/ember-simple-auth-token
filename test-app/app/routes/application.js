@@ -1,4 +1,3 @@
-import { action } from '@ember/object';
 import Route from '@ember/routing/route';
 import { inject } from '@ember/service';
 
