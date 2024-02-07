@@ -1,4 +1,4 @@
-# @triptyk/ember-simple-auth-token
+# ember-simple-auth-token
 
 [![github-actions-image]][github-actions]
 [![ember-observer-image]][ember-observer]

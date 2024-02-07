@@ -11,7 +11,7 @@ import Base from 'ember-simple-auth/authenticators/base';
 
   @class Token
   @namespace SimpleAuth.Authenticators
-  @module @triptyk/ember-simple-auth-token/authenticators/token
+  @module ember-simple-auth-token/authenticators/token
   @extends Base
 */
 export default class TokenAuthenticator extends Base {
