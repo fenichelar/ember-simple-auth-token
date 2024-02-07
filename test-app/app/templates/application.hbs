@@ -1,0 +1,30 @@
+<h2 id="title">Welcome to Ember</h2>
+
+<ul>
+  <li>
+    <LinkTo @route="index">
+      Protected Page
+    </LinkTo>
+  </li>
+  {{#if this.session.isAuthenticated}}
+    <li>
+      <button type="button" {{on "click" this.invalidateSession}}>Logout</button>
+    </li>
+  {{else}}
+    <li>
+      <LinkTo @route="login">
+        Login
+      </LinkTo>
+    </li>
+  {{/if}}
+</ul>
+
+{{outlet}}
+
+<hr>
+
+<p>Config:</p>
+<pre>{{this.config}}</pre>
+
+<p>Session Data:</p>
+<pre>{{this.sessionData}}</pre>

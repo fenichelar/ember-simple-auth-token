@@ -1,12 +1,19 @@
-# Ember Simple Auth Token
+# ember-simple-auth-token
 
 [![github-actions-image]][github-actions]
 [![ember-observer-image]][ember-observer]
 [![npm-image]][npm]
 
-This is Ember addon is an extension to the Ember Simple Auth library that provides a basic token authenticator, a JSON Web Tokens token authenticator with automatic refresh capability, and an authorizer mixin. You can find more about why JSON Web Tokens are so awesome in [this article][medium-jwt].
+This is Ember addon is an extension to the Ember Simple Auth library that provides a basic token authenticator, a JSON Web Tokens token authenticator with automatic refresh capability. You can find more about why JSON Web Tokens are so awesome in [this article][medium-jwt].
 
 **Because user's credentials and tokens are exchanged between the Ember.js app and the server, you must use HTTPS for this connection!**
+
+## Compatibility
+
+- Ember.js 4.8 or above
+- Ember CLI 4.8 or above
+- Node.js 18 or above
+- ember-simple-auth 6 or above
 
 ## Demo
 
@@ -18,11 +25,8 @@ Ember Simple Auth Token can be installed with [Ember CLI][ember-cli] by running:
 
 ```
 ember install ember-simple-auth-token
+ember install ember-simple-auth
 ```
-
-If using FastBoot, `ember-fetch` must be installed as a direct dependency and `node-fetch` must be added to your `fastbootDependencies`. If using FastBoot and the JWT authenticator, `node-fetch` and `buffer` must be added to you `fastbootDependencies`.
-
-`ember-simple-auth-token` will automatically install a compatible version of `ember-simple-auth`. If you want to manually install `ember-simple-auth`, you must ensure to install a version that is supported by `ember-simple-auth-token`.
 
 ## Setup
 
@@ -50,21 +54,19 @@ Router.map(function() {
 
 ```js
 // app/controllers/login.js
-import Controller from '@ember/controller';
-import { inject } from '@ember/service';
+export default class LoginController extends Controller {
+  @service session;
+  username = 'admin';
+  password = 'abc123';
 
-export default Controller.extend({
-  session: inject('session'),
+  @action
+  authenticate() {
+    const credentials = { username: this.username, password: this.password };
+    const authenticator = 'authenticator:jwt';
 
-  actions: {
-    authenticate: function() {
-      const credentials = this.getProperties('username', 'password');
-      const authenticator = 'authenticator:token'; // or 'authenticator:jwt'
-
-      this.session.authenticate(authenticator, credentials);
-    }
+    this.session.authenticate(authenticator, credentials);
   }
-});
+}
 ```
 
 #### JSON Web Token Authenticator
@@ -105,58 +107,31 @@ In order to send the token with all API requests made to the server, set the hea
 
 ```js
 // app/adapters/application.js
-import DS from 'ember-data';
-import { inject } from '@ember/service';
+import JSONAPIAdapter from '@ember-data/adapter/json-api';
+import { service } from '@ember/service';
 import { computed } from '@ember/object';
 
-export default DS.JSONAPIAdapter.extend({
-  session: inject('session'),
+export default class ApplicationAdapter extends JSONAPIAdapter {
+  @service declare session;
 
-  headers: computed('session.isAuthenticated', 'session.data.authenticated.token', function() {
+  get headers() {
+    const headers = {
+      Authorization: '',
+    };
     if (this.session.isAuthenticated) {
-      return {
-        Authorization: `Bearer ${this.session.data.authenticated.token}`,
-      };
-    } else {
-      return {};
+      headers['Authorization'] =
+        `Bearer ${this.session.data.authenticated.accessToken}`;
     }
-  }),
+    return headers;
+  }
 
-  handleResponse(status) {
+  handleResponse(status, headers, payload, requestData) {
     if (status === 401 && this.session.isAuthenticated) {
       this.session.invalidate();
     }
-    return this._super(...arguments);
+    return super.handleResponse(status, headers, payload, requestData);
   },
-});
-```
-
-### Mixins
-
-Although no longer recommended, the `token-adapter` mixin or `token-authorizer` mixin can be used in order to send the token with all API requests made to the server. When using `ember-simple-auth` >= 3.0.0, use the `token-adapter` mixin. When using `ember-simple-auth` < 3.0.0, use the `token-authorizer` mixin. The mixin will add the header to each API request:
-
-```
-Authorization: Bearer <token>
-```
-
-#### Adapter Mixin
-
-```js
-// app/adapters/application.js
-import DS from 'ember-data';
-import TokenAdapterMixin from 'ember-simple-auth-token/mixins/token-adapter';
-
-export default DS.JSONAPIAdapter.extend(TokenAdapterMixin);
-```
-
-#### Authorizer Mixin
-
-```js
-// app/adapters/application.js
-import DS from 'ember-data';
-import TokenAuthorizerMixin from 'ember-simple-auth-token/mixins/token-authorizer';
-
-export default DS.JSONAPIAdapter.extend(TokenAuthorizerMixin);
+};
 ```
 
 ### Customization Options
@@ -193,18 +168,6 @@ ENV['ember-simple-auth-token'] = {
 };
 ```
 
-#### Mixins
-
-In addition to `tokenPropertyName` from the authenticator:
-
-```js
-// config/environment.js
-ENV['ember-simple-auth-token'] = {
-  authorizationHeaderName: 'Authorization', // Header name added to each API request
-  authorizationPrefix: 'Bearer ', // Prefix added to each API request
-};
-```
-
 ## Testing Configuration
 
 For acceptance testing, token refresh must be disabled to allow the test to exit. Therefore, the following configuration should be set:
@@ -223,8 +186,8 @@ ENV['ember-simple-auth-token'] = {
 - `config.timeFactor` has been removed since version 2.1.0
 
 
-[github-actions-image]: https://github.com/fenichelar/ember-simple-auth-token/actions/workflows/test.yml/badge.svg
-[github-actions]: https://github.com/fenichelar/ember-simple-auth-token/actions/workflows/test.yml
+[github-actions-image]: https://github.com/fenichelar/@triptyk/ember-simple-auth-token/actions/workflows/test.yml/badge.svg
+[github-actions]: https://github.com/fenichelar/@triptyk/ember-simple-auth-token/actions/workflows/test.yml
 [ember-observer-image]: https://emberobserver.com/badges/ember-simple-auth-token.svg
 [ember-observer]: https://emberobserver.com/addons/ember-simple-auth-token
 [npm-image]: https://img.shields.io/npm/v/ember-simple-auth-token.svg
