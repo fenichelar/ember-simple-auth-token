@@ -1,5 +1,5 @@
 import { createServer, Response } from 'miragejs';
-import { sign } from 'jsonwebtoken';
+import { sign, verify } from 'jsonwebtoken';
 
 const secret = '0123456789';
 const issuer = 'Ember Simple Auth Token';
@@ -24,7 +24,6 @@ const options = {
   subject: '127.0.0.1',
   algorithm: algorithm,
 };
-
 
 export default function (config) {
   const finalConfig = {
@@ -73,12 +72,23 @@ function routes() {
     }
   });
 
-  this.post('/token-refresh', function() {
-    let token = sign(payload, secret, options);
-    return {
-      token: token,
-      refresh_token: token
-    };
+  this.post('/token-refresh', function(schema, request) {
+    return verify(JSON.parse(request.requestBody).refresh_token, secret, function(err, decoded) {
+      if (err) {
+        return new Response(401, {}, {errors: [{status: 401, message: 'Incorrect email or password'}]});
+      } else {
+        delete decoded.iat;
+        delete decoded.exp;
+        let token = sign(decoded, secret, options);
+        return {
+          token: token,
+          refresh_token: token
+        };
+      }
+    });
   });
 
+  this.post('/endpoint', function() {
+    return {response: 'true'}
+  });
 }

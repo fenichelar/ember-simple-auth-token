@@ -77,7 +77,7 @@ export default class Token extends Base {
   */
   makeRequest(url, data, headers) {
     let headerObject = null;
-    if (Object.keys(headers).length) {
+    if (headers && Object.keys(headers).length) {
       headerObject = {
         'Accept': 'application/json',
         'Content-Type': 'application/json',

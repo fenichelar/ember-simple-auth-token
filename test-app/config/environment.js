@@ -30,7 +30,7 @@ module.exports = function (environment) {
     routeAfterInvalidation: 'login',
   };
 
-  if (environment === 'development') {
+  if (environment === 'development') { // run the test-app with express api
     // ENV.APP.LOG_RESOLVER = true;
     // ENV.APP.LOG_ACTIVE_GENERATION = true;
     // ENV.APP.LOG_TRANSITIONS = true;
@@ -49,7 +49,7 @@ module.exports = function (environment) {
     ENV.api = 'http://localhost:3000';
   }
 
-  if (environment === 'mirage') {
+  if (environment === 'mirage') { // run the test-app with mirage api mock
     ENV['ember-simple-auth-token'] = {
       serverTokenEndpoint: 'http://localhost:8080/api/token-auth',
       serverTokenRefreshEndpoint: 'http://localhost:8080/api/token-refresh/',
@@ -62,24 +62,27 @@ module.exports = function (environment) {
     ENV.api = 'http://localhost:8080';
   }
 
-  if (environment === 'mirage-test') {
+  if (environment === 'mirage-test') { // for viewing tests in the browser; localhost:4201/tests;
     ENV['ember-simple-auth-token'] = {
       serverTokenEndpoint: 'http://localhost:8080/api/token-auth',
       serverTokenRefreshEndpoint: 'http://localhost:8080/api/token-refresh/',
-      refreshAccessTokens: false
+      refreshAccessTokens: false,
+      disableScheduleAccessTokenExpiration: true
     }
 
     ENV['ember-cli-mirage'] = {
-      enabled: true
+      enabled: false // mirage is started in the tests
     };
     ENV.api = 'http://localhost:8080';
+    ENV.APP.rootElement = '#ember-testing';
   }
 
   if (environment === 'test') {
     ENV['ember-simple-auth-token'] = {
-      serverTokenEndpoint: 'http://localhost:3000/api/token-auth',
-      serverTokenRefreshEndpoint: 'http://localhost:3000/api/token-refresh/',
-      refreshAccessTokens: false
+      serverTokenEndpoint: 'http://localhost:8080/api/token-auth',
+      serverTokenRefreshEndpoint: 'http://localhost:8080/api/token-refresh/',
+      refreshAccessTokens: false,
+      disableScheduleAccessTokenExpiration: true
     }
 
     ENV['ember-cli-mirage'] = {

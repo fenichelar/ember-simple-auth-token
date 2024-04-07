@@ -1,6 +1,6 @@
 /* global FastBoot */
 
-//import { get } from '@ember/object';
+import { get } from '@ember/object';
 import { getOwner } from '@ember/application';
 import { Promise, resolve } from 'rsvp';
 import { isEmpty } from '@ember/utils';
@@ -54,6 +54,7 @@ export default class JwtAuthenticator extends TokenAuthenticator {
     this.refreshAccessTokenRetryAttempts = config.refreshAccessTokenRetryAttempts || 0;
     this.refreshAccessTokenRetryTimeout = config.refreshAccessTokenRetryTimeout || 1000;
     this.tokenRefreshFailInvalidateSession = config.tokenRefreshFailInvalidateSession === true ? true : false;
+    this.disableScheduleAccessTokenExpiration = config.disableScheduleAccessTokenExpiration === true ? true : false;
   }
 
   /**
@@ -77,9 +78,9 @@ export default class JwtAuthenticator extends TokenAuthenticator {
 
     return new Promise((resolve, reject) => {
       const now = this.getCurrentTime();
-      const token = dataObject[this.tokenPropertyName];
-      const refreshToken = dataObject[this.refreshTokenPropertyName];
-      let expiresAt = dataObject[this.tokenExpireName];
+      const token = get(dataObject, this.tokenPropertyName);
+      const refreshToken = get(dataObject, this.refreshTokenPropertyName);
+      let expiresAt = get(dataObject, this.tokenExpireName);
 
       if (isEmpty(token)) {
         return reject(new Error('empty token'));
@@ -262,8 +263,7 @@ export default class JwtAuthenticator extends TokenAuthenticator {
     @param {Object} response Response body
   */
   handleAuthResponse(response) {
-    const token = response[this.tokenPropertyName];
-
+    const token = get(response, this.tokenPropertyName);
     if (isEmpty(token)) {
       throw new Error('Token is empty. Please check your backend response.');
     }
@@ -278,7 +278,7 @@ export default class JwtAuthenticator extends TokenAuthenticator {
     }
 
     if (this.refreshAccessTokens) {
-      const refreshToken = response[this.refreshTokenPropertyName];
+      const refreshToken = get(response, this.refreshTokenPropertyName);
 
       if (isEmpty(refreshToken)) {
         throw new Error('Refresh token is empty. Please check your backend response.');
@@ -321,6 +321,9 @@ export default class JwtAuthenticator extends TokenAuthenticator {
     @param {Integer} expiresAt Timestamp when the token expires
   */
   scheduleAccessTokenExpiration(expiresAt) {
+    if (this.disableScheduleAccessTokenExpiration) {
+      return false;
+    }
     const now = this.getCurrentTime();
     const wait = Math.max((expiresAt - now) * 1000, 0);
     if (!isEmpty(expiresAt)) {
@@ -339,5 +342,17 @@ export default class JwtAuthenticator extends TokenAuthenticator {
     return this.invalidate().then(() => {
       this.trigger('sessionDataInvalidated');
     });
+  }
+
+  /**
+    For testing purposes; qunit tests will not resolve if any timers are running
+
+    @method cancelAllTimers
+  */
+  cancelAllTimers() {
+    cancel(this._tokenExpirationTimeout);
+    cancel(this._refreshTokenTimeout);
+    delete this._tokenExpirationTimeout;
+    delete this._refreshTokenTimeout;
   }
 }
