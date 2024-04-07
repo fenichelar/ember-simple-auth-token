@@ -1,0 +1,6 @@
+<ul>
+  <li><LinkTo @route="authenticated.index">Home Page</LinkTo></li>
+  <li><LinkTo @route="authenticated.secure">Secure Page</LinkTo></li>
+  <li><button type="button" {{on "click" this.logout}}>Logout</button></li>
+</ul>
+<span>Access token {{if this.willTokenRefresh "refresh" "expires"}} in: {{this.displayMinutes}}:{{this.displaySeconds}}</span>

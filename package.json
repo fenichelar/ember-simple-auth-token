@@ -1,85 +1,30 @@
 {
-  "name": "ember-simple-auth-token",
-  "version": "5.3.2",
-  "description": "An authenticator and authorizer for Ember Simple Auth that is compatible with token-based authentication like JWT in Ember CLI applications.",
-  "directories": {
-    "doc": "doc",
-    "test": "tests"
-  },
-  "scripts": {
-    "build": "ember build",
-    "lint:js": "eslint ./*.js addon addon-test-support app blueprints config lib server test-support tests",
-    "start": "ember serve",
-    "test": "ember test",
-    "test:one": "ember try:one",
-    "test:all": "ember try:each",
-    "deploy": "ember build -prod && ember github-pages:commit --message \"Deploy gh-pages from commit $(git rev-parse HEAD)\" && git push origin gh-pages:gh-pages"
-  },
+  "private": true,
   "repository": "https://github.com/fenichelar/ember-simple-auth-token",
-  "author": {
-    "name": "Alec Fenichel"
-  },
   "license": "MIT",
-  "dependencies": {
-    "ember-cli-babel": "^6.6.0 || ^7.0.0",
-    "ember-fetch": "^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0",
-    "ember-simple-auth": "^1.6.0 || ^2.0.0 || ^3.0.0 || ^4.0.0 || ^5.0.0"
+  "author": "",
+  "scripts": {
+    "build": "npm run build --workspace ember-simple-auth-token",
+    "lint": "npm run lint --workspaces --if-present",
+    "lint:fix": "npm run lint:fix --workspaces --if-present",
+    "prepare": "npm run build",
+    "start": "concurrently 'npm:start:*' --restart-after 5000 --prefix-colors cyan,white,yellow",
+    "mirage": "concurrently 'npm:mirage:*' --restart-after 5000 --prefix-colors cyan,white,yellow",
+    "mirage-test": "concurrently 'npm:mirage-test:*' --restart-after 5000 --prefix-colors cyan,white,yellow",
+    "start:addon": "npm start --workspace ember-simple-auth-token -- --no-watch.clearScreen",
+    "start:test-app": "npm start --workspace test-app -- --environment development",
+    "mirage:addon": "npm start --workspace ember-simple-auth-token -- --no-watch.clearScreen",
+    "mirage:test-app": "npm start --workspace test-app -- --environment mirage",
+    "mirage-test:addon": "npm start --workspace ember-simple-auth-token -- --no-watch.clearScreen",
+    "mirage-test:test-app": "npm start --workspace test-app -- --environment mirage-test",
+    "test": "npm run test --workspaces --if-present",
+    "test:ember": "npm run test:ember --workspaces --if-present"
   },
   "devDependencies": {
-    "body-parser": "^1.20.2",
-    "broccoli-asset-rev": "^2.4.5",
-    "broccoli-funnel": "^2.0.1",
-    "ember-ajax": "^3.0.0",
-    "ember-cli": "~3.28.6",
-    "ember-cli-app-version": "^3.2.0",
-    "ember-cli-dependency-checker": "^2.0.0",
-    "ember-cli-eslint": "^4.2.3",
-    "ember-cli-github-pages": "^0.2.0",
-    "ember-cli-htmlbars": "^2.0.1",
-    "ember-cli-htmlbars-inline-precompile": "^1.0.0",
-    "ember-cli-inject-live-reload": "^1.4.1",
-    "ember-cli-qunit": "^4.1.1",
-    "ember-cli-shims": "^1.2.0",
-    "ember-cli-sri": "^2.1.0",
-    "ember-cli-uglify": "^2.0.0",
-    "ember-data": "~3.1.0",
-    "ember-disable-prototype-extensions": "^1.1.2",
-    "ember-export-application-global": "^2.0.0",
-    "ember-load-initializers": "^1.0.0",
-    "ember-maybe-import-regenerator": "^0.1.6",
-    "ember-resolver": "^4.0.0",
-    "ember-sinon-qunit": "^6.0.0",
-    "ember-source": "^3.1.0",
-    "ember-source-channel-url": "^1.0.1",
-    "ember-try": "^1.4.0",
-    "eslint-plugin-ember": "^5.2.0",
-    "eslint-plugin-node": "^6.0.1",
-    "express": "^4.18.2",
-    "glob": "^7.1.2",
-    "jsonwebtoken": "^8.2.1",
-    "loader.js": "^4.2.3",
-    "morgan": "^1.9.0"
+    "concurrently": "^8.2.0"
   },
-  "fastbootDependencies": [
-    "buffer",
-    "node-fetch"
-  ],
-  "keywords": [
-    "ember-addon",
-    "token",
-    "jwt",
-    "auth",
-    "authentication",
-    "authorization"
-  ],
-  "engines": {
-    "node": ">=10.*"
-  },
-  "ember-addon": {
-    "configPath": "tests/dummy/config",
-    "demoURL": "https://fenichelar.github.io/ember-simple-auth-token/",
-    "versionCompatibility": {
-      "ember": ">=2.16.0 <=3.28.0"
-    }
-  }
+  "workspaces": [
+    "ember-simple-auth-token",
+    "test-app"
+  ]
 }

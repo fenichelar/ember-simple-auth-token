@@ -4,7 +4,7 @@
 [![ember-observer-image]][ember-observer]
 [![npm-image]][npm]
 
-This is Ember addon is an extension to the Ember Simple Auth library that provides a basic token authenticator, a JSON Web Tokens token authenticator with automatic refresh capability, and an authorizer mixin. You can find more about why JSON Web Tokens are so awesome in [this article][medium-jwt].
+This is Ember addon is an extension to the Ember Simple Auth library that provides a basic token authenticator and a JSON Web Tokens token authenticator with automatic refresh capability. You can find more about why JSON Web Tokens are so awesome in [this article][medium-jwt].
 
 **Because user's credentials and tokens are exchanged between the Ember.js app and the server, you must use HTTPS for this connection!**
 
@@ -13,6 +13,8 @@ This is Ember addon is an extension to the Ember Simple Auth library that provid
 A demo is available [here][demo].
 
 ## Installation
+
+`ember-simple-auth-token` v6 is compatible with node >= 18, `ember-simple-auth` v6 and Ember 5 with Embroider, `ember-auto-import` >= 2 and `webpack` >= 5.
 
 Ember Simple Auth Token can be installed with [Ember CLI][ember-cli] by running:
 
@@ -25,6 +27,24 @@ If using FastBoot, `ember-fetch` must be installed as a direct dependency and `n
 `ember-simple-auth-token` will automatically install a compatible version of `ember-simple-auth`. If you want to manually install `ember-simple-auth`, you must ensure to install a version that is supported by `ember-simple-auth-token`.
 
 ## Setup
+
+### Calling session.setup() on ember-simple-auth session service
+
+`ember-simple-auth` v6 no longer uses an initializer to wire up the session service. Your applicaton must implement an application router to call .setup() on the `ember-simple-auth` session service:
+
+```js
+// app/routes/application.js
+import Route from '@ember/routing/route';
+import { inject } from '@ember/service';
+
+export default class ApplicationRoute extends Route {
+  @inject session;
+
+  async beforeModel() {
+    await this.session.setup();
+  }
+}
+```
 
 ### Authenticator
 
@@ -39,7 +59,7 @@ Router.map(function() {
 
 ```html
 {{! app/templates/login.hbs }}
-<form {{action 'authenticate' on='submit'}}>
+<form {{on "submit" this.authenticate}}>
   <label for="username">Login</label>
   {{input id='username' placeholder='Enter Login' value=username}}
   <label for="password">Password</label>
@@ -51,20 +71,38 @@ Router.map(function() {
 ```js
 // app/controllers/login.js
 import Controller from '@ember/controller';
-import { inject } from '@ember/service';
+import { service } from '@ember/service';
+import { action } from '@ember/object';
 
-export default Controller.extend({
-  session: inject('session'),
+export default class LoginController extends Controller {
+  @service session;
+  @service router;
+  username = 'admin';
+  password = 'abc123';
 
-  actions: {
-    authenticate: function() {
-      const credentials = this.getProperties('username', 'password');
-      const authenticator = 'authenticator:token'; // or 'authenticator:jwt'
-
-      this.session.authenticate(authenticator, credentials);
-    }
+  @action
+  async authenticate(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const authenticator = 'authenticator:jwt'; // or 'authenticator:token'
+    this.session.authenticate(authenticator, {username: this.username, password: this.password}).then(() => {
+      this.router.transitionTo('authenticated.index');
+    }).catch((err) => {
+      let errorMessage = '';
+      if (err.text) {
+        try {
+          errorMessage = JSON.parse(err.text).errors[0].message;
+        } catch(er) {
+          alert('An unexpected error occured. ' + er.toString());
+        }
+      } else {
+        errorMessage = err;
+      }
+      alert(errorMessage);
+    });
   }
-});
+}
+
 ```
 
 #### JSON Web Token Authenticator
@@ -75,7 +113,7 @@ The JSON Web Token authenticator will decode the token and look for the expirati
 // config/environment.js
 ENV['ember-simple-auth-token'] = {
   refreshAccessTokens: true,
-  refreshLeeway: 300 // refresh 5 minutes (300 seconds) before expiration
+  refreshLeeway: 300 // refresh 5 minutes (300 seconds) before expiration; if undefined, will default to .05 (3 seconds)
 };
 ```
 
@@ -105,14 +143,15 @@ In order to send the token with all API requests made to the server, set the hea
 
 ```js
 // app/adapters/application.js
-import DS from 'ember-data';
-import { inject } from '@ember/service';
-import { computed } from '@ember/object';
+import JSONAPIAdapter from '@ember-data/adapter/json-api';
+import { service } from '@ember/service';
 
-export default DS.JSONAPIAdapter.extend({
-  session: inject('session'),
+export default class ApplicationAdapter extends JSONAPIAdapter {
+  namespace = 'api';
 
-  headers: computed('session.isAuthenticated', 'session.data.authenticated.token', function() {
+  @service session;
+
+  get headers() {
     if (this.session.isAuthenticated) {
       return {
         Authorization: `Bearer ${this.session.data.authenticated.token}`,
@@ -120,44 +159,19 @@ export default DS.JSONAPIAdapter.extend({
     } else {
       return {};
     }
-  }),
+  }
 
   handleResponse(status) {
     if (status === 401 && this.session.isAuthenticated) {
       this.session.invalidate();
     }
-    return this._super(...arguments);
-  },
-});
+  }
+}
 ```
 
 ### Mixins
 
-Although no longer recommended, the `token-adapter` mixin or `token-authorizer` mixin can be used in order to send the token with all API requests made to the server. When using `ember-simple-auth` >= 3.0.0, use the `token-adapter` mixin. When using `ember-simple-auth` < 3.0.0, use the `token-authorizer` mixin. The mixin will add the header to each API request:
-
-```
-Authorization: Bearer <token>
-```
-
-#### Adapter Mixin
-
-```js
-// app/adapters/application.js
-import DS from 'ember-data';
-import TokenAdapterMixin from 'ember-simple-auth-token/mixins/token-adapter';
-
-export default DS.JSONAPIAdapter.extend(TokenAdapterMixin);
-```
-
-#### Authorizer Mixin
-
-```js
-// app/adapters/application.js
-import DS from 'ember-data';
-import TokenAuthorizerMixin from 'ember-simple-auth-token/mixins/token-authorizer';
-
-export default DS.JSONAPIAdapter.extend(TokenAuthorizerMixin);
-```
+Mixin support has been removed from `ember-simple-auth` v6. Mixins are therefore no longer supported in `ember-simple-auth-token`. If you need mixin support, please use the pre Ember 5, non Embroider version of `ember-simple-auth-token`.
 
 ### Customization Options
 
@@ -193,17 +207,29 @@ ENV['ember-simple-auth-token'] = {
 };
 ```
 
-#### Mixins
+## mirage
 
-In addition to `tokenPropertyName` from the authenticator:
+The test-app now uses mirage.js via [ember-cli-mirage](https://github.com/miragejs/ember-cli-mirage) to simulate a server response to the `/token-auth` and `/token-refresh` api endpoints. Run the test-app with mirage support (`ember s --environment=mirage`) from within the cloned repo:
 
-```js
-// config/environment.js
-ENV['ember-simple-auth-token'] = {
-  authorizationHeaderName: 'Authorization', // Header name added to each API request
-  authorizationPrefix: 'Bearer ', // Prefix added to each API request
-};
+```node
+cd ember-simple-auth-token
+npm run mirage
 ```
+
+Launching the test-app with `npm run mirage` will prevent the express server from running. The mirage mock server runs in test mode (`ember s --environment=test`) simply because the api responses are logged in the browser console and can more easily be inspected.
+
+## express server
+
+The test-app also ships with an optional express server which is run with `ember s --environment=development` from within the cloned repo:
+
+```node
+cd ember-simple-auth-token
+npm start
+```
+
+Launching the test-app with `npm start` will prevent the mirage api mock from running.
+
+Both mirage and express have a `/api/helloworld` GET endpoint to verify the backend service is running. A call to this endpoint is commented out in `/routes/application.js`.
 
 ## Testing Configuration
 
@@ -217,7 +243,34 @@ ENV['ember-simple-auth-token'] = {
 };
 ```
 
+## Running tests in a cloned repo
+
+ember-cli / qunit tests can be run via the command line:
+
+```node
+cd test-app
+npm run test
+```
+
+Tests can also be run in the browser, which will refresh and rerun all tests after any change to a unit test:
+
+```node
+// from /ember-simple-auth-token
+npm run mirage
+// visit http://localhost:4201/tests
+```
+
 ## Upgrade Notes
+
+Version 6:
+
+- mixins are no longer supported by the 6.0 version of `ember-simple-auth-token`
+
+- `ember-simple-auth` v6 requires calling `session.setup()` in your app's `routes/application.js`
+
+- if `refreshLeeway` is not set in your app's `config/environment.js`, it will default to 0.05 (3 seconds). This will help prevent a race condition where `handleAccessTokenExpiration()` could be called before `refreshAccessToken()` completes, logging the user out. You can set `refreshLeeway: 0` in your `config/environment.js`, but this may cause the user to be logged out even if `refreshAccessTokens = true`.
+
+Previous versions:
 
 - `getResponseData`, `getAuthenticateData`, `config.identificationField`, and `config.passwordField` have been removed since version 4.0.0
 - `config.timeFactor` has been removed since version 2.1.0
