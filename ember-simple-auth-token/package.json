@@ -25,8 +25,6 @@
     "build": "rollup --config",
     "lint": "concurrently 'npm:lint:*(!fix)' --names 'lint:'",
     "lint:fix": "concurrently 'npm:lint:*:fix' --names 'fix:'",
-    "lint:hbs": "ember-template-lint . --no-error-on-unmatched-pattern",
-    "lint:hbs:fix": "ember-template-lint . --fix --no-error-on-unmatched-pattern",
     "lint:js": "eslint . --cache",
     "lint:js:fix": "eslint . --fix",
     "prepack": "rollup --config",
@@ -45,7 +43,6 @@
     "@rollup/plugin-babel": "^6.0.4",
     "babel-plugin-ember-template-compilation": "^2.2.1",
     "concurrently": "^8.2.2",
-    "ember-template-lint": "^5.13.0",
     "eslint": "^8.56.0",
     "eslint-plugin-ember": "^11.12.0",
     "eslint-plugin-import": "^2.29.1",
@@ -53,10 +50,6 @@
     "rollup": "^4.9.1",
     "rollup-plugin-copy": "^3.5.0"
   },
-  "fastbootDependencies": [
-    "buffer",
-    "node-fetch"
-  ],
   "peerDependencies": {
     "ember-simple-auth": ">= 6.0.0"
   },

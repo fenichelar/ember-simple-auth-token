@@ -2,11 +2,8 @@ import { createServer, Response } from 'miragejs';
 import { sign, verify } from 'jsonwebtoken';
 
 const secret = '0123456789';
-const issuer = 'Ember Simple Auth Token';
-const audience = 'Developers';
 const algorithm = 'HS512';
 const expiration = '5m';
-const notBefore = 0;
 
 const payload = {
   userAccount: {
@@ -18,11 +15,7 @@ const payload = {
 
 const options = {
   expiresIn: expiration,
-  notBefore: notBefore,
-  issuer: issuer,
-  audience: audience,
-  subject: '127.0.0.1',
-  algorithm: algorithm,
+  algorithm: algorithm
 };
 
 export default function (config) {

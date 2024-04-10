@@ -4,25 +4,34 @@
 [![ember-observer-image]][ember-observer]
 [![npm-image]][npm]
 
-This is Ember addon is an extension to the Ember Simple Auth library that provides a basic token authenticator and a JSON Web Tokens token authenticator with automatic refresh capability. You can find more about why JSON Web Tokens are so awesome in [this article][medium-jwt].
+This Ember addon is an extension of the Ember Simple Auth library which provides a basic token authenticator and a JSON Web Tokens (jwt) token authenticator with automatic refresh capability. You can find more about why JSON Web Tokens are so awesome in [this blog](https://medium.com/@extio/understanding-json-web-tokens-jwt-a-secure-approach-to-web-authentication-f551e8d66deb) and [here as well](https://medium.com/swlh/all-you-need-to-know-about-json-web-token-jwt-8a5d6131157f).
 
-**Because user's credentials and tokens are exchanged between the Ember.js app and the server, you must use HTTPS for this connection!**
+**Because users' credentials and tokens are exchanged between the Ember.js app and the server, you must use HTTPS for this connection!**
 
 ## Demo
 
-A demo is available [here][demo].
+A demo is available [here][demo]. The test-app has an example of implementing jwt with auto-refresh. It can be run by cloning the repo, then:
+
+```node
+cd ember-simple-auth-token
+npm i
+npm start // express server
+// or
+npm run mirage // mirage api mock
+// navigate to http://localhost:4201
+```
+
+## Compatibility
+
+`ember-simple-auth-token` v6 is compatible with node >= 18, `ember-simple-auth` 6 and Ember 5 with Embroider (Ember build pipeline), `ember-auto-import` >= 2 (dependency manager) and `webpack` >= 5 (module bundler). npm is the supported package manager.
 
 ## Installation
-
-`ember-simple-auth-token` v6 is compatible with node >= 18, `ember-simple-auth` v6 and Ember 5 with Embroider, `ember-auto-import` >= 2 and `webpack` >= 5.
 
 Ember Simple Auth Token can be installed with [Ember CLI][ember-cli] by running:
 
 ```
 ember install ember-simple-auth-token
 ```
-
-If using FastBoot, `ember-fetch` must be installed as a direct dependency and `node-fetch` must be added to your `fastbootDependencies`. If using FastBoot and the JWT authenticator, `node-fetch` and `buffer` must be added to you `fastbootDependencies`.
 
 `ember-simple-auth-token` will automatically install a compatible version of `ember-simple-auth`. If you want to manually install `ember-simple-auth`, you must ensure to install a version that is supported by `ember-simple-auth-token`.
 
@@ -44,6 +53,81 @@ export default class ApplicationRoute extends Route {
     await this.session.setup();
   }
 }
+```
+
+### Routing
+
+It is [recommended by](https://github.com/mainmatter/ember-simple-auth) `ember-simple-auth` to use an authenticated route in your application, placing all secure routes under it, and employing `session.requireAuthentication()` in `beforeModel`.
+
+```javascript
+// app/router.js
+import EmberRouter from '@ember/routing/router';
+import config from 'test-app/config/environment';
+
+export default class Router extends EmberRouter {
+  location = config.locationType;
+  rootURL = config.rootURL;
+}
+
+Router.map(function () {
+  this.route('login');
+  this.route('authenticated', { path: '' }, function() {
+    // all routes that require the session to be authenticated
+    this.route('index', { path: '' });
+    this.route('secure');
+  });
+});
+
+// app/routes/authenticated.js
+import Route from '@ember/routing/route';
+import { inject as service } from '@ember/service';
+
+export default class AuthenticatedRoute extends Route {
+  @service session;
+
+  beforeModel(transition) {
+    this.session.requireAuthentication(transition, 'login');
+  }
+}
+```
+
+Leaving `path: ''` in your router for the authenticated root will keep all secure roots at the top-level, without an extra added path segment. You can also use a path, such as `path: 'application'`, etc. to separate the secured routes from non-secured routes in your URL structure. EG: `myapp/application/secure` and `myapp/login`.
+
+All authenticated routes can then inherit the authenticated route:
+
+```javascript
+// app/routes/authenticated/secure.js
+import Route from '../authenticated';
+
+export default class SecureRoute extends Route {}
+```
+
+Your project's folder structure would look like this:
+
+```
+project
+│
+└───app
+    │   router.js
+    │
+    └───routes
+        │   application.js
+        │   authenticated.js
+        │   login.js
+        │
+        └───authenticated
+                secure.js
+                index.js
+```
+
+Make sure `ember-simple-auth` is configured to utilize this route structure in your environment file:
+
+```javascript
+// config/environment.js
+ENV['ember-simple-auth'] = {
+  routeAfterAuthentication: 'authenticated.index',
+  routeAfterInvalidation: 'login',
+};
 ```
 
 ### Authenticator
@@ -85,9 +169,7 @@ export default class LoginController extends Controller {
     e.preventDefault();
     e.stopPropagation();
     const authenticator = 'authenticator:jwt'; // or 'authenticator:token'
-    this.session.authenticate(authenticator, {username: this.username, password: this.password}).then(() => {
-      this.router.transitionTo('authenticated.index');
-    }).catch((err) => {
+    this.session.authenticate(authenticator, {username: this.username, password: this.password}).catch((err) => {
       if (err.status === 401) {
         alert('Incorrect username or password');
         return;
@@ -235,11 +317,11 @@ cd ember-simple-auth-token
 npm run mirage
 ```
 
-Launching the test-app with `npm run mirage` will prevent the express server from running. The mirage mock server runs in test mode (`ember s --environment=test`) simply because the api responses are logged in the browser console and can more easily be inspected.
+Launching the test-app with `npm run mirage` will prevent the express server from running. The mirage mock server runs in test mode (`ember s --environment=test`) simply because the api responses are logged in the browser console and can more easily be inspected. If using FastBoot in the cloned repo, the mirage api mock will not run. You must instead use the express server via `npm start`.
 
 ## express server
 
-The test-app also ships with an optional express server which is run with `ember s --environment=development` from within the cloned repo:
+The test-app also ships with an express server which is run with `ember s --environment=development` from within the cloned repo:
 
 ```node
 cd ember-simple-auth-token
@@ -248,7 +330,7 @@ npm start
 
 Launching the test-app with `npm start` will prevent the mirage api mock from running.
 
-Both mirage and express have a `/api/helloworld` GET endpoint to verify the backend service is running. A call to this endpoint is commented out in `/routes/application.js`.
+Both mirage and express have a `/api/helloworld` GET endpoint to verify the backend service is running. A call to this endpoint is commented out in `test-app/app/routes/application.js`.
 
 ## Testing Configuration
 
@@ -262,19 +344,48 @@ ENV['ember-simple-auth-token'] = {
 };
 ```
 
+If your tests are still timing out due to a setTimeout(), you can manually end the timers used in `ember-simple-auth-token` at the end of each of your tests:
+
+```javascript
+import { module, test } from 'qunit';
+import { setupTest } from 'test-app/tests/helpers';
+import { getSettledState } from '@ember/test-helpers';
+
+module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
+  setupTest(hooks);
+
+  hooks.beforeEach(function() {
+    this.owner.application.jwt = this.owner.lookup('authenticator:jwt');
+  });
+
+  const clearState = (jwt) => {
+    let state = getSettledState();
+    if (state.hasPendingTimers || state.hasRunLoop) {
+      jwt.cancelAllTimers();
+    }
+  };
+
+  test('your test message`', function(assert) {
+    assert.expect(1);
+    // ... tests
+    clearState(this.owner.application.jwt);
+  });
+});
+```
+
 ## Running tests in a cloned repo
 
-ember-cli / qunit tests can be run via the command line:
+ember-cli / qunit tests can be run via the command line from within the cloned repo:
 
 ```node
-cd test-app
+cd ember-simple-auth-token
 npm run test
 ```
 
 Tests can also be run in the browser, which will refresh and rerun all tests after any change to a unit test:
 
 ```node
-// from /ember-simple-auth-token
+cd ember-simple-auth-token
 npm run mirage
 // visit http://localhost:4201/tests
 ```
@@ -309,5 +420,4 @@ Previous versions:
 [ruby-jwt]: https://github.com/jwt/ruby-jwt
 [node-jsonwebtoken]: https://github.com/auth0/node-jsonwebtoken
 [jwt]: https://jwt.io
-[medium-jwt]: https://medium.com/@leo/why-json-web-tokens-are-truly-awesome-23fb80b7fc20
 [blog-refresh-token]: https://auth0.com/blog/refresh-tokens-what-are-they-and-when-to-use-them

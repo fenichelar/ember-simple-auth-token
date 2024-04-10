@@ -53,7 +53,6 @@
     "ember-data": "~5.3.3",
     "ember-load-initializers": "^2.1.2",
     "ember-modifier": "^4.1.0",
-    "ember-page-title": "^8.2.2",
     "ember-qunit": "^8.0.2",
     "ember-resolver": "^11.0.1",
     "ember-simple-auth": "~6.0.0",
