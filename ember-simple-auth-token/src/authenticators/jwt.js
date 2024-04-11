@@ -1,7 +1,6 @@
 /* global FastBoot */
 
 import { get } from '@ember/object';
-import { getOwner } from '@ember/application';
 import { Promise, resolve } from 'rsvp';
 import { isEmpty } from '@ember/utils';
 import { cancel, later } from '@ember/runloop';
@@ -40,7 +39,10 @@ export default class JwtAuthenticator extends TokenAuthenticator {
   */
   constructor() {
     super(...arguments);
-    const owner = getOwner(this);
+    const ownerProperty = Reflect.ownKeys(this).find((prop) => {
+      return String(prop) === 'Symbol(OWNER)';
+    });
+    const owner = this[ownerProperty];
     const environment = owner ? owner.resolveRegistration('config:environment') || {} : {};
     const config = environment['ember-simple-auth-token'] || {};
     this.tokenDataPropertyName = config.tokenDataPropertyName || 'tokenData';
@@ -49,7 +51,7 @@ export default class JwtAuthenticator extends TokenAuthenticator {
     this.serverTokenRefreshEndpoint = config.serverTokenRefreshEndpoint || '/api/token-refresh/';
     this.refreshTokenPropertyName = config.refreshTokenPropertyName || 'refresh_token';
     this.tokenExpireName = config.tokenExpireName || 'exp';
-    this.refreshLeeway = typeof config.refreshLeeway === 'undefined' ? 0.05 : config.refreshLeeway;
+    this.refreshLeeway = config.refreshLeeway || 0;
     this.tokenRefreshInvalidateSessionResponseCodes = config.tokenRefreshInvalidateSessionResponseCodes || [401, 403];
     this.refreshAccessTokenRetryAttempts = config.refreshAccessTokenRetryAttempts || 0;
     this.refreshAccessTokenRetryTimeout = config.refreshAccessTokenRetryTimeout || 1000;
@@ -73,7 +75,7 @@ export default class JwtAuthenticator extends TokenAuthenticator {
   */
   restore(data) {
     const dataObject = {
-      ...data,
+      ...data
     };
 
     return new Promise((resolve, reject) => {
@@ -94,7 +96,7 @@ export default class JwtAuthenticator extends TokenAuthenticator {
         }
       }
       if (expiresAt > now) {
-        const wait = (expiresAt - now - (this.refreshLeeway * 60)) * 1000;
+        const wait = ((expiresAt - now - this.refreshLeeway) * 1000);
 
         if (this.tokenExpirationInvalidateSession) {
           this.scheduleAccessTokenExpiration(expiresAt);
@@ -151,8 +153,7 @@ export default class JwtAuthenticator extends TokenAuthenticator {
   scheduleAccessTokenRefresh(expiresAt, refreshToken) {
     if (this.refreshAccessTokens) {
       const now = this.getCurrentTime();
-      //const wait = ((expiresAt - now) * 1000) - this.refreshLeeway;
-      const wait = (expiresAt - now - (this.refreshLeeway * 60)) * 1000;
+      const wait = (expiresAt - now - this.refreshLeeway) * 1000
       if (!isEmpty(refreshToken) && !isEmpty(expiresAt)) {
         if (wait > 0) {
           cancel(this._refreshTokenTimeout);

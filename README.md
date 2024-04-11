@@ -214,11 +214,11 @@ The JSON Web Token authenticator will decode the token and look for the expirati
 // config/environment.js
 ENV['ember-simple-auth-token'] = {
   refreshAccessTokens: true,
-  refreshLeeway: 300 // refresh 5 minutes (300 seconds) before expiration; if undefined, will default to .05 (3 seconds)
+  refreshLeeway: 300 // refresh 5 minutes (300 seconds) before expiration
 };
 ```
 
-The `refreshLeeway` can be specified to send the requests before the token expires to account for clock skew. Some libraries like [PyJWT][pyjwt], [ruby-jwt][ruby-jwt], and [node-jsonwebtoken][node-jsonwebtoken] also support specifying a clock tolerance when verifying the token.
+The `refreshLeeway` can be specified to send the requests before the token expires to account for clock skew. Some libraries like [PyJWT][pyjwt], [ruby-jwt][ruby-jwt], and [node-jsonwebtoken][node-jsonwebtoken] also support specifying a clock tolerance when verifying the token. Leaving `refreshLeeway` undefined (or zero) could result in the addon's `invalidate()` function firing at the same time or immediately before the `refreshAccessToken()` api request. In this case, the user would be invalidated and logged out regardless of setting `refreshAccessTokens: true`. Setting a value for `refreshLeeway` (in seconds or decimals of a second) longer than your expected api response time should prevent this situation.
 
 Sample JSON Web Token:
 

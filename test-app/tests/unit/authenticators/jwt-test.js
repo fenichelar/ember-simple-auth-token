@@ -299,7 +299,7 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
       refresh_token: refreshToken
     };
 
-    this.owner.application.jwt.restore(data).catch(() => {
+    this.owner.application.jwt.restore(data).then((response) => {
       assert.equal(this.owner.application.jwt.refreshAccessToken.callCount, 1);
       clearState(this.owner.application.jwt);
     });

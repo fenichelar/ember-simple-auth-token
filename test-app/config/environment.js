@@ -67,6 +67,7 @@ module.exports = function (environment) {
       serverTokenEndpoint: 'http://localhost:8080/api/token-auth',
       serverTokenRefreshEndpoint: 'http://localhost:8080/api/token-refresh/',
       refreshAccessTokens: false,
+      refreshLeeway: 3,
       disableScheduleAccessTokenExpiration: true
     }
 
@@ -82,6 +83,7 @@ module.exports = function (environment) {
       serverTokenEndpoint: 'http://localhost:8080/api/token-auth',
       serverTokenRefreshEndpoint: 'http://localhost:8080/api/token-refresh/',
       refreshAccessTokens: false,
+      refreshLeeway: 3,
       disableScheduleAccessTokenExpiration: true
     }
 

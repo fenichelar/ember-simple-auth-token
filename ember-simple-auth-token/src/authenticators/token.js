@@ -1,4 +1,3 @@
-import { getOwner } from '@ember/application';
 import { Promise, reject, resolve } from 'rsvp';
 import { isEmpty } from '@ember/utils';
 import Base from 'ember-simple-auth/authenticators/base';
@@ -19,7 +18,10 @@ export default class Token extends Base {
   */
   constructor() {
     super(...arguments);
-    const owner = getOwner(this);
+    const ownerProperty = Reflect.ownKeys(this).find((prop) => {
+      return String(prop) === 'Symbol(OWNER)';
+    });
+    const owner = this[ownerProperty];
     const environment = owner ? owner.resolveRegistration('config:environment') || {} : {};
     const config = environment['ember-simple-auth-token'] || {};
     this.serverTokenEndpoint = config.serverTokenEndpoint || '/api/token-auth/';

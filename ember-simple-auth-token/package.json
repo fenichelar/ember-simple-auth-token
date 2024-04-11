@@ -51,7 +51,8 @@
     "rollup-plugin-copy": "^3.5.0"
   },
   "peerDependencies": {
-    "ember-simple-auth": ">= 6.0.0"
+    "ember-simple-auth": ">= 6.0.0",
+    "ember-source": "^4.12.0 || ^5.4.0",
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
