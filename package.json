@@ -1,4 +1,5 @@
 {
+  "name": "root",
   "private": true,
   "repository": "https://github.com/fenichelar/ember-simple-auth-token",
   "license": "MIT",
