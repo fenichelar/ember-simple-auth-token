@@ -11,7 +11,7 @@
     "build": "npm run build --workspace ember-simple-auth-token",
     "lint": "npm run lint --workspaces --if-present",
     "lint:fix": "npm run lint:fix --workspaces --if-present",
-    "prepare": "npm run build",
+    "prepare": "npm run build --workspace ember-simple-auth-token",
     "start": "concurrently 'npm:start:*' --restart-after 5000 --prefix-colors cyan,white,yellow",
     "mirage": "concurrently 'npm:mirage:*' --restart-after 5000 --prefix-colors cyan,white,yellow",
     "mirage-test": "concurrently 'npm:mirage-test:*' --restart-after 5000 --prefix-colors cyan,white,yellow",
