@@ -5,14 +5,13 @@
   "keywords": [
     "ember-addon"
   ],
-  "repository": "",
+  "repository": "https://github.com/TransNexus/ember-simple-auth-token.git",
   "license": "MIT",
   "author": {
     "name": "Alec Fenichel",
     "name": "Chris Novak"
   },
   "exports": {
-    ".": "./dist/index.js",
     "./*": "./dist/*.js",
     "./addon-main.js": "./addon-main.cjs"
   },

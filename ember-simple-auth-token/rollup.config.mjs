@@ -25,11 +25,8 @@ export default {
       'index.js',
       'services/**/*.js',
       'session-stores/**/*.js',
-      'utils/**/*.js',
       'authenticators/**/*.js',
-      'test-support/**/*.js',
       'configuration.js',
-      'initializers/**/*.js'
     ]),
 
     // These are the modules that should get reexported into the traditional
@@ -37,9 +34,6 @@ export default {
     // not everything in publicEntrypoints necessarily needs to go here.
     addon.appReexports([
       'authenticators/**/*.js',
-      'components/**/*.js',
-      'helpers/**/*.js',
-      'modifiers/**/*.js',
       'services/**/*.js',
     ]),
 
