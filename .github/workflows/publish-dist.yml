@@ -1,0 +1,23 @@
+name: "publish dist"
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  push-dist:
+    name: Push dist
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: NullVoxPopuli/action-setup-pnpm@v2
+      - uses: kategengler/put-built-npm-package-contents-on-branch@v1.0.0
+        with:
+          branch: ${{ github.head_ref || github.ref_name }}-dist
+          token: ${{ secrets.GITHUB_TOKEN }}
+          working-directory: ember-simple-auth-token
