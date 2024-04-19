@@ -1,0 +1,15 @@
+#tests
+test-app
+
+#build tools
+.travis.yml
+.jenkins.yml
+.codeclimate.yml
+
+#linters
+.eslintignore*
+.eslintrc*
+.template-lintrc*
+
+#editor settings
+.editorconfig
