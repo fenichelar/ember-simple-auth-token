@@ -9,7 +9,7 @@ export default class HeaderComponent extends Component {
 
   willTokenRefresh = false;
   countdown = null;
-  refreshLeeway = 3000;
+  refreshLeeway = 0;
   @tracked remainingMinutes = 0;
   @tracked remainingSeconds = 0;
 
@@ -27,7 +27,7 @@ export default class HeaderComponent extends Component {
     if (ENV['ember-simple-auth-token'].refreshAccessTokens) {
       this.willTokenRefresh = true;
       if (typeof ENV['ember-simple-auth-token'].refreshLeeway !== 'undefined') {
-        this.refreshLeeway = ENV['ember-simple-auth-token'].refreshLeeway * 60000;
+        this.refreshLeeway = ENV['ember-simple-auth-token'].refreshLeeway * 1000;
       }
     }
 

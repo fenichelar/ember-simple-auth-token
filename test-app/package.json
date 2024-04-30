@@ -57,7 +57,7 @@
     "ember-resolver": "^11.0.1",
     "ember-simple-auth": "~6.0.0",
     "ember-simple-auth-token": "^6.0.0",
-    "ember-source": "~5.7.0",
+    "ember-source": "~5.4.1",
     "ember-source-channel-url": "^3.0.0",
     "ember-template-lint": "^5.13.0",
     "ember-try": "^3.0.0",

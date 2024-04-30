@@ -39,7 +39,7 @@ ember install ember-simple-auth-token
 
 ### Calling session.setup() on ember-simple-auth session service
 
-`ember-simple-auth` v6 no longer uses an initializer to wire up the session service. Your applicaton must implement an application router to call .setup() on the `ember-simple-auth` session service:
+`ember-simple-auth` v6 no longer uses an initializer to wire up the session service. Your applicaton must implement an application route to call .setup() on the `ember-simple-auth` session service:
 
 ```js
 // app/routes/application.js
@@ -317,7 +317,7 @@ cd ember-simple-auth-token
 npm run mirage
 ```
 
-Launching the test-app with `npm run mirage` will prevent the express server from running. The mirage mock server runs in test mode (`ember s --environment=test`) simply because the api responses are logged in the browser console and can more easily be inspected. If using FastBoot in the cloned repo, the mirage api mock will not run. You must instead use the express server via `npm start`.
+Launching the test-app with `npm run mirage` or `npm run mirage-test` will prevent the express server from running. The mirage mock server runs in test mode (`ember s --environment=test`) simply because the api responses are logged in the browser console and can more easily be inspected. If using FastBoot in the cloned repo, the mirage api mock will not run. You must instead use the express server via `npm start`.
 
 ## express server
 
@@ -382,11 +382,11 @@ cd ember-simple-auth-token
 npm run test
 ```
 
-Tests can also be run in the browser, which will refresh and rerun all tests after any change to a unit test:
+Tests can also be run in the browser, which will refresh and rerun all tests after any change to a test:
 
 ```node
 cd ember-simple-auth-token
-npm run mirage
+npm run mirage-test
 // visit http://localhost:4201/tests
 ```
 

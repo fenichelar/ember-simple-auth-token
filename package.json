@@ -1,5 +1,5 @@
 {
-  "name": "",
+  "name": "root",
   "private": true,
   "repository": "https://github.com/TransNexus/ember-simple-auth-token",
   "license": "MIT",
@@ -8,18 +8,18 @@
     "name": "Chris Novak"
   },
   "scripts": {
-    "build": "npm run build --workspace ember-simple-auth-token",
+    "build": "npm run build --workspace addon",
     "lint": "npm run lint --workspaces --if-present",
     "lint:fix": "npm run lint:fix --workspaces --if-present",
-    "prepare": "npm run build --workspace ember-simple-auth-token",
+    "prepare": "npm run build --workspace addon",
     "start": "concurrently 'npm:start:*' --restart-after 5000 --prefix-colors cyan,white,yellow",
     "mirage": "concurrently 'npm:mirage:*' --restart-after 5000 --prefix-colors cyan,white,yellow",
     "mirage-test": "concurrently 'npm:mirage-test:*' --restart-after 5000 --prefix-colors cyan,white,yellow",
-    "start:addon": "npm start --workspace ember-simple-auth-token -- --no-watch.clearScreen",
+    "start:addon": "npm start --workspace addon -- --no-watch.clearScreen",
     "start:test-app": "npm start --workspace test-app -- --environment development",
-    "mirage:addon": "npm start --workspace ember-simple-auth-token -- --no-watch.clearScreen",
+    "mirage:addon": "npm start --workspace addon -- --no-watch.clearScreen",
     "mirage:test-app": "npm start --workspace test-app -- --environment mirage",
-    "mirage-test:addon": "npm start --workspace ember-simple-auth-token -- --no-watch.clearScreen",
+    "mirage-test:addon": "npm start --workspace addon -- --no-watch.clearScreen",
     "mirage-test:test-app": "npm start --workspace test-app -- --environment mirage-test",
     "test": "npm run test --workspaces --if-present",
     "test:ember": "npm run test:ember --workspaces --if-present"
@@ -28,7 +28,7 @@
     "concurrently": "^8.2.0"
   },
   "workspaces": [
-    "ember-simple-auth-token",
+    "addon",
     "test-app"
   ]
 }

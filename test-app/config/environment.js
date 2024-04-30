@@ -40,7 +40,8 @@ module.exports = function (environment) {
     ENV['ember-simple-auth-token'] = {
       serverTokenEndpoint: 'http://localhost:3000/api/token-auth',
       serverTokenRefreshEndpoint: 'http://localhost:3000/api/token-refresh/',
-      refreshAccessTokens: true
+      refreshAccessTokens: true,
+      refreshLeeway: 1
     }
 
     ENV['ember-cli-mirage'] = {
@@ -53,7 +54,8 @@ module.exports = function (environment) {
     ENV['ember-simple-auth-token'] = {
       serverTokenEndpoint: 'http://localhost:8080/api/token-auth',
       serverTokenRefreshEndpoint: 'http://localhost:8080/api/token-refresh/',
-      refreshAccessTokens: true
+      refreshAccessTokens: true,
+      refreshLeeway: 1
     }
 
     ENV['ember-cli-mirage'] = {
@@ -67,7 +69,7 @@ module.exports = function (environment) {
       serverTokenEndpoint: 'http://localhost:8080/api/token-auth',
       serverTokenRefreshEndpoint: 'http://localhost:8080/api/token-refresh/',
       refreshAccessTokens: false,
-      refreshLeeway: 3,
+      refreshLeeway: 1,
       disableScheduleAccessTokenExpiration: true
     }
 
@@ -83,7 +85,7 @@ module.exports = function (environment) {
       serverTokenEndpoint: 'http://localhost:8080/api/token-auth',
       serverTokenRefreshEndpoint: 'http://localhost:8080/api/token-refresh/',
       refreshAccessTokens: false,
-      refreshLeeway: 3,
+      refreshLeeway: 1,
       disableScheduleAccessTokenExpiration: true
     }
 
