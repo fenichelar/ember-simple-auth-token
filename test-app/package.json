@@ -83,7 +83,7 @@
     "miragejs": "0.1.48"
   },
   "engines": {
-    "node": ">= 18"
+    "node": ">= 20"
   },
   "ember": {
     "edition": "octane"

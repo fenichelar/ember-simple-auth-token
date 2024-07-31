@@ -25,9 +25,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Test scenario ${{ matrix.scenario }}
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
-        node-version: 18.x
+        node-version: 20.x
     - run: npm ci
     - run: npm run lint:js
     - run: npm run test:one ${{ matrix.scenario }} --skip-cleanup
