@@ -31,3 +31,4 @@ jobs:
     - run: npm ci
     - run: npm run lint
     - run: npm run test ${{ matrix.scenario }} --skip-cleanup
+      working-directory: test-app
