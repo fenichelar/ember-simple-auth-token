@@ -338,10 +338,12 @@ For acceptance testing, token refresh must be disabled to allow the test to exit
 
 ```js
 // config/environment.js
-ENV['ember-simple-auth-token'] = {
-  refreshAccessTokens: false,
-  tokenExpirationInvalidateSession: false,
-};
+if (environment === 'test') {
+  ENV['ember-simple-auth-token'] = {
+    refreshAccessTokens: false,
+    tokenExpirationInvalidateSession: false,
+  };
+}
 ```
 
 If your tests are still timing out due to a setTimeout(), you can manually end the timers used in `ember-simple-auth-token` at the end of each of your tests:
@@ -398,7 +400,7 @@ Version 6:
 
 - `ember-simple-auth` v6 requires calling `session.setup()` in your app's `routes/application.js`
 
-- if `refreshLeeway` is not set in your app's `config/environment.js`, it will default to 0.05 (3 seconds). This will help prevent a race condition where `handleAccessTokenExpiration()` could be called before `refreshAccessToken()` completes, logging the user out. You can set `refreshLeeway: 0` in your `config/environment.js`, but this may cause the user to be logged out even if `refreshAccessTokens = true`.
+- if `refreshLeeway` is not set in your app's `config/environment.js`, it will default to 0 seconds. This may create a race condition where `handleAccessTokenExpiration()` could be called before `refreshAccessToken()` completes, even if `refreshAccessTokens = true`. If this happens, you can set `refreshLeeway` to a positive number in your `config/environment.js` to prevent the user being logged out.
 
 Previous versions:
 
