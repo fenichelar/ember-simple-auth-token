@@ -11,24 +11,72 @@ module.exports = function() {
     return {
       scenarios: [
         {
-          name: 'ember-canary-ember-simple-auth-4.0',
+          name: 'ember-lts-4.12-ember-simple-auth-6.0',
           npm: {
             dependencies: {
-              'ember-simple-auth': '^4.0.0'
+              'ember-simple-auth': '^6.0.0'
             },
             devDependencies: {
-              'ember-source': urls[2]
+              'ember-source': '^4.12.0'
+            },
+            ember: {
+              'edition': 'octane'
             }
           }
         },
         {
-          name: 'ember-canary-ember-simple-auth-5.0',
+          name: 'ember-lts-5.4-ember-simple-auth-6.0',
           npm: {
             dependencies: {
-              'ember-simple-auth': '^5.0.0'
+              'ember-simple-auth': '^6.0.0'
+            },
+            devDependencies: {
+              'ember-source': '^5.4.0'
+            },
+            ember: {
+              'edition': 'octane'
+            }
+          }
+        },
+        {
+          name: 'ember-release-ember-simple-auth-6.0',
+          npm: {
+            dependencies: {
+              'ember-simple-auth': '^6.0.0'
+            },
+            devDependencies: {
+              'ember-source': urls[0]
+            },
+            ember: {
+              'edition': 'octane'
+            }
+          }
+        },
+        {
+          name: 'ember-beta-ember-simple-auth-6.0',
+          npm: {
+            dependencies: {
+              'ember-simple-auth': '^6.0.0'
+            },
+            devDependencies: {
+              'ember-source': urls[1]
+            },
+            ember: {
+              'edition': 'octane'
+            }
+          }
+        },
+        {
+          name: 'ember-canary-ember-simple-auth-6.0',
+          npm: {
+            dependencies: {
+              'ember-simple-auth': '^6.0.0'
             },
             devDependencies: {
               'ember-source': urls[2]
+            },
+            ember: {
+              'edition': 'octane'
             }
           }
         }
