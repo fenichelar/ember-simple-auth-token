@@ -2,7 +2,7 @@
 
 const getChannelURL = require('ember-source-channel-url');
 
-module.exports = function() {
+module.exports = async function() {
   return Promise.all([
     getChannelURL('release'),
     getChannelURL('beta'),
