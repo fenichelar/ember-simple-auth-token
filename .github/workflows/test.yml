@@ -30,5 +30,5 @@ jobs:
         node-version: 20.x
     - run: npm ci
     - run: npm run lint
-    - run: npm run test ${{ matrix.scenario }} --skip-cleanup
+    - run: npm run test:ember ${{ matrix.scenario }} --skip-cleanup
       working-directory: test-app
