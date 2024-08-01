@@ -37,6 +37,9 @@
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@babel/eslint-parser": "^7.23.3",
+    "@babel/plugin-transform-class-properties": "^7.24.7",
+    "@babel/plugin-transform-private-methods": "^7.24.7",
+    "@babel/plugin-transform-private-property-in-object": "^7.24.7",
     "@babel/runtime": "^7.25.0",
     "@embroider/addon-dev": "^4.1.0",
     "@rollup/plugin-babel": "^6.0.4",
