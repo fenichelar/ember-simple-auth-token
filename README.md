@@ -23,7 +23,7 @@ npm run mirage // mirage api mock
 
 ## Compatibility
 
-`ember-simple-auth-token` v6 is compatible with node >= 18, `ember-simple-auth` 6 and Ember versions 3.28, 4.4, 4.8, 4.12 and 5 with Embroider (Ember build pipeline), `ember-auto-import` >= 2 (dependency manager) and `webpack` >= 5 (module bundler). npm is the supported package manager.
+`ember-simple-auth-token` v6 is compatible with node >= 16, `ember-simple-auth` 6 and Ember versions 3.28, 4.4, 4.8, 4.12 and 5.x with Embroider (Ember build pipeline), `ember-auto-import` >= 2 (dependency manager) and `webpack` >= 5 (module bundler). npm is the supported package manager. Ember 3.28 projects will need `ember-auto-import v2.7.2` installed under `devDependencies`.
 
 ## Installation
 
