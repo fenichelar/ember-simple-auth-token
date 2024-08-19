@@ -1,11 +1,12 @@
 {
   "name": "test-app",
-  "version": "0.0.0",
   "private": true,
   "description": "Test app for ember-simple-auth-token addon",
-  "repository": "",
+  "repository": "https://github.com/fenichelar/ember-simple-auth-token",
   "license": "MIT",
-  "author": "",
+  "author": {
+    "name": "Alec Fenichel"
+  },
   "directories": {
     "doc": "doc",
     "test": "tests"
@@ -83,7 +84,7 @@
     "miragejs": "0.1.48"
   },
   "engines": {
-    "node": ">= 16"
+    "node": ">= 16 <=20"
   },
   "ember": {
     "edition": "octane"
