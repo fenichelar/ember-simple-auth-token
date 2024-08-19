@@ -25,10 +25,13 @@ jobs:
           - false
         include:
           - scenario: ember-release-ember-simple-auth-6.0
+            node: v20
             experimental: true
           - scenario: ember-beta-ember-simple-auth-6.0
+            node: v20
             experimental: true
           - scenario: ember-canary-ember-simple-auth-6.0
+            node: v20
             experimental: true
     steps:
     - uses: actions/checkout@v4
