@@ -2,7 +2,7 @@ import { module, test } from 'qunit';
 import { setupTest } from 'test-app/tests/helpers';
 import { setupMirage } from 'ember-cli-mirage/test-support';
 import { getSettledState } from '@ember/test-helpers';
-import { sign, verify } from 'jsonwebtoken';
+import { sign } from 'jsonwebtoken';
 import sinon from 'sinon';
 
 const secret = '0123456789';
@@ -54,7 +54,7 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
     return Math.round(time / 1000);
   };
 
-  const clearState = (jwt) => {
+  const clearState = jwt => {
     let state = getSettledState();
     if (state.hasPendingTimers || state.hasRunLoop) {
       jwt.cancelAllTimers();
@@ -68,7 +68,7 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
 
   test('getCurrentTime works', function(assert) {
     assert.expect(1);
-    assert.equal(this.owner.application.jwt.getCurrentTime(), Math.floor(new Date().valueOf() / 1000));
+    assert.strictEqual(this.owner.application.jwt.getCurrentTime(), Math.floor(new Date().valueOf() / 1000));
   });
 
   test('#restore resolves when the data includes `token` and `expiresAt`', function(assert) {
@@ -87,7 +87,7 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
       tokenData: tokenData
     };
 
-    this.owner.application.jwt.restore(data).then((content) => {
+    this.owner.application.jwt.restore(data).then(content => {
       assert.propEqual(content, data);
     });
   });
@@ -100,7 +100,7 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
       token: token
     };
 
-    this.owner.application.jwt.restore(data).then((content) => {
+    this.owner.application.jwt.restore(data).then(content => {
       assert.propEqual(content, data);
     });
   });
@@ -122,8 +122,8 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
       tokenData: tokenData
     };
 
-    this.owner.application.jwt.restore(data).catch((err) => {
-      assert.equal(err, 'Error: token is expired');
+    this.owner.application.jwt.restore(data).catch(err => {
+      assert.strictEqual(JSON.stringify(err), 'Error: token is expired');
     });
   });
 
@@ -139,8 +139,8 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
       exp: expiresAt
     };
 
-    this.owner.application.jwt.restore(data).catch((err) => {
-      assert.equal(err, 'Error: token is expired');
+    this.owner.application.jwt.restore(data).catch(err => {
+      assert.strictEqual(err, 'Error: token is expired');
     });
   });
 
@@ -162,7 +162,7 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
       exp: expiresAt
     };
 
-    this.owner.application.jwt.restore(data).then((content) => {
+    this.owner.application.jwt.restore(data).then(content => {
       assert.propEqual(content, data);
     });
   });
@@ -176,8 +176,8 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
       exp: expiresAt
     };
 
-    this.owner.application.jwt.restore(data).catch((response) => {
-      assert.equal(response, 'Error: empty token');
+    this.owner.application.jwt.restore(data).catch(response => {
+      assert.strictEqual(response, 'Error: empty token');
     });
   });
 
@@ -199,7 +199,7 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
     };
 
     this.owner.application.jwt.restore(data).then(() => {
-      assert.equal(this.owner.application.jwt.scheduleAccessTokenRefresh.callCount, 1);
+      assert.strictEqual(this.owner.application.jwt.scheduleAccessTokenRefresh.callCount, 1);
       clearState(this.owner.application.jwt);
     });
   });
@@ -214,6 +214,7 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
       exp: expiresAt
     });
     const refreshToken = createFakeToken();
+    const credentials = createFakeCredentials();
     const data = {
       token: token,
       exp: expiresAt,
@@ -221,17 +222,17 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
     };
 
     this.server.pretender.handledRequest = (verb, path, request) => {
-      assert.equal(path, 'http://localhost:8080/api/token-auth');
-      assert.equal(verb, 'POST');
-      assert.equal(request.requestBody, JSON.stringify(credentials));
-      assert.equal(JSON.stringify(request.requestHeaders), JSON.stringify({
+      assert.strictEqual(path, 'http://localhost:8080/api/token-auth');
+      assert.strictEqual(verb, 'POST');
+      assert.strictEqual(request.requestBody, JSON.stringify(credentials));
+      assert.strictEqual(JSON.stringify(request.requestHeaders), JSON.stringify({
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       }));
     };
 
     this.owner.application.jwt.restore(data).then(() => {
-      assert.equal(this.owner.application.jwt.scheduleAccessTokenRefresh.callCount, 0);
+      assert.strictEqual(this.owner.application.jwt.scheduleAccessTokenRefresh.callCount, 0);
     });
   });
 
@@ -252,7 +253,7 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
       refresh_token: token
     };
     this.owner.application.jwt.restore(data).then(() => {
-      assert.equal(this.owner.application.jwt.refreshAccessToken.callCount, 1);
+      assert.strictEqual(this.owner.application.jwt.refreshAccessToken.callCount, 1);
       clearState(this.owner.application.jwt);
     });
   });
@@ -276,7 +277,7 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
     };
 
     this.owner.application.jwt.restore(data).then(() => {
-      assert.equal(this.owner.application.jwt.scheduleAccessTokenRefresh.callCount, 1);
+      assert.strictEqual(this.owner.application.jwt.scheduleAccessTokenRefresh.callCount, 1);
       clearState(this.owner.application.jwt);
     });
   });
@@ -299,8 +300,8 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
       refresh_token: refreshToken
     };
 
-    this.owner.application.jwt.restore(data).then((response) => {
-      assert.equal(this.owner.application.jwt.refreshAccessToken.callCount, 1);
+    this.owner.application.jwt.restore(data).then(() => {
+      assert.strictEqual(this.owner.application.jwt.refreshAccessToken.callCount, 1);
       clearState(this.owner.application.jwt);
     });
   });
@@ -332,7 +333,6 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
     assert.expect(4);
 
     const token = createFakeToken();
-    const refreshToken = createFakeToken();
     const credentials = createFakeCredentials();
 
     this.server.post('/token-auth', () => ({
@@ -341,10 +341,10 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
     }), 200);
 
     this.server.pretender.handledRequest = (verb, path, request) => {
-      assert.equal(path, 'http://localhost:8080/api/token-auth');
-      assert.equal(verb, 'POST');
-      assert.equal(request.requestBody, JSON.stringify(credentials));
-      assert.equal(JSON.stringify(request.requestHeaders), JSON.stringify({
+      assert.strictEqual(path, 'http://localhost:8080/api/token-auth');
+      assert.strictEqual(verb, 'POST');
+      assert.strictEqual(request.requestBody, JSON.stringify(credentials));
+      assert.strictEqual(JSON.stringify(request.requestHeaders), JSON.stringify({
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       }));
@@ -368,10 +368,10 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
     const credentials = createFakeCredentials();
 
     this.server.pretender.handledRequest = (verb, path, request) => {
-      assert.equal(path, 'http://localhost:8080/api/token-auth');
-      assert.equal(verb, 'POST');
-      assert.equal(request.requestBody, JSON.stringify(credentials));
-      assert.equal(JSON.stringify(request.requestHeaders), JSON.stringify({
+      assert.strictEqual(path, 'http://localhost:8080/api/token-auth');
+      assert.strictEqual(verb, 'POST');
+      assert.strictEqual(request.requestBody, JSON.stringify(credentials));
+      assert.strictEqual(JSON.stringify(request.requestHeaders), JSON.stringify({
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       }));
@@ -386,23 +386,20 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
     this.owner.application.jwt.headers = {
       'X-API-KEY': '123-abc',
       'X-ANOTHER-HEADER': 0,
-      'Accept': 'application/vnd.api+json'
+      'Accept': 'application/json'
     };
 
-    const token = createFakeToken();
-    const refreshToken = createFakeToken();
     const credentials = createFakeCredentials();
 
     this.server.pretender.handledRequest = (verb, path, request) => {
-      assert.equal(path, 'http://localhost:8080/api/token-auth');
-      assert.equal(verb, 'POST');
-      assert.equal(request.requestBody, JSON.stringify(credentials));
-      assert.equal(JSON.stringify(request.requestHeaders), JSON.stringify({
+      assert.strictEqual(path, 'http://localhost:8080/api/token-auth');
+      assert.strictEqual(verb, 'POST');
+      assert.strictEqual(request.requestBody, JSON.stringify(credentials));
+      assert.strictEqual(JSON.stringify(request.requestHeaders), JSON.stringify({
         'Accept': 'application/json',
         'Content-Type': 'application/json',
         'X-API-KEY': '123-abc',
         'X-ANOTHER-HEADER': '0',
-        'Accept': 'application/vnd.api+json'
       }));
     };
 
@@ -415,23 +412,20 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
     const headers = {
       'X-API-KEY': '123-abc',
       'X-ANOTHER-HEADER': 0,
-      'Accept': 'application/vnd.api+json'
+      'Accept': 'application/json'
     };
 
-    const token = createFakeToken();
-    const refreshToken = createFakeToken();
     const credentials = createFakeCredentials();
 
     this.server.pretender.handledRequest = (verb, path, request) => {
-      assert.equal(path, 'http://localhost:8080/api/token-auth');
-      assert.equal(verb, 'POST');
-      assert.equal(request.requestBody, JSON.stringify(credentials));
-      assert.equal(JSON.stringify(request.requestHeaders), JSON.stringify({
+      assert.strictEqual(path, 'http://localhost:8080/api/token-auth');
+      assert.strictEqual(verb, 'POST');
+      assert.strictEqual(request.requestBody, JSON.stringify(credentials));
+      assert.strictEqual(JSON.stringify(request.requestHeaders), JSON.stringify({
         'Accept': 'application/json',
         'Content-Type': 'application/json',
         'X-API-KEY': '123-abc',
         'X-ANOTHER-HEADER': '0',
-        'Accept': 'application/vnd.api+json'
       }));
     };
 
@@ -442,7 +436,7 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
     assert.expect(1);
 
     this.owner.application.jwt.authenticate({username: 'admin', password: 'incorrectPassword'}).catch(error => {
-      assert.equal(error.status, 401);
+      assert.strictEqual(error.status, 401);
     });
   });
 
@@ -455,7 +449,7 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
     const credentials = createFakeCredentials();
 
     this.owner.application.jwt.authenticate(credentials).then(() => {
-      assert.equal(this.owner.application.jwt.scheduleAccessTokenRefresh.callCount, 1);
+      assert.strictEqual(this.owner.application.jwt.scheduleAccessTokenRefresh.callCount, 1);
       clearState(this.owner.application.jwt);
     });
   });
@@ -468,7 +462,7 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
     const credentials = createFakeCredentials();
 
     this.owner.application.jwt.authenticate(credentials).then(() => {
-      assert.equal(this.owner.application.jwt.scheduleAccessTokenRefresh.callCount, 0);
+      assert.strictEqual(this.owner.application.jwt.scheduleAccessTokenRefresh.callCount, 0);
     });
   });
 
@@ -480,7 +474,7 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
     const credentials = createFakeCredentials();
 
     this.owner.application.jwt.authenticate(credentials).then(() => {
-      assert.equal(this.owner.application.jwt.refreshAccessToken.callCount, 0);
+      assert.strictEqual(this.owner.application.jwt.refreshAccessToken.callCount, 0);
     });
   });
 
@@ -494,7 +488,7 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
     const credentials = createFakeCredentials();
 
     this.owner.application.jwt.authenticate(credentials).then(() => {
-      assert.equal(this.owner.application.jwt.scheduleAccessTokenRefresh.callCount, 1);
+      assert.strictEqual(this.owner.application.jwt.scheduleAccessTokenRefresh.callCount, 1);
       clearState(this.owner.application.jwt);
     });
   });
@@ -502,14 +496,13 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
   test('#refreshAccessToken sends a fetch request to the refresh token endpoint', function(assert) {
     assert.expect(4);
 
-    const token = createFakeToken();
     const refreshToken = createFakeToken();
 
     this.server.pretender.handledRequest = (verb, path, request) => {
-      assert.equal(path, 'http://localhost:8080/api/token-refresh/');
-      assert.equal(verb, 'POST');
-      assert.equal(request.requestBody, JSON.stringify({refresh_token: refreshToken}));
-      assert.equal(JSON.stringify(request.requestHeaders), JSON.stringify({
+      assert.strictEqual(path, 'http://localhost:8080/api/token-refresh/');
+      assert.strictEqual(verb, 'POST');
+      assert.strictEqual(request.requestBody, JSON.stringify({refresh_token: refreshToken}));
+      assert.strictEqual(JSON.stringify(request.requestHeaders), JSON.stringify({
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       }));
@@ -532,19 +525,17 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
       refresh_token: token
     }), 200);
 
-    const credentials = createFakeCredentials();
-
     this.server.pretender.handledRequest = (verb, path, request) => {
-      assert.equal(path, 'http://localhost:8080/api/token-refresh/');
-      assert.equal(verb, 'POST');
-      assert.equal(request.requestBody, JSON.stringify({
+      assert.strictEqual(path, 'http://localhost:8080/api/token-refresh/');
+      assert.strictEqual(verb, 'POST');
+      assert.strictEqual(request.requestBody, JSON.stringify({
         auth: {
           nested: {
             refreshToken: refreshToken
           }
         }
       }));
-      assert.equal(JSON.stringify(request.requestHeaders), JSON.stringify({
+      assert.strictEqual(JSON.stringify(request.requestHeaders), JSON.stringify({
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       }));
@@ -559,21 +550,20 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
     this.owner.application.jwt.headers = {
       'X-API-KEY': '123-abc',
       'X-ANOTHER-HEADER': 0,
-      'Accept': 'application/vnd.api+json'
+      'Accept': 'application/json'
     };
 
     const refreshToken = createFakeToken();
 
     this.server.pretender.handledRequest = (verb, path, request) => {
-      assert.equal(path, 'http://localhost:8080/api/token-refresh/');
-      assert.equal(verb, 'POST');
-      assert.equal(request.requestBody, JSON.stringify({refresh_token: refreshToken}));
-      assert.equal(JSON.stringify(request.requestHeaders), JSON.stringify({
+      assert.strictEqual(path, 'http://localhost:8080/api/token-refresh/');
+      assert.strictEqual(verb, 'POST');
+      assert.strictEqual(request.requestBody, JSON.stringify({refresh_token: refreshToken}));
+      assert.strictEqual(JSON.stringify(request.requestHeaders), JSON.stringify({
         'Accept': 'application/json',
         'Content-Type': 'application/json',
         'X-API-KEY': '123-abc',
         'X-ANOTHER-HEADER': '0',
-        'Accept': 'application/vnd.api+json'
       }));
     };
 
@@ -611,8 +601,8 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
 
     this.server.post('/token-refresh', () => ({}), 401);
 
-    this.owner.application.jwt.refreshAccessToken(token).catch((err) => {
-      assert.equal(this.owner.application.jwt.invalidate.callCount, 1);
+    this.owner.application.jwt.refreshAccessToken(token).catch(() => {
+      assert.strictEqual(this.owner.application.jwt.invalidate.callCount, 1);
     });
   });
 
@@ -626,7 +616,7 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
     this.server.post('/token-refresh', () => ({}), 403);
 
     this.owner.application.jwt.refreshAccessToken(refreshToken).catch(() => {
-      assert.equal(this.owner.application.jwt.invalidate.callCount, 1);
+      assert.strictEqual(this.owner.application.jwt.invalidate.callCount, 1);
     });
   });
 
@@ -640,7 +630,7 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
     this.server.post('/token-refresh', () => ({}), 500);
 
     this.owner.application.jwt.refreshAccessToken(refreshToken).catch(() => {
-      assert.equal(this.owner.application.jwt.invalidate.callCount, 0);
+      assert.strictEqual(this.owner.application.jwt.invalidate.callCount, 0);
     });
   });
 
@@ -655,8 +645,8 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
     const objectToken = createFakeToken(objectTokenData);
     const stringToken = createFakeToken(stringTokenData);
 
-    assert.equal(this.owner.application.jwt.getTokenData(objectToken).username, objectTokenData.username);
-    assert.equal(this.owner.application.jwt.getTokenData(stringToken), stringTokenData);
+    assert.strictEqual(this.owner.application.jwt.getTokenData(objectToken).username, objectTokenData.username);
+    assert.strictEqual(this.owner.application.jwt.getTokenData(stringToken), stringTokenData);
   });
 
   test('#getTokenData returns correctly encoded data', function(assert) {
@@ -665,7 +655,7 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
     const token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE0NTQxNzM1NzEsImRhdGEiOnsiYXV0aGVudGljYXRlZCI6dHJ1ZSwidXNlciI6eyJpZCI6IjdhMWRkYzJmLWI5MTAtNDY2Yi04MDhhLTUxOTUyOTkwZjUyNyIsIm5hbWUiOiJUaG9yYmrDuHJuIEhlcm1hbnNlbiIsIm1vYmlsZSI6IjQwNDUxMzg5IiwiZW1haWwiOiJ0aEBza2FsYXIubm8iLCJsb2NhbGUiOiJuYiIsInNpZ25faW5fY291bnQiOjI1fX19.se8PT5e1G1_xhPTQf_16BIv0Q9uEjQxLGE3iTJwhAec';
 
     const data = this.owner.application.jwt.getTokenData(token);
-    assert.equal(data.data.user.name, 'Thorbjørn Hermansen');
+    assert.strictEqual(data.data.user.name, 'Thorbjørn Hermansen');
   });
 
 });

@@ -18,7 +18,7 @@ export default class Token extends Base {
   */
   constructor() {
     super(...arguments);
-    const ownerProperty = Reflect.ownKeys(this).find((prop) => {
+    const ownerProperty = Reflect.ownKeys(this).find(prop => {
       return String(prop) === 'Symbol(OWNER)';
     });
     const owner = this[ownerProperty];

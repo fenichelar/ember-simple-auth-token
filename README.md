@@ -177,7 +177,7 @@ export default class LoginController extends Controller {
     e.preventDefault();
     e.stopPropagation();
     const authenticator = 'authenticator:jwt'; // or 'authenticator:token'
-    this.session.authenticate(authenticator, {username: this.username, password: this.password}).catch((err) => {
+    this.session.authenticate(authenticator, {username: this.username, password: this.password}).catch(err => {
       if (err.status === 401) {
         alert('Incorrect username or password');
         return;
@@ -368,7 +368,7 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
     this.owner.application.jwt = this.owner.lookup('authenticator:jwt');
   });
 
-  const clearState = (jwt) => {
+  const clearState = jwt => {
     let state = getSettledState();
     if (state.hasPendingTimers || state.hasRunLoop) {
       jwt.cancelAllTimers();

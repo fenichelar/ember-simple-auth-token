@@ -1,8 +1,6 @@
 import { module, test } from 'qunit';
 import { setupTest } from 'test-app/tests/helpers';
 import { setupMirage } from 'ember-cli-mirage/test-support';
-import sinon from 'sinon';
-
 
 module('Unit | Authenticator | authenticators/token.js', function (hooks) {
   setupTest(hooks);
@@ -129,10 +127,10 @@ module('Unit | Authenticator | authenticators/token.js', function (hooks) {
     const credentials = createFakeCredentials();
 
     this.server.pretender.handledRequest = (verb, path, request) => {
-      assert.equal(path, 'http://localhost:8080/api/token-auth');
-      assert.equal(verb, 'POST');
-      assert.equal(request.requestBody, JSON.stringify(credentials));
-      assert.equal(JSON.stringify(request.requestHeaders), JSON.stringify({
+      assert.strictEqual(path, 'http://localhost:8080/api/token-auth');
+      assert.strictEqual(verb, 'POST');
+      assert.strictEqual(request.requestBody, JSON.stringify(credentials));
+      assert.strictEqual(JSON.stringify(request.requestHeaders), JSON.stringify({
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       }));
@@ -173,10 +171,10 @@ module('Unit | Authenticator | authenticators/token.js', function (hooks) {
     }), 201);
 
     this.server.pretender.handledRequest = (verb, path, request) => {
-      assert.equal(path, 'http://localhost:8080/api/token-auth');
-      assert.equal(verb, 'POST');
-      assert.equal(request.requestBody, JSON.stringify(credentials));
-      assert.equal(JSON.stringify(request.requestHeaders), JSON.stringify({
+      assert.strictEqual(path, 'http://localhost:8080/api/token-auth');
+      assert.strictEqual(verb, 'POST');
+      assert.strictEqual(request.requestBody, JSON.stringify(credentials));
+      assert.strictEqual(JSON.stringify(request.requestHeaders), JSON.stringify({
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       }));
@@ -193,15 +191,15 @@ module('Unit | Authenticator | authenticators/token.js', function (hooks) {
     this.owner.application.token.headers = {
       'X-API-KEY': '123-abc',
       'X-ANOTHER-HEADER': 0,
-      'Accept': 'application/vnd.api+json'
+      'Accept': 'application/json'
     };
 
     this.server.pretender.handledRequest = (verb, path, request) => {
-      assert.equal(path, 'http://localhost:8080/api/token-auth');
-      assert.equal(verb, 'POST');
-      assert.equal(request.requestBody, JSON.stringify(credentials));
-      assert.equal(JSON.stringify(request.requestHeaders), JSON.stringify({
-        'Accept': 'application/vnd.api+json',
+      assert.strictEqual(path, 'http://localhost:8080/api/token-auth');
+      assert.strictEqual(verb, 'POST');
+      assert.strictEqual(request.requestBody, JSON.stringify(credentials));
+      assert.strictEqual(JSON.stringify(request.requestHeaders), JSON.stringify({
+        'Accept': 'application/json',
         'Content-Type': 'application/json',
         'X-API-KEY': '123-abc',
         'X-ANOTHER-HEADER': '0'
@@ -219,15 +217,15 @@ module('Unit | Authenticator | authenticators/token.js', function (hooks) {
     const headers = {
       'X-API-KEY': '123-abc',
       'X-ANOTHER-HEADER': 0,
-      'Accept': 'application/vnd.api+json'
+      'Accept': 'application/json'
     };
 
     this.server.pretender.handledRequest = (verb, path, request) => {
-      assert.equal(path, 'http://localhost:8080/api/token-auth');
-      assert.equal(verb, 'POST');
-      assert.equal(request.requestBody, JSON.stringify(credentials));
-      assert.equal(JSON.stringify(request.requestHeaders), JSON.stringify({
-        'Accept': 'application/vnd.api+json',
+      assert.strictEqual(path, 'http://localhost:8080/api/token-auth');
+      assert.strictEqual(verb, 'POST');
+      assert.strictEqual(request.requestBody, JSON.stringify(credentials));
+      assert.strictEqual(JSON.stringify(request.requestHeaders), JSON.stringify({
+        'Accept': 'application/json',
         'Content-Type': 'application/json',
         'X-API-KEY': '123-abc',
         'X-ANOTHER-HEADER': '0',
@@ -241,7 +239,7 @@ module('Unit | Authenticator | authenticators/token.js', function (hooks) {
     assert.expect(1);
 
     this.owner.application.token.authenticate({username: 'admin', password: 'incorrectPassword'}).catch(error => {
-      assert.equal(error.status, 401);
+      assert.strictEqual(error.status, 401);
     });
   });
 

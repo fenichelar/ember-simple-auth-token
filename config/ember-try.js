@@ -7,7 +7,7 @@ module.exports = async function() {
     getChannelURL('release'),
     getChannelURL('beta'),
     getChannelURL('canary')
-  ]).then((urls) => {
+  ]).then(urls => {
     return {
       scenarios: [
         {

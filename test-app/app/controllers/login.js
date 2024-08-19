@@ -13,7 +13,7 @@ export default class LoginController extends Controller {
     e.preventDefault();
     e.stopPropagation();
     const authenticator = 'authenticator:jwt';
-    this.session.authenticate(authenticator, {username: this.username, password: this.password}).catch((err) => {
+    this.session.authenticate(authenticator, {username: this.username, password: this.password}).catch(err => {
       if (err.status === 401) {
         alert('Incorrect username or password');
         return;
