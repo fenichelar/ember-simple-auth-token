@@ -81,6 +81,20 @@ module.exports = async function() {
           }
         },
         {
+          name: 'ember-lts-5.8-ember-simple-auth-6.0',
+          npm: {
+            dependencies: {
+              'ember-simple-auth': '^6.0.0'
+            },
+            devDependencies: {
+              'ember-source': '^5.8.0'
+            },
+            ember: {
+              'edition': 'octane'
+            }
+          }
+        },
+        {
           name: 'ember-release-ember-simple-auth-6.0',
           npm: {
             dependencies: {
