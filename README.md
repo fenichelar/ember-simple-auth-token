@@ -10,7 +10,7 @@ This Ember addon is an extension of the Ember Simple Auth library which provides
 
 ## Demo
 
-A demo is available [here][demo]. The test-app has an example of implementing jwt with auto-refresh. It can be run by cloning the repo, then:
+The test-app has an example of implementing jwt with auto-refresh. It can be run by cloning the repo, then:
 
 ```node
 cd ember-simple-auth-token
@@ -23,23 +23,31 @@ npm run mirage // mirage api mock
 
 ## Compatibility
 
-`ember-simple-auth-token` v6 is compatible with node >= 16, `ember-simple-auth` 6 and Ember versions 3.28, 4.4, 4.8, 4.12 and 5.x with Embroider (Ember build pipeline), `ember-auto-import` >= 2 (dependency manager) and `webpack` >= 5 (module bundler). npm is the supported package manager. Ember 3.28 projects will need `ember-auto-import v2.7.2` installed under `devDependencies`.
+| Library | Compatible Versions |
+| - | - |
+| node | v16, v18, v20 |
+| ember | v3.28, v4.4, v4.8, v4.12, v5.4, v5.8 |
+| ember-simple-auth | v6 |
+| ember-auto-import | v2 |
+| webpack | v5 |
+
+`ember` v3.28 projects require `ember-auto-import` v2.7.2.
 
 ## Installation
 
-Ember Simple Auth Token can be installed with [Ember CLI][ember-cli] by running:
+Ember Simple Auth Token can be installed with [Ember CLI](https://ember-cli.com) by running:
 
 ```
 ember install ember-simple-auth-token
 ```
 
-`ember-simple-auth-token` will automatically install a compatible version of `ember-simple-auth`. If you want to manually install `ember-simple-auth`, you must ensure to install a version that is supported by `ember-simple-auth-token`.
+You must manually install a compatible version of `ember-simple-auth`.
 
 ## Setup
 
 ### Calling session.setup() on ember-simple-auth session service
 
-`ember-simple-auth` v6 no longer uses an initializer to wire up the session service. Your applicaton must implement an application route to call .setup() on the `ember-simple-auth` session service:
+`ember-simple-auth` no longer uses an initializer to wire up the session service. Your applicaton must implement an application route to call `session.setup()` on the `ember-simple-auth` session service:
 
 ```js
 // app/routes/application.js
@@ -218,7 +226,7 @@ ENV['ember-simple-auth-token'] = {
 };
 ```
 
-The `refreshLeeway` can be specified to send the requests before the token expires to account for clock skew. Some libraries like [PyJWT][pyjwt], [ruby-jwt][ruby-jwt], and [node-jsonwebtoken][node-jsonwebtoken] also support specifying a clock tolerance when verifying the token. Leaving `refreshLeeway` undefined (or zero) could result in the addon's `invalidate()` function firing at the same time or immediately before the `refreshAccessToken()` api request. In this case, the user would be invalidated and logged out regardless of setting `refreshAccessTokens: true`. Setting a value for `refreshLeeway` (in seconds or decimals of a second) longer than your expected api response time should prevent this situation.
+The `refreshLeeway` can be specified to send the requests before the token expires to account for clock skew. Some libraries like [PyJWT](https://github.com/jpadilla/pyjwt), [ruby-jwt](https://github.com/jwt/ruby-jwt), and [node-jsonwebtoken](https://github.com/auth0/node-jsonwebtoken) also support specifying a clock tolerance when verifying the token. Leaving `refreshLeeway` undefined (or zero) could result in the addon's `invalidate()` function firing at the same time or immediately before the `refreshAccessToken()` api request. In this case, the user would be invalidated and logged out regardless of setting `refreshAccessTokens: true`. Setting a value for `refreshLeeway` (in seconds or decimals of a second) longer than your expected api response time should prevent this situation.
 
 Sample JSON Web Token:
 
@@ -234,9 +242,9 @@ const decodedPayload = {
 };
 ```
 
-To debug JSON Web Token issues, see [jwt][jwt].
+To debug JSON Web Token issues, see [jwt](https://jwt.io).
 
-The JSON Web Token authenticator supports both separate access tokens and refresh tokens. By specifying the `tokenPropertyName` and the `refreshTokenPropertyName` to the same value, the same token will be used for both access and refresh requests. For more information about refresh tokens, see [this blog][blog-refresh-token].
+The JSON Web Token authenticator supports both separate access tokens and refresh tokens. By specifying the `tokenPropertyName` and the `refreshTokenPropertyName` to the same value, the same token will be used for both access and refresh requests. For more information about refresh tokens, see [this blog](https://auth0.com/blog/refresh-tokens-what-are-they-and-when-to-use-them).
 
 #### Adapter
 
@@ -396,16 +404,11 @@ npm run mirage-test
 
 Version 6:
 
-- mixins are no longer supported by the 6.0 version of `ember-simple-auth-token`
+- mixins are no longer supported by `ember-simple-auth-token`
 
-- `ember-simple-auth` v6 requires calling `session.setup()` in your app's `routes/application.js`
+- `ember-simple-auth` requires calling `session.setup()` in your app's `routes/application.js`
 
 - if `refreshLeeway` is not set in your app's `config/environment.js`, it will default to 0 seconds. This may create a race condition where `handleAccessTokenExpiration()` could be called before `refreshAccessToken()` completes, even if `refreshAccessTokens = true`. If this happens, you can set `refreshLeeway` to a positive number in your `config/environment.js` to prevent the user being logged out.
-
-Previous versions:
-
-- `getResponseData`, `getAuthenticateData`, `config.identificationField`, and `config.passwordField` have been removed since version 4.0.0
-- `config.timeFactor` has been removed since version 2.1.0
 
 
 [github-actions-image]: https://github.com/fenichelar/ember-simple-auth-token/actions/workflows/test.yml/badge.svg
@@ -414,12 +417,3 @@ Previous versions:
 [ember-observer]: https://emberobserver.com/addons/ember-simple-auth-token
 [npm-image]: https://img.shields.io/npm/v/ember-simple-auth-token.svg
 [npm]: https://www.npmjs.com/package/ember-simple-auth-token
-
-[demo]: https://fenichelar.github.io/ember-simple-auth-token
-[ember-cli]: https://ember-cli.com
-[ember-simple-auth]: https://github.com/simplabs/ember-simple-auth
-[pyjwt]: https://github.com/jpadilla/pyjwt
-[ruby-jwt]: https://github.com/jwt/ruby-jwt
-[node-jsonwebtoken]: https://github.com/auth0/node-jsonwebtoken
-[jwt]: https://jwt.io
-[blog-refresh-token]: https://auth0.com/blog/refresh-tokens-what-are-they-and-when-to-use-them
