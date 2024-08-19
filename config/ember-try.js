@@ -11,6 +11,90 @@ module.exports = async function() {
     return {
       scenarios: [
         {
+          name: 'ember-lts-3.4-ember-simple-auth-6.0',
+          npm: {
+            dependencies: {
+              'ember-simple-auth': '^6.0.0'
+            },
+            devDependencies: {
+              'ember-source': '^3.4.0'
+            },
+            ember: {
+              'edition': 'octane'
+            }
+          }
+        },
+        {
+          name: 'ember-lts-3.8-ember-simple-auth-6.0',
+          npm: {
+            dependencies: {
+              'ember-simple-auth': '^6.0.0'
+            },
+            devDependencies: {
+              'ember-source': '^3.8.0'
+            },
+            ember: {
+              'edition': 'octane'
+            }
+          }
+        },
+        {
+          name: 'ember-lts-3.12-ember-simple-auth-6.0',
+          npm: {
+            dependencies: {
+              'ember-simple-auth': '^6.0.0'
+            },
+            devDependencies: {
+              'ember-source': '^3.12.0'
+            },
+            ember: {
+              'edition': 'octane'
+            }
+          }
+        },
+        {
+          name: 'ember-lts-3.16-ember-simple-auth-6.0',
+          npm: {
+            dependencies: {
+              'ember-simple-auth': '^6.0.0'
+            },
+            devDependencies: {
+              'ember-source': '^3.16.0'
+            },
+            ember: {
+              'edition': 'octane'
+            }
+          }
+        },
+        {
+          name: 'ember-lts-3.20-ember-simple-auth-6.0',
+          npm: {
+            dependencies: {
+              'ember-simple-auth': '^6.0.0'
+            },
+            devDependencies: {
+              'ember-source': '^3.20.0'
+            },
+            ember: {
+              'edition': 'octane'
+            }
+          }
+        },
+        {
+          name: 'ember-lts-3.24-ember-simple-auth-6.0',
+          npm: {
+            dependencies: {
+              'ember-simple-auth': '^6.0.0'
+            },
+            devDependencies: {
+              'ember-source': '^3.24.0'
+            },
+            ember: {
+              'edition': 'octane'
+            }
+          }
+        },
+        {
           name: 'ember-lts-3.28-ember-simple-auth-6.0',
           npm: {
             dependencies: {
