@@ -123,7 +123,7 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
     };
 
     this.owner.application.jwt.restore(data).catch(err => {
-      assert.strictEqual(JSON.stringify(err), 'Error: token is expired');
+      assert.strictEqual(err.toString(), 'Error: token is expired');
     });
   });
 
@@ -140,7 +140,7 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
     };
 
     this.owner.application.jwt.restore(data).catch(err => {
-      assert.strictEqual(err, 'Error: token is expired');
+      assert.strictEqual(err.toString(), 'Error: token is expired');
     });
   });
 
@@ -177,7 +177,7 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
     };
 
     this.owner.application.jwt.restore(data).catch(response => {
-      assert.strictEqual(response, 'Error: empty token');
+      assert.strictEqual(response.toString(), 'Error: empty token');
     });
   });
 
