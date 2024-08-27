@@ -191,7 +191,7 @@ export default class LoginController extends Controller {
             errorMessage = err.text;
           }
         } catch(er) {
-          alert('An unexpected error occured. ' + er.toString());
+          alert('An unexpected error occurred. ' + er.toString());
         }
       } else {
         errorMessage = err;

@@ -1,8 +1,9 @@
-<h1>Login</h1>
+<h1 id="h1-login">Login</h1>
 <form {{on "submit" this.authenticate}}>
   <label for="username">Login</label>
   <Input id="username" placeholder="Enter Login" @value={{this.username}} />
   <label for="password">Password</label>
   <Input id="password" placeholder="Enter Password" @type="password" @value={{this.password}} />
-  <button type="submit">Login</button>
+  <button id="btn-login" type="submit">Login</button>
+  <div id="error-message">{{this.errorMessage}}</div>
 </form>

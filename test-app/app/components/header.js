@@ -5,6 +5,7 @@ import { service } from '@ember/service';
 import ENV from 'test-app/config/environment';
 
 export default class HeaderComponent extends Component {
+  @service router;
   @service session;
 
   willTokenRefresh = false;
@@ -31,7 +32,7 @@ export default class HeaderComponent extends Component {
       }
     }
 
-    if (ENV.environment !== 'test') {
+    if (ENV.environment.match(/test/) === null) {
       this.setCountdown();
     }
   }
@@ -84,6 +85,12 @@ export default class HeaderComponent extends Component {
 
   @action
   logout() {
-    this.session.invalidate();
+    if (ENV.environment.match(/test/) === null) {
+      this.session.invalidate();
+    } else {
+      this.session.invalidate().then(() => { // ember-simple-auth does not transition on session.invalidate() in tests
+        this.router.transitionTo('login');
+      });
+    }
   }
 }
