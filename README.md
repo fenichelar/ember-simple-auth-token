@@ -26,12 +26,10 @@ npm run mirage // mirage api mock
 | Library | Compatible Versions |
 | - | - |
 | node | v16, v18, v20 |
-| ember | v3.28, v4.4, v4.8, v4.12, v5.4, v5.8 |
+| ember | v4.4, v4.8, v4.12, v5.4, v5.8 |
 | ember-simple-auth | v6 |
 | ember-auto-import | v2 |
 | webpack | v5 |
-
-`ember` v3.28 projects require `ember-auto-import` v2.7.2.
 
 ## Installation
 

@@ -15,7 +15,6 @@ jobs:
           - v18
           - v20
         scenario:
-          - ember-lts-3.28-ember-simple-auth-6.0
           - ember-lts-4.4-ember-simple-auth-6.0
           - ember-lts-4.8-ember-simple-auth-6.0
           - ember-lts-4.12-ember-simple-auth-6.0
