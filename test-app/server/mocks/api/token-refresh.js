@@ -1,8 +1,8 @@
 module.exports = function(app) {
-  var express = require('express');
-  var bodyParser = require('body-parser');
-  var jwt = require('jsonwebtoken');
-  var apiTokenRefreshRouter = express.Router();
+  const express = require('express');
+  const bodyParser = require('body-parser');
+  const jwt = require('jsonwebtoken');
+  const apiTokenRefreshRouter = express.Router();
 
   apiTokenRefreshRouter.post('/', function(req, res) {
     res.set('Access-Control-Allow-Origin', 'http://localhost:4201');
@@ -16,7 +16,7 @@ module.exports = function(app) {
       } else {
         delete decoded.iat;
         delete decoded.exp;
-        var token = jwt.sign(decoded, 'secret', { expiresIn: '5m' });
+        const token = jwt.sign(decoded, 'secret', { expiresIn: '5m' });
         return res.send({
           token: token,
           refresh_token: token,

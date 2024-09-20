@@ -1,8 +1,8 @@
 module.exports = function(app) {
-  var express = require('express');
-  var bodyParser = require('body-parser');
-  var jwt = require('jsonwebtoken');
-  var apiTokenAuthRouter = express.Router();
+  const express = require('express');
+  const bodyParser = require('body-parser');
+  const jwt = require('jsonwebtoken');
+  const apiTokenAuthRouter = express.Router();
 
   apiTokenAuthRouter.post('/', function(req, res) {
     res.set('Access-Control-Allow-Origin', 'http://localhost:4201');

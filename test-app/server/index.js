@@ -5,10 +5,10 @@ module.exports = function() {
   const express = require('express');
   const app = express();
   const { globSync } = require('glob');
-  var mocks = globSync('server/mocks/api/*.js', {cwd: process.cwd()});
+  const mocks = globSync('server/mocks/api/*.js', {cwd: process.cwd()});
 
   // Log proxy requests
-  var morgan  = require('morgan');
+  const morgan  = require('morgan');
   app.use(morgan('dev'));
 
   app.get('/api/helloworld', function(req, res) {
@@ -25,7 +25,7 @@ module.exports = function() {
 
   mocks.map(function(cwd, len, fileNames) {
     fileNames.forEach(function(fileName) {
-      var route = require('.' + fileName.replace('server', ''));
+      const route = require('.' + fileName.replace('server', ''));
       route(app);
     })
   });
