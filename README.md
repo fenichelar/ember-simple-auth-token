@@ -235,7 +235,7 @@ const decodedHeader = {
   'typ': 'JWT'
 };
 const decodedPayload = {
-  'username': 'john',
+  'username': 'username',
   'exp': 98343234 // <ISO-8601> UTC seconds
 };
 ```
