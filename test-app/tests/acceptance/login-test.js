@@ -13,8 +13,8 @@ module('Acceptance | login', function (hooks) {
 
     assert.strictEqual(currentURL(), '/login');
 
-    await fillIn('#username', 'admin');
-    await fillIn('#password', 'abc123');
+    await fillIn('#username', 'username');
+    await fillIn('#password', 'password');
 
     await click('#btn-login');
 
@@ -35,7 +35,7 @@ module('Acceptance | login', function (hooks) {
 
     assert.strictEqual(currentURL(), '/login');
 
-    await fillIn('#username', 'admin');
+    await fillIn('#username', 'username');
     await fillIn('#password', 'invalid');
 
     await click('#btn-login');

@@ -8,8 +8,8 @@ export default class LoginController extends Controller {
   @service router;
 
   @tracked errorMessage = '';
-  username = 'admin';
-  password = 'abc123';
+  username = 'username';
+  password = 'password';
 
   @action
   async authenticate(e) {

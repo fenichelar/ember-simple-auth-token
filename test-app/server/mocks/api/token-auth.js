@@ -8,7 +8,7 @@ module.exports = function(app) {
     res.set('Access-Control-Allow-Origin', 'http://localhost:4201');
     res.set('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
 
-    if (req.body.username !== 'admin' || req.body.password !== 'abc123') {
+    if (req.body.username !== 'username' || req.body.password !== 'password') {
       return res.send(401);
     }
 

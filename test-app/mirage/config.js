@@ -1,15 +1,15 @@
 import { createServer, Response } from 'miragejs';
 import { sign, verify } from 'jsonwebtoken';
 
-const secret = '0123456789';
+const secret = 'secret';
 const algorithm = 'HS512';
 const expiration = '5m';
 
 const payload = {
   userAccount: {
-    id: '7a887474-26bb-43ec-a063-6b8c6aba727e',
-    firstName: 'test',
-    lastName: 'user'
+    id: 'id',
+    firstName: 'firstName',
+    lastName: 'lastName'
   }
 };
 
@@ -54,7 +54,7 @@ function routes() {
 
   this.post('/token-auth', function(schema, request) {
     let body = JSON.parse(request.requestBody);
-    if (body.username === 'admin' && body.password === 'abc123') {
+    if (body.username === 'username' && body.password === 'password') {
       let token = sign(payload, secret, options);
       return {
         token: token,

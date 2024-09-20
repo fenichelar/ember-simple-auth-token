@@ -12,8 +12,8 @@ module('Unit | Authenticator | authenticators/token.js', function (hooks) {
 
   const createFakeCredentials = () => {
     return {
-      username: 'admin',
-      password: 'abc123'
+      username: 'username',
+      password: 'password'
     };
   };
 
@@ -109,7 +109,7 @@ module('Unit | Authenticator | authenticators/token.js', function (hooks) {
     assert.expect(1);
 
     const response = {
-      token: 'secret token!'
+      token: 'token'
     };
 
     this.server.post('/token-auth', () => ({
@@ -143,7 +143,7 @@ module('Unit | Authenticator | authenticators/token.js', function (hooks) {
     assert.expect(1);
 
     const response = {
-      token: 'secret token!'
+      token: 'token'
     };
     const credentials = createFakeCredentials();
 
@@ -162,7 +162,7 @@ module('Unit | Authenticator | authenticators/token.js', function (hooks) {
     this.owner.application.token.tokenPropertyName = 'auth.nested.token';
 
     const response = {
-      token: 'secret token!'
+      token: 'token'
     };
     const credentials = createFakeCredentials();
 
@@ -238,7 +238,7 @@ module('Unit | Authenticator | authenticators/token.js', function (hooks) {
   test('#authenticate rejects with the correct error', function(assert) {
     assert.expect(1);
 
-    this.owner.application.token.authenticate({username: 'admin', password: 'incorrectPassword'}).catch(error => {
+    this.owner.application.token.authenticate({username: 'username', password: 'incorrectPassword'}).catch(error => {
       assert.strictEqual(error.status, 401);
     });
   });

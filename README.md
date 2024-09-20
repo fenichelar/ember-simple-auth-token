@@ -167,8 +167,8 @@ import { action } from '@ember/object';
 export default class LoginController extends Controller {
   @service session;
   @service router;
-  username = 'admin';
-  password = 'abc123';
+  username = 'username';
+  password = 'password';
 
   @action
   async authenticate(e) {

@@ -5,13 +5,13 @@ import { getSettledState } from '@ember/test-helpers';
 import { sign } from 'jsonwebtoken';
 import sinon from 'sinon';
 
-const secret = '0123456789';
+const secret = 'secret';
 
 const payload = {
   userAccount: {
-    id: '7a887474-26bb-43ec-a063-6b8c6aba727e',
-    firstName: 'test',
-    lastName: 'user'
+    id: 'id',
+    firstName: 'firstName',
+    lastName: 'lastName'
   }
 };
 
@@ -30,8 +30,8 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
 
   const createFakeCredentials = () => {
     return {
-      username: 'admin',
-      password: 'abc123'
+      username: 'username',
+      password: 'password'
     };
   };
 
@@ -435,7 +435,7 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
   test('#authenticate rejects with the correct error', function(assert) {
     assert.expect(1);
 
-    this.owner.application.jwt.authenticate({username: 'admin', password: 'incorrectPassword'}).catch(error => {
+    this.owner.application.jwt.authenticate({username: 'username', password: 'incorrectPassword'}).catch(error => {
       assert.strictEqual(error.status, 401);
     });
   });
