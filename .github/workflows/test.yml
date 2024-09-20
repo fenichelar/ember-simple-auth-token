@@ -10,85 +10,35 @@ jobs:
     continue-on-error: ${{ matrix.experimental }}
     strategy:
       matrix:
+        node:
+          - v16
+          - v18
+          - v20
         scenario:
-          - ember-lts-2.16-ember-simple-auth-1.6
-          - ember-lts-2.16-ember-simple-auth-2.0
-          - ember-lts-2.18-ember-simple-auth-1.6
-          - ember-lts-2.18-ember-simple-auth-2.0
-          - ember-lts-3.4-ember-simple-auth-1.6
-          - ember-lts-3.4-ember-simple-auth-2.0
-          - ember-lts-3.4-ember-simple-auth-3.0
-          - ember-lts-3.4-ember-simple-auth-4.0
-          - ember-lts-3.4-ember-simple-auth-5.0
-          - ember-lts-3.8-ember-simple-auth-1.6
-          - ember-lts-3.8-ember-simple-auth-2.0
-          - ember-lts-3.8-ember-simple-auth-3.0
-          - ember-lts-3.8-ember-simple-auth-4.0
-          - ember-lts-3.8-ember-simple-auth-5.0
-          - ember-lts-3.12-ember-simple-auth-1.6
-          - ember-lts-3.12-ember-simple-auth-2.0
-          - ember-lts-3.12-ember-simple-auth-3.0
-          - ember-lts-3.12-ember-simple-auth-4.0
-          - ember-lts-3.12-ember-simple-auth-5.0
-          - ember-lts-3.16-ember-simple-auth-1.6
-          - ember-lts-3.16-ember-simple-auth-2.0
-          - ember-lts-3.16-ember-simple-auth-3.0
-          - ember-lts-3.16-ember-simple-auth-4.0
-          - ember-lts-3.16-ember-simple-auth-5.0
-          - ember-lts-3.20-ember-simple-auth-1.6
-          - ember-lts-3.20-ember-simple-auth-2.0
-          - ember-lts-3.20-ember-simple-auth-3.0
-          - ember-lts-3.20-ember-simple-auth-4.0
-          - ember-lts-3.20-ember-simple-auth-5.0
-          - ember-lts-3.24-ember-simple-auth-1.6
-          - ember-lts-3.24-ember-simple-auth-2.0
-          - ember-lts-3.24-ember-simple-auth-3.0
-          - ember-lts-3.24-ember-simple-auth-4.0
-          - ember-lts-3.24-ember-simple-auth-5.0
-          - ember-lts-3.28-ember-simple-auth-1.6
-          - ember-lts-3.28-ember-simple-auth-2.0
-          - ember-lts-3.28-ember-simple-auth-3.0
-          - ember-lts-3.28-ember-simple-auth-4.0
-          - ember-lts-3.28-ember-simple-auth-5.0
+          - ember-lts-4.4-ember-simple-auth-6.0
+          - ember-lts-4.8-ember-simple-auth-6.0
+          - ember-lts-4.12-ember-simple-auth-6.0
+          - ember-lts-5.4-ember-simple-auth-6.0
+          - ember-lts-5.8-ember-simple-auth-6.0
         experimental:
           - false
         include:
-          - scenario: ember-release-ember-simple-auth-1.6
+          - scenario: ember-release-ember-simple-auth-6.0
+            node: v20
             experimental: true
-          - scenario: ember-release-ember-simple-auth-2.0
+          - scenario: ember-beta-ember-simple-auth-6.0
+            node: v20
             experimental: true
-          - scenario: ember-release-ember-simple-auth-3.0
-            experimental: true
-          - scenario: ember-release-ember-simple-auth-4.0
-            experimental: true
-          - scenario: ember-release-ember-simple-auth-5.0
-            experimental: true
-          - scenario: ember-beta-ember-simple-auth-1.6
-            experimental: true
-          - scenario: ember-beta-ember-simple-auth-2.0
-            experimental: true
-          - scenario: ember-beta-ember-simple-auth-3.0
-            experimental: true
-          - scenario: ember-beta-ember-simple-auth-4.0
-            experimental: true
-          - scenario: ember-beta-ember-simple-auth-5.0
-            experimental: true
-          - scenario: ember-canary-ember-simple-auth-1.6
-            experimental: true
-          - scenario: ember-canary-ember-simple-auth-2.0
-            experimental: true
-          - scenario: ember-canary-ember-simple-auth-3.0
-            experimental: true
-          - scenario: ember-canary-ember-simple-auth-4.0
-            experimental: true
-          - scenario: ember-canary-ember-simple-auth-5.0
+          - scenario: ember-canary-ember-simple-auth-6.0
+            node: v20
             experimental: true
     steps:
     - uses: actions/checkout@v4
-    - name: Test scenario ${{ matrix.scenario }}
-      uses: actions/setup-node@v3
+    - name: Test scenario ${{ matrix.scenario }} using node ${{ matrix.node }}
+      uses: actions/setup-node@v4
       with:
-        node-version: 14.x
+        node-version: ${{ matrix.node }}
     - run: npm ci
-    - run: npm run lint:js
-    - run: npm run test:one ${{ matrix.scenario }} --skip-cleanup
+    - run: npm run lint
+    - run: npm run test:ember ${{ matrix.scenario }} --skip-cleanup
+      working-directory: test-app

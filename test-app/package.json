@@ -1,0 +1,92 @@
+{
+  "name": "test-app",
+  "private": true,
+  "description": "Test app for ember-simple-auth-token addon",
+  "repository": "https://github.com/fenichelar/ember-simple-auth-token",
+  "license": "MIT",
+  "author": {
+    "name": "Alec Fenichel"
+  },
+  "directories": {
+    "doc": "doc",
+    "test": "tests"
+  },
+  "scripts": {
+    "build": "ember build --environment=production",
+    "lint": "concurrently \"npm:lint:*(!fix)\" --names \"lint:\"",
+    "lint:css": "stylelint \"**/*.css\"",
+    "lint:css:fix": "concurrently \"npm:lint:css -- --fix\"",
+    "lint:fix": "concurrently \"npm:lint:*:fix\" --names \"fix:\"",
+    "lint:hbs": "ember-template-lint .",
+    "lint:hbs:fix": "ember-template-lint . --fix",
+    "lint:js": "eslint . --cache",
+    "lint:js:fix": "eslint . --fix",
+    "start": "ember serve",
+    "test": "concurrently \"npm:lint\" \"npm:test:*\" --names \"lint,test:\"",
+    "test:ember": "ember test"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "@babel/eslint-parser": "^7.23.10",
+    "@babel/plugin-proposal-decorators": "^7.24.0",
+    "@ember/optional-features": "^2.1.0",
+    "@ember/string": "^3.1.1",
+    "@ember/test-helpers": "^3.3.0",
+    "@embroider/compat": "^3.6.0",
+    "@embroider/test-setup": "^4.0.0",
+    "@embroider/webpack": "^4.0.4",
+    "@glimmer/component": "^1.1.2",
+    "@glimmer/tracking": "^1.1.2",
+    "body-parser": "1.20.2",
+    "broccoli-asset-rev": "^3.0.0",
+    "concurrently": "^8.2.2",
+    "ember-auto-import": "^2.7.2",
+    "ember-cli": "~5.10.0",
+    "ember-cli-app-version": "^6.0.1",
+    "ember-cli-babel": "^8.2.0",
+    "ember-cli-clean-css": "^3.0.0",
+    "ember-cli-dependency-checker": "^3.3.2",
+    "ember-cli-htmlbars": "^6.3.0",
+    "ember-cli-inject-live-reload": "^2.1.0",
+    "ember-cli-mirage": "3.0.3",
+    "ember-cli-sri": "^2.1.1",
+    "ember-cli-terser": "^4.0.2",
+    "ember-data": "~5.3.3",
+    "ember-load-initializers": "^2.1.2",
+    "ember-modifier": "^4.1.0",
+    "ember-qunit": "^8.0.2",
+    "ember-resolver": "^11.0.1",
+    "ember-simple-auth": "~6.0.0",
+    "ember-simple-auth-token": "^6.0.0",
+    "ember-source": "~5.4.1",
+    "ember-source-channel-url": "^3.0.0",
+    "ember-template-lint": "^5.13.0",
+    "ember-try": "^3.0.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-ember": "^11.12.0",
+    "eslint-plugin-n": "^16.6.2",
+    "eslint-plugin-qunit": "^8.1.1",
+    "express": "4.19.2",
+    "glob": "10.3.12",
+    "jsonwebtoken": "8.5.1",
+    "loader.js": "^4.7.0",
+    "morgan": "1.10.0",
+    "node-polyfill-webpack-plugin": "^3.0.0",
+    "qunit": "^2.20.1",
+    "qunit-dom": "^2.0.0",
+    "sinon": "4.2.2",
+    "stylelint": "^15.11.0",
+    "stylelint-config-standard": "^34.0.0",
+    "tracked-built-ins": "^3.3.0",
+    "webpack": "^5.90.3"
+  },
+  "peerDependencies": {
+    "miragejs": "0.1.48"
+  },
+  "engines": {
+    "node": ">= 16 <=20"
+  },
+  "ember": {
+    "edition": "octane"
+  }
+}
