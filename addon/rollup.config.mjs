@@ -21,12 +21,7 @@ export default {
     // is aligned to the config here.
     // See https://github.com/embroider-build/embroider/blob/main/docs/v2-faq.md#how-can-i-define-the-public-exports-of-my-addon
     addon.publicEntrypoints([
-      '**/*.js',
-      //'index.js',
-      'services/**/*.js',
-      'session-stores/**/*.js',
       'authenticators/**/*.js',
-      'configuration.js',
     ]),
 
     // These are the modules that should get reexported into the traditional

@@ -16,7 +16,6 @@
   },
   "files": [
     "addon-main.cjs",
-    "declarations",
     "dist"
   ],
   "scripts": {
