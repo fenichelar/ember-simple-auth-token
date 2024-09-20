@@ -18,7 +18,7 @@ module.exports = function(app) {
       }
       return res.send({
         token: token,
-        refresh_token: token
+        refresh_token: token,
       });
     });
   });

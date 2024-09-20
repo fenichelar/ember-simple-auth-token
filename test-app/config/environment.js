@@ -41,11 +41,11 @@ module.exports = function (environment) {
       serverTokenEndpoint: 'http://localhost:3000/api/token-auth',
       serverTokenRefreshEndpoint: 'http://localhost:3000/api/token-refresh/',
       refreshAccessTokens: true,
-      refreshLeeway: 1
+      refreshLeeway: 1,
     }
 
     ENV['ember-cli-mirage'] = {
-      enabled: false
+      enabled: false,
     };
     ENV.api = 'http://localhost:3000';
   }
@@ -55,11 +55,11 @@ module.exports = function (environment) {
       serverTokenEndpoint: 'http://localhost:8080/api/token-auth',
       serverTokenRefreshEndpoint: 'http://localhost:8080/api/token-refresh/',
       refreshAccessTokens: true,
-      refreshLeeway: 1
+      refreshLeeway: 1,
     }
 
     ENV['ember-cli-mirage'] = {
-      enabled: true
+      enabled: true,
     };
     ENV.api = 'http://localhost:8080';
   }
@@ -70,11 +70,11 @@ module.exports = function (environment) {
       serverTokenRefreshEndpoint: 'http://localhost:8080/api/token-refresh/',
       refreshAccessTokens: false,
       refreshLeeway: 1,
-      disableScheduleAccessTokenExpiration: true
+      disableScheduleAccessTokenExpiration: true,
     }
 
     ENV['ember-cli-mirage'] = {
-      enabled: false // mirage is started in the tests
+      enabled: false, // mirage is started in the tests
     };
     ENV.api = 'http://localhost:8080';
     ENV.locationType = 'none';
@@ -90,11 +90,11 @@ module.exports = function (environment) {
       serverTokenRefreshEndpoint: 'http://localhost:8080/api/token-refresh/',
       refreshAccessTokens: false,
       refreshLeeway: 1,
-      disableScheduleAccessTokenExpiration: true
+      disableScheduleAccessTokenExpiration: true,
     }
 
     ENV['ember-cli-mirage'] = {
-      enabled: true
+      enabled: true,
     };
     ENV.api = 'http://localhost:8080';
     // Testem prefers this...

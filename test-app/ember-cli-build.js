@@ -7,7 +7,7 @@ module.exports = function (defaults) {
   let app = new EmberApp(defaults, {
     autoImport: {
       watchDependencies: ['ember-simple-auth-token'],
-    }
+    },
   });
 
   /*const { maybeEmbroider } = require('@embroider/test-setup');
@@ -20,10 +20,10 @@ module.exports = function (defaults) {
         node: {global: true},
         plugins: [
           new NodePolyfillPlugin({
-            includeAliases: ['Buffer', 'crypto', 'fs', 'process', 'stream', 'util', 'vm']
-          })
+            includeAliases: ['Buffer', 'crypto', 'fs', 'process', 'stream', 'util', 'vm'],
+          }),
         ],
-        devtool: 'eval-source-map' // optional for browser tools debugging
+        devtool: 'eval-source-map', // optional for browser tools debugging
       },
     },
   });

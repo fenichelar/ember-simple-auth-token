@@ -11,7 +11,7 @@ module.exports = function(app) {
     jwt.verify(req.body.refresh_token, 'secret', function(err, decoded) {
       if (err) {
         return res.status(401).send({
-          error: err
+          error: err,
         });
       } else {
         delete decoded.iat;
@@ -19,7 +19,7 @@ module.exports = function(app) {
         var token = jwt.sign(decoded, 'secret', { expiresIn: '5m' });
         return res.send({
           token: token,
-          refresh_token: token
+          refresh_token: token,
         });
       }
     });

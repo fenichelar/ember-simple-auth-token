@@ -9,13 +9,13 @@ const payload = {
   userAccount: {
     id: 'id',
     firstName: 'firstName',
-    lastName: 'lastName'
-  }
+    lastName: 'lastName',
+  },
 };
 
 const options = {
   expiresIn: expiration,
-  algorithm: algorithm
+  algorithm: algorithm,
 };
 
 export default function (config) {
@@ -58,7 +58,7 @@ function routes() {
       let token = sign(payload, secret, options);
       return {
         token: token,
-        refresh_token: token
+        refresh_token: token,
       };
     } else {
       return new Response(401, {}, {errors: [{status: 401, message: 'Incorrect email or password'}]});
@@ -75,7 +75,7 @@ function routes() {
         let token = sign(decoded, secret, options);
         return {
           token: token,
-          refresh_token: token
+          refresh_token: token,
         };
       }
     });

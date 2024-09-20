@@ -21,7 +21,9 @@ module.exports = {
   env: {
     browser: true,
   },
-  rules: {},
+  rules: {
+    'comma-dangle': ['error', 'always-multiline'],
+  },
   overrides: [
     // node files
     {
