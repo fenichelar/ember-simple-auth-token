@@ -37,7 +37,7 @@
     "@embroider/webpack": "^4.0.4",
     "@glimmer/component": "^1.1.2",
     "@glimmer/tracking": "^1.1.2",
-    "body-parser": "1.20.2",
+    "body-parser": "^1.20.3",
     "broccoli-asset-rev": "^3.0.0",
     "concurrently": "^8.2.2",
     "ember-auto-import": "^2.7.2",
@@ -66,22 +66,22 @@
     "eslint-plugin-ember": "^11.12.0",
     "eslint-plugin-n": "^16.6.2",
     "eslint-plugin-qunit": "^8.1.1",
-    "express": "4.19.2",
-    "glob": "10.3.12",
-    "jsonwebtoken": "8.5.1",
+    "express": "^4.21.0",
+    "glob": "^10.3.12",
+    "jsonwebtoken": "^8.5.1",
     "loader.js": "^4.7.0",
-    "morgan": "1.10.0",
+    "morgan": "^1.10.0",
     "node-polyfill-webpack-plugin": "^3.0.0",
     "qunit": "^2.20.1",
     "qunit-dom": "^2.0.0",
-    "sinon": "4.2.2",
+    "sinon": "^4.2.2",
     "stylelint": "^15.11.0",
     "stylelint-config-standard": "^34.0.0",
     "tracked-built-ins": "^3.3.0",
     "webpack": "^5.90.3"
   },
   "peerDependencies": {
-    "miragejs": "0.1.48"
+    "miragejs": "^0.1.48"
   },
   "engines": {
     "node": ">= 16 <=20"
