@@ -1,7 +1,10 @@
 {
   "name": "root",
   "private": true,
-  "repository": "https://github.com/fenichelar/ember-simple-auth-token",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fenichelar/ember-simple-auth-token.git"
+  },
   "license": "MIT",
   "author": {
     "name": "Alec Fenichel"
@@ -29,5 +32,6 @@
   "workspaces": [
     "addon",
     "test-app"
-  ]
+  ],
+  "version": ""
 }

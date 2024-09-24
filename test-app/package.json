@@ -2,7 +2,10 @@
   "name": "test-app",
   "private": true,
   "description": "Test app for ember-simple-auth-token addon",
-  "repository": "https://github.com/fenichelar/ember-simple-auth-token",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fenichelar/ember-simple-auth-token.git"
+  },
   "license": "MIT",
   "author": {
     "name": "Alec Fenichel"
@@ -88,5 +91,6 @@
   },
   "ember": {
     "edition": "octane"
-  }
+  },
+  "version": ""
 }
