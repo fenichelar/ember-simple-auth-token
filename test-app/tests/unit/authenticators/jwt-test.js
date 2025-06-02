@@ -658,4 +658,26 @@ module('Unit | Authenticator | authenticators/jwt.js', function (hooks) {
     assert.strictEqual(data.data.user.name, 'Thorbjørn Hermansen');
   });
 
+  test('#handleAuthResponse uses custom tokenDataPropertyName', function(assert) {
+    assert.expect(2);
+
+    const customPropertyName = 'customTokenData';
+    this.owner.application.jwt.tokenDataPropertyName = customPropertyName;
+
+    const token = createFakeToken();
+    const refreshToken = createFakeToken();
+    const credentials = createFakeCredentials();
+    const expectedTokenData = this.owner.application.jwt.getTokenData(token);
+
+    this.server.post('/token-auth', () => ({
+      token: token,
+      refresh_token: refreshToken
+    }), 200);
+
+    this.owner.application.jwt.authenticate(credentials).then(data => {
+      assert.ok(data[customPropertyName], 'Session data contains custom property name');
+      assert.deepEqual(data[customPropertyName], expectedTokenData, 'Custom property contains correct token data');
+      clearState(this.owner.application.jwt);
+    });
+  });
 });

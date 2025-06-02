@@ -288,7 +288,7 @@ export default class JwtAuthenticator extends TokenAuthenticator {
       this.scheduleAccessTokenRefresh(expiresAt, refreshToken);
     }
 
-    return {...response, ...tokenExpireData, tokenData: tokenData};
+    return {...response, ...tokenExpireData, [this.tokenDataPropertyName]: tokenData};
   }
 
   /**
