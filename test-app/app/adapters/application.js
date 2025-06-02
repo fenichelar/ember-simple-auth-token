@@ -17,10 +17,4 @@ export default class ApplicationAdapter extends JSONAPIAdapter {
       return {};
     }
   }
-
-  handleResponse(status) {
-    if (status === 401 && this.session.isAuthenticated) {
-      this.session.invalidate();
-    }
-  }
 }
