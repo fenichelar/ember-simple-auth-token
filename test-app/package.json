@@ -70,7 +70,7 @@
     "eslint-plugin-n": "^16.6.2",
     "eslint-plugin-qunit": "^8.1.1",
     "express": "^4.21.0",
-    "glob": "^10.3.12",
+    "glob": "^10.5.0",
     "jsonwebtoken": "^8.5.1",
     "loader.js": "^4.7.0",
     "morgan": "^1.10.0",
